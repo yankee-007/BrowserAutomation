@@ -1,0 +1,4 @@
+# PageSense Controller dependencies.
+# Deliberately minimal: one WebSocket library, nothing else.
+# No web framework, no database, no queue, no LLM SDK.
+websockets>=12.0

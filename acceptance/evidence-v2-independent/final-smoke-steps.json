@@ -1,0 +1,102 @@
+[
+  {
+    "step": "1. 全新 Controller 启动",
+    "ok": true,
+    "detail": "connected=False"
+  },
+  {
+    "step": "2. 重新加载扩展后自动 CONNECTED",
+    "ok": true,
+    "detail": "waited 0.0s"
+  },
+  {
+    "step": "3. CONNECT：桥接状态与版本",
+    "ok": true,
+    "detail": "{\"state\": \"CONNECTED\", \"connected\": true, \"host\": \"127.0.0.1\", \"port\": 8765, \"hasToken\": true, \"autoconnect\": true, \"protocol\": \"pagesense/1\", \"version\": \"2.0.0"
+  },
+  {
+    "step": "4. 活动页面为 demo.html",
+    "ok": true,
+    "detail": "{\"id\": 1518572798, \"url\": \"http://127.0.0.1:8770/test/demo.html\", \"title\": \"PageSense Demo Page\"}"
+  },
+  {
+    "step": "5. SCAN 返回真实 DOM 数据",
+    "ok": true,
+    "detail": "{\"matched\": 34, \"total\": 28, \"hidden\": 6, \"inViewport\": 17}"
+  },
+  {
+    "step": "6. SCAN 的元素与真实 DOM 映射一致",
+    "ok": true,
+    "detail": "mapped=28 stats=28"
+  },
+  {
+    "step": "7. SEARCH 命中且 elementId 指向真实节点",
+    "ok": true,
+    "detail": "total=1 node={\"domId\": null, \"tag\": \"button\", \"text\": \"立即沟通\", \"value\": \"\", \"rect\": {\"x\": 279, \"y\": 345, \"w\": 81, \"h\": 37}, \"pageX\": 2"
+  },
+  {
+    "step": "8. 取得 input/click 元素的 elementId",
+    "ok": true,
+    "detail": "input=25 click=24"
+  },
+  {
+    "step": "9. HIGHLIGHT 产生 1 个 overlay 且矩形贴合目标",
+    "ok": true,
+    "detail": "{\"overlay\": {\"x\": 380, \"y\": 483, \"w\": 81, \"h\": 37}, \"target\": {\"x\": 380, \"y\": 483, \"w\": 81, \"h\": 37}, \"targetExists\": true, \"label\": \"#24 <button> 测试点击\", \"overlayCount\": 1, \"overlayTotal\": 2}"
+  },
+  {
+    "step": "10. INPUT 后真实 DOM value 正确",
+    "ok": true,
+    "detail": "value='AI应用工程师'"
+  },
+  {
+    "step": "11. CLICK 使真实计数器 +1",
+    "ok": true,
+    "detail": "0 -> 1"
+  },
+  {
+    "step": "12. KEYPRESS Enter 被真实页面记录",
+    "ok": true,
+    "detail": "lastKey='Enter'"
+  },
+  {
+    "step": "13. SCROLL down 真实改变 scrollY",
+    "ok": true,
+    "detail": "scrollY=500"
+  },
+  {
+    "step": "14. 再次 SCAN 与真实 DOM 一致",
+    "ok": true,
+    "detail": "stats=28 elements=28 mapped=28"
+  },
+  {
+    "step": "15. 最终 DOM 状态正确（输入保留、无残留 overlay、映射干净）",
+    "ok": true,
+    "detail": "value='AI应用工程师' overlays=0"
+  },
+  {
+    "step": "16. 停止 Controller 后扩展离开 CONNECTED",
+    "ok": true,
+    "detail": "state=ERROR"
+  },
+  {
+    "step": "17. 不再显示假连接（不会停在 CONNECTED）",
+    "ok": true,
+    "detail": "state=ERROR"
+  },
+  {
+    "step": "18. 重启 Controller 后自动恢复 CONNECTED",
+    "ok": true,
+    "detail": "waited 1.0s"
+  },
+  {
+    "step": "19. 重连后再次 SCAN 正常",
+    "ok": true,
+    "detail": "{\"matched\": 34, \"total\": 28, \"hidden\": 6, \"inViewport\": 11}"
+  },
+  {
+    "step": "20. 全流程无未捕获异常 / 未处理 rejection",
+    "ok": true,
+    "detail": "[]"
+  }
+]

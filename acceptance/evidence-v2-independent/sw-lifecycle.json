@@ -1,0 +1,114 @@
+[
+  {
+    "t": 1790619906.42,
+    "event": "connected",
+    "label": "A. 短间隔重启（立即恢复）"
+  },
+  {
+    "t": 1790619908.45,
+    "event": "controller_stopped",
+    "label": "A. 短间隔重启（立即恢复）",
+    "ext_state": "ERROR"
+  },
+  {
+    "t": 1790619909.44,
+    "event": "probe_no_wake",
+    "label": "A. 短间隔重启（立即恢复）",
+    "reconnected": true,
+    "waited": 1.0,
+    "ext_state": "CONNECTED"
+  },
+  {
+    "t": 1790619910.25,
+    "event": "scan_after_recovery",
+    "label": "A. 短间隔重启（立即恢复）",
+    "total": 28
+  },
+  {
+    "t": 1790619911.25,
+    "event": "connected",
+    "label": "B. 长间隔（45s）+ 无任何唤醒"
+  },
+  {
+    "t": 1790619913.27,
+    "event": "controller_stopped",
+    "label": "B. 长间隔（45s）+ 无任何唤醒",
+    "ext_state": "ERROR"
+  },
+  {
+    "t": 1790619983.29,
+    "event": "probe_no_wake",
+    "label": "B. 长间隔（45s）+ 无任何唤醒",
+    "reconnected": false,
+    "waited": 25.0,
+    "ext_state": "DISCONNECTED"
+  },
+  {
+    "t": 1790619984.29,
+    "event": "connected",
+    "label": "C. 长间隔（45s）+ 开 Popup 唤醒"
+  },
+  {
+    "t": 1790619986.31,
+    "event": "controller_stopped",
+    "label": "C. 长间隔（45s）+ 开 Popup 唤醒",
+    "ext_state": "ERROR"
+  },
+  {
+    "t": 1790620056.33,
+    "event": "probe_no_wake",
+    "label": "C. 长间隔（45s）+ 开 Popup 唤醒",
+    "reconnected": false,
+    "waited": 25.0,
+    "ext_state": "DISCONNECTED"
+  },
+  {
+    "t": 1790620057.56,
+    "event": "after_wake",
+    "label": "C. 长间隔（45s）+ 开 Popup 唤醒",
+    "wake": "popup",
+    "reconnected": true,
+    "waited": 0.0,
+    "ext_state": "CONNECTED"
+  },
+  {
+    "t": 1790620058.37,
+    "event": "scan_after_recovery",
+    "label": "C. 长间隔（45s）+ 开 Popup 唤醒",
+    "total": 28
+  },
+  {
+    "t": 1790620059.37,
+    "event": "connected",
+    "label": "D. 长间隔（45s）+ 切到 demo 标签页唤醒"
+  },
+  {
+    "t": 1790620061.39,
+    "event": "controller_stopped",
+    "label": "D. 长间隔（45s）+ 切到 demo 标签页唤醒",
+    "ext_state": "ERROR"
+  },
+  {
+    "t": 1790620131.41,
+    "event": "probe_no_wake",
+    "label": "D. 长间隔（45s）+ 切到 demo 标签页唤醒",
+    "reconnected": false,
+    "waited": 25.0,
+    "ext_state": "DISCONNECTED"
+  },
+  {
+    "t": 1790620131.64,
+    "event": "after_wake",
+    "label": "D. 长间隔（45s）+ 切到 demo 标签页唤醒",
+    "wake": "demo-tab",
+    "reconnected": true,
+    "waited": 0.0,
+    "ext_state": "CONNECTED"
+  },
+  {
+    "t": 1790620132.45,
+    "event": "scan_after_recovery",
+    "label": "D. 长间隔（45s）+ 切到 demo 标签页唤醒",
+    "total": 28
+  }
+]

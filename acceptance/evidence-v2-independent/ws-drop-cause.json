@@ -1,0 +1,177 @@
+[
+  {
+    "t": 1790618256.95,
+    "kind": "handler_enter"
+  },
+  {
+    "t": 1790618256.95,
+    "kind": "controller_state",
+    "connected": true,
+    "version": "2.0.0"
+  },
+  {
+    "t": 1790618256.95,
+    "kind": "MARK",
+    "label": "1000 (control)"
+  },
+  {
+    "t": 1790618259.37,
+    "kind": "controller_state",
+    "connected": false,
+    "version": null
+  },
+  {
+    "t": 1790618259.37,
+    "kind": "handler_EXC",
+    "exc_type": "TypeError",
+    "msg": "note() got multiple values for argument 'kind'"
+  },
+  {
+    "t": 1790618259.37,
+    "kind": "handler_exit",
+    "connected": false
+  },
+  {
+    "t": 1790618259.37,
+    "kind": "scan_FAIL",
+    "label": "1000 (control)",
+    "ms": 40.1,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618260.38,
+    "kind": "handler_enter"
+  },
+  {
+    "t": 1790618260.38,
+    "kind": "controller_state",
+    "connected": true,
+    "version": "2.0.0"
+  },
+  {
+    "t": 1790618260.39,
+    "kind": "after_fail",
+    "label": "1000 (control)",
+    "recovered": true,
+    "ext_state": "CONNECTED",
+    "ext_last_error": "null"
+  },
+  {
+    "t": 1790618260.39,
+    "kind": "ext_log",
+    "label": "1000 (control)",
+    "entries": "[{\"time\": \"01:56:41\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"6000 elements\"}, {\"time\": \"01:56:45\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"1500 elements\"}, {\"time\": \"01:56:48\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"2500 elements\"}, {\"time\": \"01:57:39\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"1000 elements\"}]"
+  },
+  {
+    "t": 1790618260.4,
+    "kind": "ext_console",
+    "label": "1000 (control)",
+    "items": "[]"
+  },
+  {
+    "t": 1790618260.9,
+    "kind": "MARK",
+    "label": "3000 (fails)"
+  },
+  {
+    "t": 1790618262.24,
+    "kind": "controller_state",
+    "connected": false,
+    "version": null
+  },
+  {
+    "t": 1790618262.24,
+    "kind": "handler_exit",
+    "connected": false
+  },
+  {
+    "t": 1790618262.24,
+    "kind": "scan_FAIL",
+    "label": "3000 (fails)",
+    "ms": 63.4,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618263.24,
+    "kind": "handler_enter"
+  },
+  {
+    "t": 1790618263.24,
+    "kind": "controller_state",
+    "connected": true,
+    "version": "2.0.0"
+  },
+  {
+    "t": 1790618263.25,
+    "kind": "after_fail",
+    "label": "3000 (fails)",
+    "recovered": true,
+    "ext_state": "CONNECTED",
+    "ext_last_error": "null"
+  },
+  {
+    "t": 1790618263.25,
+    "kind": "ext_log",
+    "label": "3000 (fails)",
+    "entries": "[{\"time\": \"01:56:45\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"1500 elements\"}, {\"time\": \"01:56:48\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"2500 elements\"}, {\"time\": \"01:57:39\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"1000 elements\"}, {\"time\": \"01:57:42\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"3000 elements\"}]"
+  },
+  {
+    "t": 1790618263.27,
+    "kind": "ext_console",
+    "label": "3000 (fails)",
+    "items": "[]"
+  },
+  {
+    "t": 1790618263.77,
+    "kind": "MARK",
+    "label": "3000 again"
+  },
+  {
+    "t": 1790618265.09,
+    "kind": "controller_state",
+    "connected": false,
+    "version": null
+  },
+  {
+    "t": 1790618265.09,
+    "kind": "handler_exit",
+    "connected": false
+  },
+  {
+    "t": 1790618265.1,
+    "kind": "scan_FAIL",
+    "label": "3000 again",
+    "ms": 66.7,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618266.1,
+    "kind": "handler_enter"
+  },
+  {
+    "t": 1790618266.1,
+    "kind": "controller_state",
+    "connected": true,
+    "version": "2.0.0"
+  },
+  {
+    "t": 1790618266.11,
+    "kind": "after_fail",
+    "label": "3000 again",
+    "recovered": true,
+    "ext_state": "CONNECTED",
+    "ext_last_error": "null"
+  },
+  {
+    "t": 1790618266.11,
+    "kind": "ext_log",
+    "label": "3000 again",
+    "entries": "[{\"time\": \"01:56:48\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"2500 elements\"}, {\"time\": \"01:57:39\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"1000 elements\"}, {\"time\": \"01:57:42\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"3000 elements\"}, {\"time\": \"01:57:45\", \"method\": \"SCAN_PAGE\", \"success\": true, \"summary\": \"3000 elements\"}]"
+  },
+  {
+    "t": 1790618266.12,
+    "kind": "ext_console",
+    "label": "3000 again",
+    "items": "[]"
+  }
+]

@@ -1,0 +1,355 @@
+TEST scanner-unit.js EXIT 0
+PASS  U01 button: tag/text
+PASS  U02 link: tag/text/href
+PASS  U03 input: tag/placeholder
+PASS  U04 textarea: tag/placeholder
+PASS  U05a select 被识别
+PASS  U05b option 长沙 被识别（可见性跟随 select）
+PASS  U06 ARIA: role/ariaLabel/text
+PASS  U07a contenteditable: tag/text
+SKIP   U07b contenteditable 分类（jsdom 不实现 isContentEditable；由真实浏览器 E2E 覆盖）
+PASS  U08 display:none 被过滤
+PASS  U09 visibility:hidden 被过滤
+PASS  U10 opacity:0 被过滤
+PASS  U11 width/height=0 被过滤
+PASS  U12 混合: matched/total/hidden
+PASS  U13 elementId 1..N 唯一
+PASS  U14 text=提交
+PASS  U15 aria-label 回退=关闭
+PASS  U16 placeholder 回退=搜索职位
+PASS  U17 1000 字符截断为 300
+PASS  U18 value 优先于 placeholder
+PASS  U19 title 回退=提示
+PASS  U20 alt 回退=图片按钮
+PASS  U21 特殊字符 JSON roundtrip 成功且文本保留
+PASS  U22 page 字段完整
+PASS  U22b 顶层 page/stats/elements 存在
+PASS  U23a stats.total === elements.length
+PASS  U23b stats.inViewport 与数据一致
+PASS  U23c stats.matched/hidden 一致
+PASS  U24 空页面不崩溃，返回空 elements
+PASS  VT1 扫描后真实 DOM 写入映射，elementId 与属性一致
+PASS  VT2 映射唯一且每个 elementId 解析到对应节点
+PASS  VT2b 非法 elementId 返回 null
+PASS  VT3 重新扫描清理旧映射并正确重建
+
+SCANNER UNIT SUMMARY: ALL PASS
+TEST highlighter-unit.js EXIT 0
+PASS  VH1 highlight 返回 success
+PASS  VH2 Overlay 与标签被创建
+PASS  VH3 标签显示 #id <tag> 文本
+PASS  VH4 连续高亮后仅一个 Overlay，且属于最新元素
+PASS  VH5 CLEAR 移除 Overlay 且重复调用安全
+PASS  VH6 locate 存在元素 success
+PASS  VH7 locate 缺失元素返回 ELEMENT_NOT_FOUND
+PASS  VH8 非法 id 返回 INVALID_ELEMENT_ID
+PASS  VH9 高亮元素被删除后 Overlay 自动移除
+PASS  VH10 删除后再次定位返回 ELEMENT_NOT_FOUND
+
+HIGHLIGHTER UNIT SUMMARY: ALL PASS
+TEST action-unit.js EXIT 0
+PASS  A01 click success envelope shape
+PASS  A020 click invalid id -> INVALID_ELEMENT_ID (null)
+PASS  A021 click invalid id -> INVALID_ELEMENT_ID (undefined)
+PASS  A022 click invalid id -> INVALID_ELEMENT_ID (-1)
+PASS  A023 click invalid id -> INVALID_ELEMENT_ID (0)
+PASS  A024 click invalid id -> INVALID_ELEMENT_ID ("abc")
+PASS  A03 click missing id -> ELEMENT_NOT_FOUND
+PASS  A04 click disabled -> ELEMENT_DISABLED
+PASS  A04b click aria-disabled -> ELEMENT_DISABLED
+PASS  A05 input text success + events + readback
+PASS  A06 input textarea success
+PASS  A07 input contenteditable success
+PASS  A08 input unsupported -> UNSUPPORTED_ELEMENT
+PASS  A09 input non-string value -> INVALID_VALUE
+PASS  A10 clear empties value (action CLEAR_ELEMENT)
+PASS  A11 keypress Enter fires keydown/keyup
+PASS  A12 keypress invalid -> INVALID_KEY
+PASS  A13 keypress Space alias normalized
+PASS  A13b keypress ArrowDown no rescan hint
+PASS  A14 scroll down returns before/after + moved
+PASS  A14b scroll up returns to 0
+PASS  A15a scroll invalid direction -> INVALID_VALUE
+PASS  A150 scroll invalid amount 0 -> INVALID_VALUE
+PASS  A151 scroll invalid amount -5 -> INVALID_VALUE
+PASS  A152 scroll invalid amount NaN -> INVALID_VALUE
+PASS  A153 scroll invalid amount Infinity -> INVALID_VALUE
+PASS  A154 scroll invalid amount 99999 -> INVALID_VALUE
+PASS  A15c scroll at boundary -> moved false, still success
+PASS  A17a isTextEntry: text input / CE
+PASS  A17b isClickable: button/link/checkbox, not text input
+PASS  A18 20 clicks -> counter exactly 20
+PASS  A19 20 inputs -> final value-20
+PASS  A20 mixed sequence no state pollution
+
+ACTION UNIT SUMMARY: ALL PASS
+TEST popup-ui.js EXIT 0
+PASS  P01 扫描后面板显示且渲染 8 张卡片
+PASS  P02 搜索 Python -> 1 张且为 Python开发工程师
+PASS  P03 搜索 沟通 -> 立即沟通
+PASS  P04 搜索 搜索 -> 按钮文本 + input placeholder 共 2 张
+PASS  P05 空搜索恢复全部 8 张
+PASS  P06 无结果显示空状态
+PASS  P07 Button 过滤: 4 button + role=button 共 5 张
+PASS  P08 Link 过滤: 2 张
+PASS  P09 Input 过滤: 1 张
+PASS  P10 Other 过滤: 0 张（空状态）
+PASS  P11 All 恢复 8 张
+PASS  P12 Button + 搜索 -> 仅搜索按钮 1 张
+PASS  P13 Button + 沟通 -> 立即沟通 1 张
+PASS  P14a Link + Python -> 1 张
+PASS  P14b Link + 沟通 -> 0 张
+PASS  P15 清空条件恢复 8 张
+PASS  P17 按 id 搜索 jobInput -> 1 张
+PASS  P18 按 className 搜索 -> 1 张
+PASS  P19 搜索 button -> 5 张（4 个 tag=button + 1 个 role=button 的 div，role 也在搜索范围）
+PASS  P20 Raw JSON 已生成且可解析
+
+POPUP UI SUMMARY: ALL PASS
+TEST v2-popup-ui.js EXIT 0
+PASS  V2P-01 扫描渲染 8 张卡片
+PASS  V2P-02 未搜索时状态行显示扫描元素总数
+PASS  V2P-03 有搜索结果时状态行同时显示扫描数与结果数
+PASS  V2P-04 精确文本匹配只返回 1 张
+PASS  V2P-05 卡片显示 matchedFields 与 score
+PASS  V2P-06 结果按相关度排序（exact text 100 在前，placeholder 次之）
+PASS  V2P-07 不同字段命中的卡片都被标注
+PASS  V2P-08 有查询时 × 按钮可见
+PASS  V2P-09 点击 × 清空查询并恢复全部元素
+PASS  V2P-10 清空后输入框为空
+PASS  V2P-11 清空后 × 按钮隐藏
+PASS  V2P-12 Ctrl+K 聚焦搜索框
+PASS  V2P-13 Ctrl+K 被 preventDefault（不触发浏览器默认行为）
+PASS  V2P-14 Escape 清空搜索
+PASS  V2P-15 query + Button 过滤（AND）
+PASS  V2P-16 query + Link 过滤（AND）
+PASS  V2P-17 query + Input 过滤（AND）
+PASS  V2P-18 过滤状态下状态行仍显示搜索结果数
+PASS  V2P-19 清空条件恢复 8 张
+PASS  V2P-20 重新扫描后搜索索引重建（旧结果不再出现）
+PASS  V2P-21 重新扫描后全量列表同步减少
+PASS  V2P-22 Controller 面板存在且默认可折叠
+PASS  V2P-23 Controller 面板显示 endpoint
+PASS  V2P-24 Controller 面板显示已连接状态
+PASS  V2P-25 连接状态圆点为已连接样式
+PASS  V2P-26 Controller 面板显示最近请求日志
+PASS  V2P-27 最近请求日志含方法与结果
+PASS  V2P-28 点击断开后状态变为未连接
+PASS  V2P-29 点击连接后状态变为已连接
+PASS  V2P-30 连接请求携带用户输入的端口与 token
+PASS  V2P-31 连接请求由 Popup 主动发起（host 固定 127.0.0.1）
+PASS  V2P-32 Popup 通过 Service Worker 消息控制连接（不在 Popup 建 WebSocket）
+PASS  SP-01 查询限于侧栏所属窗口
+PASS  SP-02 其他窗口切换不影响当前结果
+PASS  SP-03 切换标签页更新标题
+PASS  SP-04 切换后旧卡片、原始数据与操作入口清空
+PASS  SP-05 扫描请求正在等待响应
+PASS  SP-06 丢弃切换前迟到的扫描结果
+PASS  SP-07 新标签页可以重新扫描
+PASS  SP-08 刷新立即清空旧结果
+PASS  SP-09 同标签页导航清空结果并更新 URL
+PASS  SP-10 关闭当前标签页清空结果并切换标题
+
+V2 POPUP UI SUMMARY: ALL PASS
+TEST v2-search-unit.js EXIT 0
+PASS  S01a normalizeSearchText 折叠连续空格并小写
+PASS  S01b normalizeSearchText 处理全角空格
+PASS  S01c normalizeSearchText 中文不被破坏
+PASS  S01d normalizeSearchText null 安全
+PASS  S01e tokenize 空查询 -> []
+PASS  S02a 中文精确匹配 text -> score 100, matchedFields=[text]
+PASS  S02b 中文精确匹配 elementId 正确
+PASS  S02c 中文精确匹配 element 摘要字段完整
+PASS  S03a 中文包含匹配 -> 3 条命中
+PASS  S03b 中文 contains 命中 score=60（立即沟通 / 继续沟通）
+PASS  S03c 中文 startsWith 命中 score=80（沟通记录）
+PASS  S03d 中文全部命中 and matchedFields=text
+PASS  S03e 同分时按 elementId 升序（DOM 顺序）稳定
+PASS  S04a 英文大小写不敏感（小写查询命中大写文本）
+PASS  S04b 英文大小写不敏感（全大写多词查询命中）
+PASS  S04c 英文前缀匹配 score=80
+PASS  S04d 英文包含匹配 score=60
+PASS  S04e 英文大小写不敏感（混合大小写）
+PASS  S04f 英文精确匹配 score=100
+PASS  S05a 多关键词 AND：两个词都命中才返回
+PASS  S05b 多关键词命中 AI应用工程师
+PASS  S05c 多关键词分数为各词分数之和（80+60）
+PASS  S05d 多关键词需要全部命中（缺少一个词则不返回）
+PASS  S05e 多关键词关键词列表已归一化
+PASS  S06a placeholder 命中
+PASS  S06b placeholder 前缀匹配 score=40
+PASS  S06c placeholder 精确匹配 score=50
+PASS  S06d aria-label 命中
+PASS  S06e aria-label 精确 score=55
+PASS  S06f title 命中
+PASS  S06g id 精确匹配 score=45
+PASS  S06h className 包含匹配 score=20
+PASS  S06i tag 精确匹配命中全部 <button>（31/34/35 及 role=button 的 36）
+PASS  S06j tag 精确匹配 score=35
+PASS  S06k role 精确匹配（role=button 的 div）score=40 且排在 tag 命中之前
+PASS  S06l href 可被文本匹配
+PASS  S06m href 单字符关键词不参与匹配（避免命中所有链接）
+PASS  S07a 排序：exact > prefix > contains > placeholder
+PASS  S07b 分数单调递减
+PASS  S07c 更贴近用户目标的 exact 结果排在最前
+PASS  S08a 空 query 返回全部元素（不报错）
+PASS  S08b 空 query score=0
+PASS  S08c 空 query matchedFields 为空数组
+PASS  S08d 空 query 保持 DOM 顺序
+PASS  S08e 仅空格的 query 等同空 query
+PASS  S09a 无结果返回 total=0 且结果为空数组
+PASS  S09b 无结果 results 长度为 0
+PASS  S10a 默认 limit = 20
+PASS  S10b total 仍然报告全部命中数
+PASS  S10c truncated 标记为 true
+PASS  S10d 显式 limit 生效
+PASS  S10e limit 上限 100
+PASS  S10f limit 非法值回退默认 20
+PASS  S10g limit < 1 被夹取为 1
+PASS  S10h clampSearchLimit 上限
+PASS  S10i clampSearchLimit 默认
+PASS  S11a query + Button filter (AND)
+PASS  S11b query + Link filter (AND)
+PASS  S11c query + Input filter (AND)
+PASS  S11d query + Other filter (AND)
+PASS  S11e 无匹配类型时返回 0 而非报错
+PASS  S11f 空 query + Button filter 返回全部按钮
+PASS  S12a 索引失效后搜索返回 NO_SCAN_DATA
+PASS  S12b 索引失效时不返回任何结果
+PASS  S12c 重建索引后可搜索
+PASS  S12d 重新建索引后旧元素不可再被搜到
+PASS  S12e 重新建索引后新元素可被搜到
+PASS  S12f getIndexInfo 反映索引规模
+PASS  S13a element-search.js 不访问 DOM（搜索只基于 Scanner 数据）
+PASS  S13b element-search.js 不建立第二套 DOM 映射
+
+  search performance:
+     100 elements  build=1ms  search=0ms  hits=100
+     500 elements  build=0ms  search=1ms  hits=500
+    1000 elements  build=1ms  search=1ms  hits=1000
+PASS  S14a 100/500/1000 元素下搜索不卡顿（单次 < 250ms）
+PASS  S14b 搜索结果返回 durationMs 指标
+PASS  S14c 1000 元素全部命中多关键词查询
+
+V2 SEARCH UNIT SUMMARY: ALL PASS
+TEST static-check.js EXIT 0
+PASS  T01 manifest.json 存在且可解析
+PASS  T02 manifest_version === 3
+PASS  T03 name/version 合法
+PASS  T04 原生侧栏指向界面，工具栏不再使用临时弹窗
+PASS  T05 permissions 最小化 (activeTab, scripting, storage, sidePanel)
+PASS  T06 无高风险权限
+PASS  T07 无 MV2 配置 (browser_action/background.scripts)
+PASS  T08 无静态 content_scripts（按需注入设计）
+PASS  T09 manifest 引用文件全部存在
+PASS  T10 要求的全部文件存在
+PASS  T11 popup.html 引用的 CSS/JS/图片存在
+PASS  T12 popup.js 引用的 DOM ID 全部存在于 popup.html
+PASS  T13 popup.js 注入的脚本文件全部存在
+PASS  T13b 注入顺序正确（依赖在前）
+PASS  T14 无网站硬编码/反检测代码
+PASS  T15 constants 定义 LOCATE/HIGHLIGHT/CLEAR Action
+PASS  T16 constants 集中管理映射属性名与 Overlay 标识
+PASS  T17 data-pagesense-id 字符串未散落在其他文件
+PASS  T18 Overlay pointer-events:none（不拦截页面交互）
+PASS  T19 Overlay 使用最大 z-index
+PASS  T20 scroll/resize 经 requestAnimationFrame 节流
+PASS  T21 元素删除检测使用 isConnected
+PASS  T22 失效返回 ELEMENT_NOT_FOUND 且不猜测同名元素
+PASS  T23 Popup 卡片按钮使用 data-card-action 事件委托
+PASS  T24 Popup 存在取消高亮入口
+PASS  T25 constants 定义 V1.2 五个 Action
+PASS  T26 ERROR_CODES 扩展 V1.2 错误码
+PASS  T27 KEYPRESS 按键白名单 SUPPORTED_KEYS
+PASS  T28 CLICK 使用 element.click()，无坐标/CDP 模拟
+PASS  T29 INPUT 使用原生 value setter 并触发 input/change
+PASS  T30 无 Action Queue/批量执行入口
+PASS  T31 SCROLL amount 安全校验（0 < amount <= 5000）
+PASS  T32 Popup 存在全局滚动控制与 Action Log
+PASS  T33 Popup 按能力显示 Action（isClickable/isTextEntry）
+PASS  T34 Action 统一返回协议（actionId/timestamp/durationMs）
+PASS  T35 manifest version = 2.0.0
+PASS  T35b Popup 显示 V2.0
+PASS  T35c README 标注 V2.0
+PASS  T36 MV3 service_worker 正确配置（非 MV2 常驻后台页）
+PASS  T36b background 引用的 SW 文件存在
+PASS  T37 host_permissions 仅 http/https（无 file:// 等）
+PASS  T38 Popup 不建立 WebSocket（长连接必须由 Service Worker 持有）
+PASS  T38b Service Worker 通过 importScripts 载入 bridge
+PASS  T39 扩展内不存在 WebSocket 服务端实现（扩展只做 client）
+PASS  T39b bridge 使用 WebSocket client 构造
+PASS  T40 默认仅回环地址 127.0.0.1
+PASS  T40b 源码中不存在 0.0.0.0 绑定
+PASS  T41 源码中不存在硬编码 token 字面量
+PASS  T41c Controller 侧 token 由 secrets 随机生成
+PASS  T41b token 仅由用户输入并存入 chrome.storage
+PASS  T42 指数退避重连（1/2/5/10/30s，上限 30s）
+PASS  T42b 重连使用 setTimeout 而非紧循环
+PASS  T42c 处理断线/错误/关闭（onclose/onerror/onopen）
+PASS  T42d 心跳维持 MV3 worker 存活
+PASS  T43 element-search.js 是独立模块（buildIndex/search/clearIndex/getIndexInfo）
+PASS  T43b 搜索基于 Scanner 数据，不重新查询 DOM
+PASS  T43c 统一 normalizeSearchText（trim + 折叠空白 + 小写）
+PASS  T43d SEARCH_ELEMENTS Action 定义于 constants
+PASS  T43e content.js 处理 SEARCH_ELEMENTS
+PASS  T44 SCAN_PAGE 后重建索引（索引与最近一次扫描绑定）
+PASS  T44b 搜索索引失效时返回 NO_SCAN_DATA
+PASS  T45 bridge 不直接操作 DOM（无 click()/querySelector/dispatchEvent）
+PASS  T45b bridge 通过既有 Content Script Action 执行动作（不建第二套 Action）
+PASS  T45c bridge 与 Popup 使用同一份 CONTENT_FILES 依赖顺序
+PASS  T46 协议方法集合完整（PING..SCROLL_PAGE）
+PASS  T46b 未知方法返回 UNKNOWN_METHOD
+PASS  T46c 请求带唯一 id，响应按 id 关联
+PASS  T47 V2 未引入 LLM / Agent / Planner
+PASS  T47b V2 未实现 Action Queue / 批量执行
+PASS  T47c CLI 不做 search-and-click（无自动选第一条点击）
+PASS  T48 controller/ 包文件齐全（无大型后端依赖）
+PASS  T48b Controller 仅依赖 websockets
+
+STATIC CHECK SUMMARY: ALL PASS
+TEST content-docs-check.js EXIT 0
+PASS  D01 demo: 普通链接
+PASS  D02 demo: 普通按钮
+PASS  D03 demo: disabled button
+PASS  D04 demo: input
+PASS  D05 demo: textarea
+PASS  D06 demo: select + option
+PASS  D07 demo: contenteditable
+PASS  D08 demo: ARIA button
+PASS  D09 demo: display:none
+PASS  D10 demo: visibility:hidden
+PASS  D11 demo: opacity:0
+PASS  D12 demo: 长页面 spacer
+PASS  D13 demo: 页面底部按钮
+PASS  D14 demo: hidden 属性场景
+PASS  D15 demo: 动态目标按钮
+PASS  D16 demo: 删除/恢复目标按钮
+PASS  D17 demo: 动态新增按钮
+PASS  R01 说明项目是什么
+PASS  R02 Chrome 加载方式
+PASS  R03 Edge 加载方式
+PASS  R04 如何扫描页面
+PASS  R05 demo 测试说明
+PASS  R06 当前能力
+PASS  R07 限制: 内部页面
+PASS  R08 限制: iframe
+PASS  R09 限制: Shadow DOM
+PASS  R10 限制: Canvas
+PASS  R11 限制: 虚拟列表
+PASS  R12 限制: 动态页面快照
+PASS  R13 安全边界说明
+PASS  R14 README 描述的权限与 manifest 一致且 host_permissions 有说明
+PASS  R15 README 明确声明 V2 不具备自动操作 / LLM / Agent 能力
+PASS  R16 README 写明 V1.1 Mapping/定位/高亮
+PASS  R17 README 写明 elementId 生命周期（非永久 ID）
+PASS  R18 README 写明侧栏关闭后高亮继续存在
+PASS  R19 README 项目结构含新模块
+PASS  C01 侧栏宽度随浏览器调整
+PASS  C02 侧栏填满高度，主体区域可滚动
+PASS  C03 关键按钮未被隐藏
+PASS  C04 .hidden 工具类存在
+
+CONTENT/DOCS SUMMARY: ALL PASS
+TEST element-explorer-unit.js EXIT 0
+PASS scan scopes, text/structure/media categories, hidden ancestry, duplicate text, long text search, attributes, native CSS, escaped unique paths, details, password masking and stable IDs
+PASS 257 matches paged completely without duplicates or lost records; viewport and group filters

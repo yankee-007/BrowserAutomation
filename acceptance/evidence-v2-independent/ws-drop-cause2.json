@@ -1,0 +1,80 @@
+{
+  "events": [
+    {
+      "t": 1790618364.58,
+      "event": "MARK",
+      "label": "1000 control"
+    },
+    {
+      "t": 1790618367.4,
+      "event": "scan_ok",
+      "label": "1000 control",
+      "ms": 36.1,
+      "total": 1000
+    },
+    {
+      "t": 1790618370.41,
+      "event": "extension_timeline",
+      "label": "1000 control",
+      "n_samples": 31,
+      "transitions": "[{\"t\": 1790618366.975, \"state\": \"CONNECTED\", \"lastError\": null, \"logLen\": 0, \"since\": 1790618364581}, {\"t\": 1790618367.431, \"state\": \"CONNECTED\", \"lastError\": null, \"logLen\": 1, \"since\": 1790618364581}]"
+    },
+    {
+      "t": 1790618370.41,
+      "event": "controller_closes",
+      "label": "1000 control",
+      "closes": "[]"
+    },
+    {
+      "t": 1790618370.41,
+      "event": "sw",
+      "label": "1000 control",
+      "targets": "[{\"url\": \"chrome-extension://fjekeadnlgppeafgmgaipjlkiphlgehe/background/service-worker.js\", \"targetId\": \"A8DE75AAA043ADB0979401FA518F94A8\"}]"
+    },
+    {
+      "t": 1790618370.41,
+      "event": "MARK",
+      "label": "3000"
+    },
+    {
+      "t": 1790618373.25,
+      "event": "handler_exit",
+      "close_code": 1006,
+      "close_reason": ""
+    },
+    {
+      "t": 1790618373.25,
+      "event": "scan_FAIL",
+      "label": "3000",
+      "ms": 75.1,
+      "code": "NOT_CONNECTED"
+    },
+    {
+      "t": 1790618376.26,
+      "event": "extension_timeline",
+      "label": "3000",
+      "n_samples": 32,
+      "transitions": "[{\"t\": 1790618372.786, \"state\": \"CONNECTED\", \"lastError\": null, \"logLen\": 1, \"since\": 1790618364581}, {\"t\": 1790618373.242, \"state\": \"CONNECTED\", \"lastError\": null, \"logLen\": 2, \"since\": 1790618364581}, {\"t\": 1790618373.346, \"state\": \"ERROR\", \"lastError\": null, \"logLen\": 2, \"since\": null}, {\"t\": 1790618374.303, \"state\": \"CONNECTED\", \"lastError\": null, \"logLen\": 2, \"since\": 1790618374251}]"
+    },
+    {
+      "t": 1790618376.26,
+      "event": "controller_closes",
+      "label": "3000",
+      "closes": "[{\"t\": 1790618373.247, \"close_code\": 1006, \"close_reason\": \"\", \"connected_after\": false}]"
+    },
+    {
+      "t": 1790618376.27,
+      "event": "sw",
+      "label": "3000",
+      "targets": "[{\"url\": \"chrome-extension://fjekeadnlgppeafgmgaipjlkiphlgehe/background/service-worker.js\", \"targetId\": \"A8DE75AAA043ADB0979401FA518F94A8\"}]"
+    }
+  ],
+  "closes": [
+    {
+      "t": 1790618373.247,
+      "close_code": 1006,
+      "close_reason": "",
+      "connected_after": false
+    }
+  ]
+}

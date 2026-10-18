@@ -1,0 +1,22 @@
+﻿PASS  P01 扫描后面板显示且渲染 8 张卡片
+PASS  P02 搜索 Python -> 1 张且为 Python开发工程师
+PASS  P03 搜索 沟通 -> 立即沟通
+PASS  P04 搜索 搜索 -> 按钮文本 + input placeholder 共 2 张
+PASS  P05 空搜索恢复全部 8 张
+PASS  P06 无结果显示空状态
+PASS  P07 Button 过滤: 4 button + role=button 共 5 张
+PASS  P08 Link 过滤: 2 张
+PASS  P09 Input 过滤: 1 张
+PASS  P10 Other 过滤: 0 张（空状态）
+PASS  P11 All 恢复 8 张
+PASS  P12 Button + 搜索 -> 仅搜索按钮 1 张
+PASS  P13 Button + 沟通 -> 立即沟通 1 张
+PASS  P14a Link + Python -> 1 张
+PASS  P14b Link + 沟通 -> 0 张
+PASS  P15 清空条件恢复 8 张
+PASS  P17 按 id 搜索 jobInput -> 1 张
+PASS  P18 按 className 搜索 -> 1 张
+PASS  P19 搜索 button -> 5 张（4 个 tag=button + 1 个 role=button 的 div，role 也在搜索范围）
+PASS  P20 Raw JSON 已生成且可解析
+
+POPUP UI SUMMARY: ALL PASS

@@ -1,0 +1,88 @@
+{
+  "verifiedAt": "2026-10-15T16:04:30.554Z",
+  "browser": "Edg/155.0.4283.45",
+  "node": "v24.18.0",
+  "sourceHashes": {
+    "manifest.json": "00e76e6749ec6b6f4c22621f129e7e8253759dedf04aa227af7dcbd4bd94f44b",
+    "background/service-worker.js": "d54e4f27d64e78e43aec2d51a512a25e27f465ebbcf34687b27f9a0c68e9f712",
+    "popup/popup.html": "85c1b6b26a1fd25e16e320726ac5a539502564cd3b09e0a697f406b6b9d14b7c",
+    "popup/popup.css": "478780650ed625ee281c2004d1e280b9e3dc807046b0bf4bdb06c94c4f3c3ac6",
+    "popup/popup.js": "3c12f8d1f3514bd8843164abee84cc0284326c605778557f148a607f3d31aa52"
+  },
+  "results": [
+    {
+      "name": "Native side panel configured with toolbar opening",
+      "details": {
+        "behavior": {
+          "openPanelOnActionClick": true
+        },
+        "options": {
+          "enabled": true,
+          "path": "popup/popup.html"
+        },
+        "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36 Edg/155.0.0.0"
+      }
+    },
+    {
+      "name": "Real native side panel opened for demo",
+      "details": {
+        "type": "page"
+      }
+    },
+    {
+      "name": "Demo scanned through native panel",
+      "details": {
+        "total": 28
+      }
+    },
+    {
+      "name": "Search and highlight from native panel"
+    },
+    {
+      "name": "Manual click reaches the demo element"
+    },
+    {
+      "name": "Manual input reaches the demo field"
+    },
+    {
+      "name": "Responsive panel layout 320",
+      "details": {
+        "width": 320,
+        "height": 780,
+        "documentWidth": 320,
+        "mainWidth": 320,
+        "mainScrollWidth": 320,
+        "footerBottom": 780
+      }
+    },
+    {
+      "name": "Responsive panel layout 400",
+      "details": {
+        "width": 400,
+        "height": 780,
+        "documentWidth": 400,
+        "mainWidth": 400,
+        "mainScrollWidth": 400,
+        "footerBottom": 780
+      }
+    },
+    {
+      "name": "Responsive panel layout 600",
+      "details": {
+        "width": 600,
+        "height": 780,
+        "documentWidth": 600,
+        "mainWidth": 600,
+        "mainScrollWidth": 600,
+        "footerBottom": 780
+      }
+    },
+    {
+      "name": "Native panel persists and clears results on tab switch"
+    },
+    {
+      "name": "Navigation clears old results"
+    }
+  ],
+  "errors": []
+}

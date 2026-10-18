@@ -1,0 +1,84 @@
+{
+  "events": [
+    {
+      "t": 1790618666.39,
+      "event": "scan",
+      "label": "1000",
+      "ok": true,
+      "ms": 40.3,
+      "total": 1000,
+      "wire_frame_bytes": 404960
+    },
+    {
+      "t": 1790618669.19,
+      "event": "scan",
+      "label": "1500 pad100 (was FAIL)",
+      "ok": true,
+      "ms": 70.9,
+      "total": 1500,
+      "wire_frame_bytes": 1061508
+    },
+    {
+      "t": 1790618672.03,
+      "event": "scan",
+      "label": "2560 (was OK)",
+      "ok": true,
+      "ms": 82.2,
+      "total": 2560,
+      "wire_frame_bytes": 1045964
+    },
+    {
+      "t": 1790618674.88,
+      "event": "scan",
+      "label": "2600 (was FAIL)",
+      "ok": true,
+      "ms": 83.9,
+      "total": 2600,
+      "wire_frame_bytes": 1062400
+    },
+    {
+      "t": 1790618677.75,
+      "event": "scan",
+      "label": "3000 (was FAIL)",
+      "ok": true,
+      "ms": 88.8,
+      "total": 3000,
+      "wire_frame_bytes": 1226761
+    },
+    {
+      "t": 1790618680.94,
+      "event": "scan",
+      "label": "5000 (was FAIL)",
+      "ok": true,
+      "ms": 138.6,
+      "total": 5000,
+      "wire_frame_bytes": 2054454
+    }
+  ],
+  "largeFrames": [
+    {
+      "bytes": 404960,
+      "head": "{\"id\":\"req_001\",\"type\":\"RESPONSE\",\"success\":true,\"result\":{\""
+    },
+    {
+      "bytes": 1061508,
+      "head": "{\"id\":\"req_002\",\"type\":\"RESPONSE\",\"success\":true,\"result\":{\""
+    },
+    {
+      "bytes": 1045964,
+      "head": "{\"id\":\"req_003\",\"type\":\"RESPONSE\",\"success\":true,\"result\":{\""
+    },
+    {
+      "bytes": 1062400,
+      "head": "{\"id\":\"req_004\",\"type\":\"RESPONSE\",\"success\":true,\"result\":{\""
+    },
+    {
+      "bytes": 1226761,
+      "head": "{\"id\":\"req_005\",\"type\":\"RESPONSE\",\"success\":true,\"result\":{\""
+    },
+    {
+      "bytes": 2054454,
+      "head": "{\"id\":\"req_006\",\"type\":\"RESPONSE\",\"success\":true,\"result\":{\""
+    }
+  ]
+}

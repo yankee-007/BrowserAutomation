@@ -1,0 +1,27 @@
+﻿PASS  T01 manifest.json 存在且可解析
+PASS  T02 manifest_version === 3
+PASS  T03 name/version 合法
+PASS  T04 action.default_popup 指向 popup.html
+PASS  T05 permissions 最小化 (activeTab, scripting)
+PASS  T06 无高风险权限
+PASS  T07 无 MV2 配置 (browser_action/background.scripts)
+PASS  T08 无静态 content_scripts（按需注入设计）
+PASS  T09 manifest 引用文件全部存在
+PASS  T10 要求的全部文件存在
+PASS  T11 popup.html 引用的 CSS/JS/图片存在
+PASS  T12 popup.js 引用的 DOM ID 全部存在于 popup.html
+PASS  T13 popup.js 注入的脚本文件全部存在
+PASS  T13b 注入顺序正确（依赖在前）
+PASS  T14 无网站硬编码/反检测代码
+PASS  T15 constants 定义 LOCATE/HIGHLIGHT/CLEAR Action
+PASS  T16 constants 集中管理映射属性名与 Overlay 标识
+PASS  T17 data-pagesense-id 字符串未散落在其他文件
+PASS  T18 Overlay pointer-events:none（不拦截页面交互）
+PASS  T19 Overlay 使用最大 z-index
+PASS  T20 scroll/resize 经 requestAnimationFrame 节流
+PASS  T21 元素删除检测使用 isConnected
+PASS  T22 失效返回 ELEMENT_NOT_FOUND 且不猜测同名元素
+PASS  T23 Popup 卡片按钮使用 data-card-action 事件委托
+PASS  T24 Popup 存在取消高亮入口
+
+STATIC CHECK SUMMARY: ALL PASS

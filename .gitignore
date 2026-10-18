@@ -1,0 +1,11 @@
+# Installed dependencies and Python bytecode; keep manifests and lockfiles.
+node_modules/
+__pycache__/
+*.py[cod]
+
+# Existing browser profiles contain machine state and local browsing data.
+/.edge-profile/
+/acceptance/edge-v2-indep-profile/
+
+# Per-machine Agent permissions; shared project rules remain trackable.
+/.claude/settings.local.json

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PageSense Demo Page</title>
+  <style>
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 24px;
+      color: #1f2430;
+      line-height: 1.6;
+    }
+    h1 {
+      border-bottom: 2px solid #2b5fff;
+      padding-bottom: 8px;
+    }
+    section {
+      margin-bottom: 28px;
+      padding: 16px;
+      border: 1px solid #e3e6ef;
+      border-radius: 8px;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 16px;
+      color: #2b5fff;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    button,
+    select,
+    input,
+    textarea {
+      font-size: 14px;
+      padding: 8px 12px;
+      border: 1px solid #c7ccd9;
+      border-radius: 6px;
+    }
+    button.primary {
+      background: #2b5fff;
+      color: #fff;
+      border-color: #2b5fff;
+    }
+    button:disabled {
+      background: #e5e7ee;
+      color: #9aa1b2;
+      cursor: not-allowed;
+    }
+    .icon-close {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+    }
+    .icon-close::before {
+      content: "\000D7";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    [contenteditable="true"] {
+      border: 1px dashed #2b5fff;
+      border-radius: 6px;
+      padding: 8px 12px;
+      min-height: 24px;
+      background: #f3f6ff;
+    }
+    .spacer {
+      height: 1200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9aa1b2;
+      border: 1px dashed #c7ccd9;
+      border-radius: 8px;
+    }
+    .note {
+      color: #6b7280;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <h1>PageSense Demo Page</h1>
+  <p class="note">
+    用本页面验证 V1 Scanner：可见性过滤、视口判断、文本提取、搜索与分类。
+    打开扩展 Popup，点击「扫描当前页面」。
+  </p>
+
+  <section>
+    <h2>1. 普通链接</h2>
+    <div class="row">
+      <a href="https://example.com">前往 Example</a>
+      <a href="#section-bottom">页内锚点链接</a>
+      <a href="https://example.com" role="link">带 role=link 的链接</a>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. 普通按钮</h2>
+    <div class="row">
+      <button type="button" class="primary">立即沟通</button>
+      <button type="button">普通按钮</button>
+      <button type="button" class="icon-close" aria-label="关闭弹窗"></button>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. Disabled Button</h2>
+    <div class="row">
+      <button type="button" disabled>已禁用的按钮</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. 输入框 / 文本域 / 下拉框</h2>
+    <div class="row">
+      <input type="text" name="username" placeholder="请输入用户名" />
+      <input type="email" id="emailInput" name="email" placeholder="请输入邮箱" aria-label="邮箱地址" />
+      <input type="checkbox" name="subscribe" id="subscribe" title="订阅邮件" />
+      <label for="subscribe">订阅</label>
+      <textarea name="message" placeholder="请输入留言内容" rows="3" cols="30"></textarea>
+      <select name="city" id="citySelect">
+        <option value="bj">北京</option>
+        <option value="sh">上海</option>
+        <option value="gz">广州</option>
+        <option value="sz">深圳</option>
+      </select>
+    </div>
+  </section>
+
+  <section>
+    <h2>5. contenteditable</h2>
+    <div class="row">
+      <div contenteditable="true" role="textbox" aria-label="富文本编辑区">
+        这是一个可编辑的 div，点击可以输入文字。
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>6. 隐藏元素（应被过滤）</h2>
+    <div class="row">
+      <button type="button" style="display: none;">display:none 按钮</button>
+      <a href="https://example.com/hidden" style="display: none;">display:none 链接</a>
+      <button type="button" style="visibility: hidden;">visibility:hidden 按钮</button>
+      <button type="button" style="opacity: 0;">opacity:0 按钮</button>
+      <button type="button" hidden>hidden 属性按钮</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>7. 零尺寸元素（应被过滤）</h2>
+    <div class="row">
+      <button type="button" style="width:0;height:0;padding:0;border:none;overflow:hidden;">
+        零尺寸按钮
+      </button>
+    </div>
+  </section>
+
+  <div class="spacer" id="section-bottom">
+    ↓ 向下滚动 1200px，下面的按钮初始不在视口内（visible=true, inViewport=false）
+  </div>
+
+  <section style="margin-top: 24px;">
+    <h2>8. 需要滚动才能看到的按钮</h2>
+    <div class="row">
+      <button type="button" class="primary" id="bottomButton">页面底部按钮（初始在视口外）</button>
+      <a href="https://example.com/bottom">页面底部链接</a>
+    </div>
+    <p class="note">
+      预期：扫描后该按钮 visible 为 true、inViewport 为 false；滚动页面后重新扫描，
+      inViewport 变为 true。
+    </p>
+  </section>
+
+  <section>
+    <h2>9. 动态 DOM 变化（V1.1 定位失效检测）</h2>
+    <div class="row">
+      <button type="button" class="primary" id="dynamicTarget">动态目标按钮（可被删除）</button>
+    </div>
+    <div class="row" style="margin-top: 12px;">
+      <button type="button" id="deleteTargetBtn">删除目标按钮</button>
+      <button type="button" id="restoreTargetBtn">恢复目标按钮</button>
+      <button type="button" id="addElementBtn">新增一个按钮</button>
+    </div>
+    <div class="row" id="addedContainer" style="margin-top: 12px;"></div>
+    <p class="note">
+      实验：扫描 → 高亮「动态目标按钮」→ 点「删除目标按钮」→ 再次定位/高亮，
+      应返回 ELEMENT_NOT_FOUND（不会猜测同名元素）；「新增一个按钮」后需重新扫描才能看到。
+    </p>
+  </section>
+
+  <section>
+    <h2>10. Action Layer 测试（V1.2）</h2>
+
+    <div class="row">
+      <span>点击次数：<strong id="clickCount">0</strong></span>
+      <button type="button" class="primary" id="clickTestBtn">测试点击</button>
+    </div>
+
+    <div class="row" style="margin-top: 12px;">
+      <input type="text" id="actionInput" placeholder="Action 输入测试" />
+      <span class="note">当前值：<strong id="actionInputValue">(空)</strong></span>
+      <span class="note">事件：input=<span id="inputEventCount">0</span>
+        change=<span id="changeEventCount">0</span></span>
+    </div>
+
+    <div class="row" style="margin-top: 12px;">
+      <textarea id="actionTextarea" placeholder="Action 文本域测试" rows="2" cols="28"></textarea>
+      <span class="note">当前值：<strong id="actionTextareaValue">(空)</strong></span>
+    </div>
+
+    <div class="row" style="margin-top: 12px;">
+      <div contenteditable="true" id="actionCE" role="textbox"
+        aria-label="Action contenteditable 测试" style="min-width:220px;"></div>
+      <span class="note">内容：<strong id="actionCEValue">(空)</strong>
+        input=<span id="ceInputCount">0</span></span>
+    </div>
+
+    <div class="row" style="margin-top: 12px;">
+      <span class="note">最后按键：<strong id="lastKey">(无)</strong></span>
+    </div>
+
+    <div class="row" style="margin-top: 12px;">
+      <button type="button" id="actionDisabled" disabled>禁用按钮（点击应被拒绝）</button>
+    </div>
+
+    <p class="note">
+      预期：CLICK 使计数 +1；INPUT/TEXTAREA/CE 写入后回显更新并触发事件；
+      KEYPRESS 记录按键；禁用按钮返回 ELEMENT_DISABLED；滚动测试见上方 spacer 与全局滚动按钮。
+    </p>
+  </section>
+
+  <script>
+    (function () {
+      "use strict";
+      var target = document.getElementById("dynamicTarget");
+      var addedContainer = document.getElementById("addedContainer");
+      var addedCount = 0;
+
+      document.getElementById("deleteTargetBtn").addEventListener("click", function () {
+        if (target && target.parentNode) {
+          target.parentNode.removeChild(target);
+        }
+      });
+
+      document.getElementById("restoreTargetBtn").addEventListener("click", function () {
+        if (!target.isConnected) {
+          // Insert back before the control row's parent section
+          var section = document.getElementById("deleteTargetBtn")
+            .closest("section");
+          var firstRow = section.querySelector(".row");
+          firstRow.appendChild(target);
+        }
+      });
+
+      document.getElementById("addElementBtn").addEventListener("click", function () {
+        addedCount++;
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = "动态新增按钮 #" + addedCount;
+        addedContainer.appendChild(btn);
+      });
+
+      /* ---- V1.2 Action Layer test wiring ---- */
+
+      var clickCount = 0;
+      var inputEvents = 0;
+      var changeEvents = 0;
+      var ceInputEvents = 0;
+
+      document.getElementById("clickTestBtn").addEventListener("click", function () {
+        clickCount++;
+        document.getElementById("clickCount").textContent = String(clickCount);
+      });
+
+      var actionInput = document.getElementById("actionInput");
+      actionInput.addEventListener("input", function () {
+        inputEvents++;
+        document.getElementById("inputEventCount").textContent = String(inputEvents);
+        document.getElementById("actionInputValue").textContent =
+          actionInput.value || "(空)";
+      });
+      actionInput.addEventListener("change", function () {
+        changeEvents++;
+        document.getElementById("changeEventCount").textContent = String(changeEvents);
+      });
+
+      var actionTextarea = document.getElementById("actionTextarea");
+      actionTextarea.addEventListener("input", function () {
+        document.getElementById("actionTextareaValue").textContent =
+          actionTextarea.value || "(空)";
+      });
+
+      var actionCE = document.getElementById("actionCE");
+      actionCE.addEventListener("input", function () {
+        ceInputEvents++;
+        document.getElementById("ceInputCount").textContent = String(ceInputEvents);
+        document.getElementById("actionCEValue").textContent =
+          actionCE.innerText || "(空)";
+      });
+
+      document.addEventListener("keydown", function (event) {
+        document.getElementById("lastKey").textContent = event.key === " "
+          ? "Space"
+          : event.key;
+      });
+    })();
+  </script>
+</body>
+</html>

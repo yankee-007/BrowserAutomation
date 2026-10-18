@@ -1,0 +1,268 @@
+[
+  {
+    "t": 1790618131.29,
+    "kind": "page_loaded",
+    "n": 1000
+  },
+  {
+    "t": 1790618131.33,
+    "kind": "scan_ok",
+    "n": 1000,
+    "attempt": 0,
+    "ms": 36.4,
+    "total": 1000,
+    "connected": true
+  },
+  {
+    "t": 1790618131.35,
+    "kind": "scan_ok",
+    "n": 1000,
+    "attempt": 1,
+    "ms": 28.5,
+    "total": 1000,
+    "connected": true
+  },
+  {
+    "t": 1790618131.38,
+    "kind": "scan_ok",
+    "n": 1000,
+    "attempt": 2,
+    "ms": 27.8,
+    "total": 1000,
+    "connected": true
+  },
+  {
+    "t": 1790618131.38,
+    "kind": "sw_targets",
+    "n": 1000,
+    "count": 1
+  },
+  {
+    "t": 1790618132.66,
+    "kind": "page_loaded",
+    "n": 2000
+  },
+  {
+    "t": 1790618132.72,
+    "kind": "scan_ok",
+    "n": 2000,
+    "attempt": 0,
+    "ms": 58.6,
+    "total": 2000,
+    "connected": true
+  },
+  {
+    "t": 1790618132.77,
+    "kind": "scan_ok",
+    "n": 2000,
+    "attempt": 1,
+    "ms": 55.7,
+    "total": 2000,
+    "connected": true
+  },
+  {
+    "t": 1790618132.82,
+    "kind": "scan_ok",
+    "n": 2000,
+    "attempt": 2,
+    "ms": 49.1,
+    "total": 2000,
+    "connected": true
+  },
+  {
+    "t": 1790618132.83,
+    "kind": "sw_targets",
+    "n": 2000,
+    "count": 1
+  },
+  {
+    "t": 1790618134.11,
+    "kind": "page_loaded",
+    "n": 3000
+  },
+  {
+    "t": 1790618134.18,
+    "kind": "controller_state",
+    "connected": false,
+    "version": null
+  },
+  {
+    "t": 1790618134.18,
+    "kind": "scan_FAIL",
+    "n": 3000,
+    "attempt": 0,
+    "ms": 73.0,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618135.18,
+    "kind": "controller_state",
+    "connected": true,
+    "version": "2.0.0"
+  },
+  {
+    "t": 1790618135.18,
+    "kind": "reconnected",
+    "n": 3000,
+    "attempt": 0,
+    "ok": true,
+    "seconds": 1.0
+  },
+  {
+    "t": 1790618135.24,
+    "kind": "controller_state",
+    "connected": false,
+    "version": null
+  },
+  {
+    "t": 1790618135.24,
+    "kind": "scan_FAIL",
+    "n": 3000,
+    "attempt": 1,
+    "ms": 61.1,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618136.25,
+    "kind": "controller_state",
+    "connected": true,
+    "version": "2.0.0"
+  },
+  {
+    "t": 1790618136.25,
+    "kind": "reconnected",
+    "n": 3000,
+    "attempt": 1,
+    "ok": true,
+    "seconds": 1.0
+  },
+  {
+    "t": 1790618136.31,
+    "kind": "controller_state",
+    "connected": false,
+    "version": null
+  },
+  {
+    "t": 1790618136.31,
+    "kind": "scan_FAIL",
+    "n": 3000,
+    "attempt": 2,
+    "ms": 62.7,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618137.31,
+    "kind": "controller_state",
+    "connected": true,
+    "version": "2.0.0"
+  },
+  {
+    "t": 1790618137.31,
+    "kind": "reconnected",
+    "n": 3000,
+    "attempt": 2,
+    "ok": true,
+    "seconds": 1.0
+  },
+  {
+    "t": 1790618137.33,
+    "kind": "sw_targets",
+    "n": 3000,
+    "count": 1
+  },
+  {
+    "t": 1790618138.61,
+    "kind": "page_loaded",
+    "n": 5000
+  },
+  {
+    "t": 1790618138.71,
+    "kind": "controller_state",
+    "connected": false,
+    "version": null
+  },
+  {
+    "t": 1790618138.71,
+    "kind": "scan_FAIL",
+    "n": 5000,
+    "attempt": 0,
+    "ms": 101.1,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618139.71,
+    "kind": "controller_state",
+    "connected": true,
+    "version": "2.0.0"
+  },
+  {
+    "t": 1790618139.71,
+    "kind": "reconnected",
+    "n": 5000,
+    "attempt": 0,
+    "ok": true,
+    "seconds": 1.0
+  },
+  {
+    "t": 1790618139.82,
+    "kind": "controller_state",
+    "connected": false,
+    "version": null
+  },
+  {
+    "t": 1790618139.82,
+    "kind": "scan_FAIL",
+    "n": 5000,
+    "attempt": 1,
+    "ms": 104.1,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618140.82,
+    "kind": "controller_state",
+    "connected": true,
+    "version": "2.0.0"
+  },
+  {
+    "t": 1790618140.82,
+    "kind": "reconnected",
+    "n": 5000,
+    "attempt": 1,
+    "ok": true,
+    "seconds": 1.0
+  },
+  {
+    "t": 1790618140.92,
+    "kind": "controller_state",
+    "connected": false,
+    "version": null
+  },
+  {
+    "t": 1790618140.92,
+    "kind": "scan_FAIL",
+    "n": 5000,
+    "attempt": 2,
+    "ms": 100.7,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618141.93,
+    "kind": "controller_state",
+    "connected": true,
+    "version": "2.0.0"
+  },
+  {
+    "t": 1790618141.93,
+    "kind": "reconnected",
+    "n": 5000,
+    "attempt": 2,
+    "ok": true,
+    "seconds": 1.0
+  },
+  {
+    "t": 1790618141.94,
+    "kind": "sw_targets",
+    "n": 5000,
+    "count": 1
+  }
+]

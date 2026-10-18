@@ -1,0 +1,94 @@
+{
+  "verifiedAt": "2026-10-18T05:23:40.946Z",
+  "browser": "Edg/155.0.4283.45",
+  "node": "v24.18.0",
+  "sourceHashes": {
+    "shared/constants.js": "f3223739cc57f2b3db6fe2c8bae2b0b1fdcf932f0098b76e2dc9ac136f71b8db",
+    "content/scanner.js": "063f9267529cde6118a367f43c2210ec0c72aa91327417952c8993ed600f4e1c",
+    "content/element-search.js": "013310bd78f9828cbbc3666c2d455446aac53dae40133ed742281d8ad9b1d0d7",
+    "content/content.js": "31439d8915a6e9f30077baf699ba05d433f3d9f4996209c52cd0568df5fe702c",
+    "popup/popup.js": "f2c8388e02ec8f39693f7d2794a1f5db1e73a45adb801951c28dcbc64bcf4b76",
+    "popup/popup.html": "55749e256a959480e731ba3bccda476ee383c52a6aeff0968309557f29b95798",
+    "popup/popup.css": "5633a17b90b9c4a9b12d2c954c08670744743af9200f83cf831ca10d8e02ddad",
+    "bridge/controller-bridge.js": "c9818bf49b5c231a9fe93a0ccdb46d3b6d5214968ae404d1f9628831a8178d54"
+  },
+  "results": [
+    {
+      "name": "Default content scan includes text/media/structure/controls; card rendering paginated",
+      "details": {
+        "total": 281,
+        "categories": {
+          "region": 2,
+          "heading": 2,
+          "paragraph": 260,
+          "button": 1,
+          "label": 1,
+          "input": 1,
+          "select": 2,
+          "toggle": 1,
+          "editable": 1,
+          "image": 1,
+          "list": 2,
+          "table": 5,
+          "text": 2
+        }
+      }
+    },
+    {
+      "name": "All 257 search matches reachable across pages without duplicates or an overall cap"
+    },
+    {
+      "name": "Search finds text beyond the 300-character card preview"
+    },
+    {
+      "name": "Tag/class/attributes/CSS intersect; details, escaped unique selector, copy payloads and highlight work"
+    },
+    {
+      "name": "Invalid CSS/JSON are explicit errors; clear and group/subtype filtering work"
+    },
+    {
+      "name": "CSS result membership refreshes with live content changes and stable IDs"
+    },
+    {
+      "name": "Interactive and all-visible-DOM scopes rescan correctly"
+    },
+    {
+      "name": "Real Python client ↔ WebSocket ↔ extension supports scopes, page 3, CSS/attrs, accurate indexSize and inspect"
+    },
+    {
+      "name": "Detailed card and query controls fit width 320",
+      "details": {
+        "width": 320,
+        "documentWidth": 320,
+        "mainWidth": 320,
+        "mainScrollWidth": 320
+      }
+    },
+    {
+      "name": "Detailed card and query controls fit width 400",
+      "details": {
+        "width": 400,
+        "documentWidth": 400,
+        "mainWidth": 400,
+        "mainScrollWidth": 400
+      }
+    },
+    {
+      "name": "Detailed card and query controls fit width 600",
+      "details": {
+        "width": 600,
+        "documentWidth": 600,
+        "mainWidth": 600,
+        "mainScrollWidth": 600
+      }
+    },
+    {
+      "name": "5000 DOM text records scanned without count cap; final page reachable",
+      "details": {
+        "total": 5283,
+        "scanMs": 245
+      }
+    }
+  ],
+  "errors": []
+}

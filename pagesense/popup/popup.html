@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PageSense</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <img class="brand-logo" src="../icons/icon-32.png" alt="PageSense" width="24" height="24" />
+      <h1 class="brand-name">PageSense</h1>
+      <span class="brand-version">V2.0</span>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <section class="page-meta" id="pageMeta">
+      <div class="page-meta-row">
+        <span class="page-meta-label">当前页面：</span>
+        <span class="page-meta-value" id="currentPageTitle">读取中…</span>
+      </div>
+      <div class="page-meta-row page-meta-url" id="currentPageUrl" title=""></div>
+    </section>
+
+    <details class="controller-panel" id="controllerPanel">
+      <summary class="controller-summary-row">
+        <span class="controller-dot" id="controllerDot"></span>
+        <span class="controller-title">Controller</span>
+        <span class="controller-state-inline" id="controllerStateInline">未连接</span>
+      </summary>
+      <div class="controller-body">
+        <div class="controller-state">
+          <span id="controllerStateText">○ 未连接</span>
+          <span class="controller-endpoint" id="controllerEndpoint">127.0.0.1:8765</span>
+        </div>
+        <div class="controller-config">
+          <label class="controller-field">
+            <span>端口</span>
+            <input type="number" id="controllerPort" min="1" max="65535" value="8765" />
+          </label>
+          <label class="controller-field">
+            <span>Token</span>
+            <input type="password" id="controllerToken" placeholder="server.py 启动时生成的 token"
+              autocomplete="off" />
+          </label>
+        </div>
+        <div class="controller-actions">
+          <button type="button" class="btn btn-secondary" id="controllerConnectBtn">连接 Controller</button>
+          <button type="button" class="btn btn-secondary" id="controllerDisconnectBtn">断开</button>
+        </div>
+        <div class="controller-error hidden" id="controllerError"></div>
+        <div class="controller-log-title">最近请求</div>
+        <div class="controller-log" id="controllerLog">
+          <div class="controller-log-empty">（暂无请求）</div>
+        </div>
+      </div>
+    </details>
+
+    <label class="scan-scope-label" for="scanScope">扫描范围</label>
+    <select id="scanScope" class="scan-scope">
+      <option value="content">页面内容：控件、文本、媒体与语义结构</option>
+      <option value="interactive">仅交互控件</option>
+      <option value="all">全部可见 DOM（含普通容器）</option>
+    </select>
+    <button class="btn btn-primary btn-scan" id="scanBtn" type="button">
+      扫描当前页面
+    </button>
+    <button class="btn btn-secondary btn-pick" id="pickElementBtn" type="button"
+      aria-pressed="false" aria-describedby="pickStatus">在页面选择元素</button>
+    <div class="pick-status" id="pickStatus" role="status">点击按钮后，到网页中选择元素；Esc 取消。</div>
+
+    <div class="live-scan-controls">
+      <label class="live-scan-toggle">
+        <input id="liveScanToggle" type="checkbox" aria-describedby="liveScanStatus" />
+        实时扫描
+      </label>
+      <span id="liveScanStatus" class="live-scan-status" role="status">未开启</span>
+    </div>
+
+    <section class="picked-panel hidden" id="pickedElementPanel" aria-label="选中元素信息">
+      <div class="picked-heading">
+        <strong>选中元素 · 选择时快照</strong>
+        <button type="button" class="element-action-btn" id="clearPickedBtn">清除</button>
+      </div>
+      <div class="picked-summary" id="pickedElementSummary"></div>
+      <div class="element-actions">
+        <button type="button" class="element-action-btn" id="copyPickedCssBtn">复制 CSS</button>
+        <button type="button" class="element-action-btn" id="copyPickedTextBtn">复制文本</button>
+      </div>
+      <div class="inspector-body" id="pickedElementDetails"></div>
+    </section>
+
+    <div class="error-box hidden" id="errorBox" role="alert">
+      <div class="error-title">无法读取此页面。</div>
+      <div class="error-body">
+        可能原因：
+        <ul>
+          <li>当前页面属于浏览器内部页面（如 chrome:// 或 edge://）</li>
+          <li>页面尚未加载完成或正在刷新</li>
+          <li>当前页面不允许扩展访问（如官方应用商店）</li>
+        </ul>
+      </div>
+      <details class="dev-log">
+        <summary>开发日志</summary>
+        <pre id="devLog"></pre>
+      </details>
+    </div>
+
+    <section class="result-panel hidden" id="resultPanel">
+      <div class="stats" id="statsBar">
+        <div class="stat-item">
+          <span class="stat-value" id="statTotal">0</span>
+          <span class="stat-label">个元素</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="statInViewport">0</span>
+          <span class="stat-label">在视口内</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="statHidden">0</span>
+          <span class="stat-label">已过滤隐藏</span>
+        </div>
+      </div>
+
+      <div class="page-details">
+        <div><strong>域名：</strong><span id="detailDomain"></span></div>
+        <div><strong>视口：</strong><span id="detailViewport"></span></div>
+        <div><strong>滚动：</strong><span id="detailScroll"></span></div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-wrap">
+          <input
+            type="search"
+            class="search-input"
+            id="searchInput"
+            placeholder="搜索页面元素…（Ctrl+K）文本 / 标签 / placeholder / aria-label / id / class"
+            autocomplete="off" />
+          <button type="button" class="search-clear hidden" id="searchClearBtn"
+            title="清空搜索" aria-label="清空搜索">×</button>
+        </div>
+      </div>
+
+      <details class="advanced-filters" id="advancedFilters">
+        <summary>按标签 / class / ID / CSS / 属性筛选</summary>
+        <div class="query-grid">
+          <label>标签名<input id="tagFilter" placeholder="例如 p, h2, button" /></label>
+          <label>class（空格表示同时包含）<input id="classFilter" placeholder="例如 card featured" /></label>
+          <label>精确 ID<input id="idFilter" placeholder="例如 searchInput" /></label>
+          <label>CSS 选择器<input id="cssFilter" placeholder='例如 article.card > p[data-kind="price"]' /></label>
+          <label>属性 JSON（null 表示存在）<input id="attributeFilter" placeholder='例如 {"data-testid":"price"}' /></label>
+          <label class="viewport-filter"><input id="viewportFilter" type="checkbox" />仅视口内</label>
+        </div>
+        <p class="query-help">条件取交集；CSS 使用浏览器原生语法。查找普通容器请选择“全部可见 DOM”。</p>
+        <button id="clearFiltersBtn" class="btn btn-secondary" type="button">清除查询条件</button>
+      </details>
+
+      <div class="search-status" id="searchStatus"></div>
+
+      <div id="filterBar">
+       <div class="filter-bar" role="tablist" aria-label="内容分组">
+        <button type="button" class="filter-chip active" data-filter="all">全部</button>
+        <button type="button" class="filter-chip" data-filter="interactive">交互控件</button>
+        <button type="button" class="filter-chip" data-filter="text-content">文本内容</button>
+        <button type="button" class="filter-chip" data-filter="media-content">图片/媒体</button>
+        <button type="button" class="filter-chip" data-filter="structure">页面结构</button>
+       </div>
+       <details class="type-filters">
+        <summary>细分类型（数量为本次扫描统计）</summary>
+        <div class="filter-bar">
+        <button type="button" class="filter-chip" data-filter="button">Button</button>
+        <button type="button" class="filter-chip" data-filter="link">Link</button>
+        <button type="button" class="filter-chip" data-filter="input">Input</button>
+        <button type="button" class="filter-chip" data-filter="select">选择框</button>
+        <button type="button" class="filter-chip" data-filter="toggle">勾选/切换</button>
+        <button type="button" class="filter-chip" data-filter="editable">可编辑</button>
+        <button type="button" class="filter-chip" data-filter="control">其他控件</button>
+        <button type="button" class="filter-chip" data-filter="heading">标题</button>
+        <button type="button" class="filter-chip" data-filter="paragraph">段落</button>
+        <button type="button" class="filter-chip" data-filter="label">标签/说明</button>
+        <button type="button" class="filter-chip" data-filter="text">普通文本</button>
+        <button type="button" class="filter-chip" data-filter="image">图片</button>
+        <button type="button" class="filter-chip" data-filter="media">音视频/图形</button>
+        <button type="button" class="filter-chip" data-filter="list">列表</button>
+        <button type="button" class="filter-chip" data-filter="table">表格</button>
+        <button type="button" class="filter-chip" data-filter="region">区域</button>
+        <button type="button" class="filter-chip" data-filter="form">表单</button>
+        <button type="button" class="filter-chip" data-filter="other">Other</button>
+        </div>
+       </details>
+      </div>
+
+      <div class="rescan-hint hidden" id="rescanHint" role="status">
+        <span>页面可能已变化，建议重新扫描。</span>
+        <button type="button" class="rescan-hint-btn" id="rescanHintBtn">重新扫描</button>
+      </div>
+
+      <div class="scroll-controls" id="scrollControls">
+        <span class="scroll-controls-label">页面滚动：</span>
+        <button type="button" class="scroll-btn" data-scroll-direction="up">↑ 500px</button>
+        <button type="button" class="scroll-btn" data-scroll-direction="down">↓ 500px</button>
+      </div>
+
+      <div class="list-meta" id="listMeta"></div>
+      <div class="element-list" id="elementList"></div>
+      <div class="pagination" id="pagination">
+        <button type="button" class="btn btn-secondary" id="prevPageBtn">上一页</button>
+        <span id="pageStatus"></span>
+        <button type="button" class="btn btn-secondary" id="nextPageBtn">下一页</button>
+        <label>每页<select id="pageSize"><option value="50">50</option><option value="100" selected>100</option></select></label>
+      </div>
+
+      <details class="action-log-details" id="actionLogDetails">
+        <summary>Action Log（最近 20 条）</summary>
+        <div class="action-log" id="actionLogList">
+          <div class="action-log-empty">（暂无 Action）</div>
+        </div>
+      </details>
+
+      <details class="raw-data">
+        <summary>Debug / Raw Data (JSON)</summary>
+        <pre id="rawJson"></pre>
+      </details>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <button class="btn btn-secondary" id="copyBtn" type="button" disabled>复制 JSON</button>
+    <button class="btn btn-secondary" id="exportBtn" type="button" disabled>导出 JSON</button>
+    <button class="btn btn-secondary" id="clearHighlightBtn" type="button" disabled>取消高亮</button>
+  </footer>
+
+  <div class="toast hidden" id="toast" role="status"></div>
+
+  <script src="../shared/constants.js"></script>
+  <script src="../content/element-search.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

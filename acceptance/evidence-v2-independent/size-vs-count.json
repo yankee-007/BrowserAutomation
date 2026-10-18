@@ -1,0 +1,74 @@
+[
+  {
+    "t": 1790618467.89,
+    "event": "scan",
+    "n": 1500,
+    "pad": 0,
+    "ok": true,
+    "ms": 60.4,
+    "payload_bytes": 689893
+  },
+  {
+    "t": 1790618470.72,
+    "event": "scan",
+    "n": 1500,
+    "pad": 50,
+    "ok": true,
+    "ms": 55.5,
+    "payload_bytes": 912237
+  },
+  {
+    "t": 1790618473.52,
+    "event": "scan",
+    "n": 1500,
+    "pad": 100,
+    "ok": false,
+    "ms": 63.1,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618477.34,
+    "event": "scan",
+    "n": 1500,
+    "pad": 200,
+    "ok": false,
+    "ms": 76.7,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618481.33,
+    "event": "scan",
+    "n": 1500,
+    "pad": 300,
+    "ok": false,
+    "ms": 88.0,
+    "code": "NOT_CONNECTED"
+  },
+  {
+    "t": 1790618485.19,
+    "event": "scan",
+    "n": 2500,
+    "pad": 0,
+    "ok": true,
+    "ms": 82.2,
+    "payload_bytes": 1153788
+  },
+  {
+    "t": 1790618488.05,
+    "event": "scan",
+    "n": 2550,
+    "pad": 0,
+    "ok": true,
+    "ms": 79.8,
+    "payload_bytes": 1176988
+  },
+  {
+    "t": 1790618490.89,
+    "event": "scan",
+    "n": 2600,
+    "pad": 0,
+    "ok": false,
+    "ms": 69.2,
+    "code": "NOT_CONNECTED"
+  }
+]

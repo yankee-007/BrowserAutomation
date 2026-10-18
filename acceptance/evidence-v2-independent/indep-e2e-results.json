@@ -1,0 +1,1811 @@
+{
+  "results": [
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01",
+      "name": "Extension 完成 HELLO/HELLO_ACK 并连接",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01b",
+      "name": "Popup 桥接状态 = CONNECTED",
+      "ok": true,
+      "detail": "expected 'CONNECTED' got 'CONNECTED'"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01c",
+      "name": "Popup 版本 = 2.0.0",
+      "ok": true,
+      "detail": "expected '2.0.0' got '2.0.0'"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01d",
+      "name": "Popup endpoint = 127.0.0.1:8765",
+      "ok": true,
+      "detail": "expected '127.0.0.1:8765' got '127.0.0.1:8765'"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01e",
+      "name": "Popup protocol = pagesense/1",
+      "ok": true,
+      "detail": "expected 'pagesense/1' got 'pagesense/1'"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01f",
+      "name": "Popup 未报告 lastError",
+      "ok": true,
+      "detail": "null"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01g",
+      "name": "Popup 界面显示「● 已连接」（渲染后的真实 DOM 文本）",
+      "ok": true,
+      "detail": "{\"state\": \"● 已连接\", \"inline\": \"● 已连接\", \"endpoint\": \"127.0.0.1:8765\", \"dot\": \"controller-dot is-connected\", \"err\": \"controller-error hidden\", \"errText\": \"\", \"panelOpen\": true, \"buttonDisabled\": false, \"title\": \"PageSense\", \"version\": \"V2.0\"}"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01g2",
+      "name": "Popup 折叠标题栏同样显示已连接",
+      "ok": true,
+      "detail": "{\"state\": \"● 已连接\", \"inline\": \"● 已连接\", \"endpoint\": \"127.0.0.1:8765\", \"dot\": \"controller-dot is-connected\", \"err\": \"controller-error hidden\", \"errText\": \"\", \"panelOpen\": true, \"buttonDisabled\": false, \"title\": \"PageSense\", \"version\": \"V2.0\"}"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01h",
+      "name": "Popup 显示端点与 Controller 一致",
+      "ok": true,
+      "detail": "{\"state\": \"● 已连接\", \"inline\": \"● 已连接\", \"endpoint\": \"127.0.0.1:8765\", \"dot\": \"controller-dot is-connected\", \"err\": \"controller-error hidden\", \"errText\": \"\", \"panelOpen\": true, \"buttonDisabled\": false, \"title\": \"PageSense\", \"version\": \"V2.0\"}"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01i",
+      "name": "Popup 连接指示灯为已连接样式",
+      "ok": true,
+      "detail": "controller-dot is-connected"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01j",
+      "name": "Popup 未显示错误条",
+      "ok": true,
+      "detail": "controller-error hidden"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01k",
+      "name": "Popup 版本标签为 V2.0",
+      "ok": true,
+      "detail": "\"V2.0\""
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-01l",
+      "name": "Popup 最近请求列表已渲染 Controller 请求",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-02",
+      "name": "PING -> PONG",
+      "ok": true,
+      "detail": "{\"pong\": true, \"timestamp\": 1790619326053, \"version\": \"2.0.0\"}"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-02b",
+      "name": "PONG 携带扩展版本 2.0.0",
+      "ok": true,
+      "detail": "expected '2.0.0' got '2.0.0'"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-02c",
+      "name": "PONG 携带时间戳",
+      "ok": true,
+      "detail": "{\"pong\": true, \"timestamp\": 1790619326053, \"version\": \"2.0.0\"}"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-03",
+      "name": "GET_STATUS connected=true",
+      "ok": true,
+      "detail": "{\"connected\": true, \"state\": \"CONNECTED\", \"host\": \"127.0.0.1\", \"port\": 8765, \"protocol\": \"pagesense/1\", \"version\": \"2.0.0\", \"activeTab\": {\"tabId\": 2120318556, \"url\": \"http://127.0.0.1:8770/test/demo.h"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-03b",
+      "name": "GET_STATUS 返回活动标签页 tabId/url/title",
+      "ok": true,
+      "detail": "{\"tabId\": 2120318556, \"url\": \"http://127.0.0.1:8770/test/demo.html\", \"title\": \"PageSense Demo Page\"}"
+    },
+    {
+      "section": "CONNECT / handshake",
+      "id": "E2E-03c",
+      "name": "Controller 与 Popup 报告同一活动标签页",
+      "ok": true,
+      "detail": "expected 2120318556 got 2120318556"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04",
+      "name": "SCAN 返回 page/stats/elements",
+      "ok": true,
+      "detail": "{\"matched\": 34, \"total\": 28, \"hidden\": 6, \"inViewport\": 17}"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-tabId",
+      "name": "SCAN 结果含 tabId",
+      "ok": true,
+      "detail": "2120318556"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-url",
+      "name": "SCAN 结果含 url",
+      "ok": true,
+      "detail": "\"http://127.0.0.1:8770/test/demo.html\""
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-title",
+      "name": "SCAN 结果含 title",
+      "ok": true,
+      "detail": "\"PageSense Demo Page\""
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-schemaVersion",
+      "name": "SCAN 结果含 schemaVersion",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-scannedAt",
+      "name": "SCAN 结果含 scannedAt",
+      "ok": true,
+      "detail": "\"2026-09-28T18:15:26.079Z\""
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-eq",
+      "name": "elements.length == stats.total",
+      "ok": true,
+      "detail": "expected 28 got 28"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-mh",
+      "name": "stats.matched == total + hidden",
+      "ok": true,
+      "detail": "expected 34 got 34"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-iv",
+      "name": "stats.inViewport <= stats.total",
+      "ok": true,
+      "detail": "{'matched': 34, 'total': 28, 'hidden': 6, 'inViewport': 17}"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-dom",
+      "name": "page.domain 为 127.0.0.1",
+      "ok": true,
+      "detail": "expected '127.0.0.1' got '127.0.0.1'"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-url",
+      "name": "url 指向真实 demo 页面",
+      "ok": true,
+      "detail": "http://127.0.0.1:8770/test/demo.html"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-ids",
+      "name": "elementId 为 1..N 且唯一",
+      "ok": true,
+      "detail": "expected [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28] got [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-map",
+      "name": "真实 DOM 上 data-pagesense-id 数量 == stats.total",
+      "ok": true,
+      "detail": "expected 28 got 28"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-spot",
+      "name": "抽查 6 个元素的 tag/rect/text 与真实 DOM 一致",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "section": "SCAN",
+      "id": "E2E-04-visible",
+      "name": "每个元素都带 visible/inViewport 布尔值",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-01",
+      "name": "搜索「立即沟通」有结果",
+      "ok": true,
+      "detail": "{\"query\": \"立即沟通\", \"normalizedQuery\": \"立即沟通\", \"keywords\": [\"立即沟通\"], \"limit\": 20, \"total\": 1, \"returned\": 1, \"truncated\": false, \"durationMs\": 1, \"indexSize\": 1, \"results\": [{\"elementId\": 4, \"score\": 10"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-01b",
+      "name": "第一条为 text 精确匹配（score=100）",
+      "ok": true,
+      "detail": "expected 100 got 100"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-01c",
+      "name": "matchedFields 含 text",
+      "ok": true,
+      "detail": "['text']"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-01d",
+      "name": "返回的 elementId 指向真实对应节点",
+      "ok": true,
+      "detail": "{\"domId\": null, \"tag\": \"button\", \"text\": \"立即沟通\", \"value\": \"\", \"rect\": {\"x\": 279, \"y\": 345, \"w\": 81, \"h\": 37}, \"pageX\": 279, \"pageY\": 345, \"hasOwnMappingAttr\": true}"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-02",
+      "name": "结果结构含 elementId/score/matchedFields/element",
+      "ok": true,
+      "detail": "[{\"elementId\": 4, \"score\": 100, \"matchedFields\": [\"text\"], \"element\": {\"tag\": \"button\", \"text\": \"立即沟通\", \"role\": null, \"visible\": true, \"inViewport\": true}}]"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-02b",
+      "name": "results 长度 == returned",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-02c",
+      "name": "truncated == (total > returned)",
+      "ok": true,
+      "detail": "expected False got False"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-02d",
+      "name": "keywords 已分词",
+      "ok": true,
+      "detail": "expected ['立即沟通'] got ['立即沟通']"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-03",
+      "name": "空 query 返回全部扫描元素",
+      "ok": true,
+      "detail": "expected 28 got 28"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-03b",
+      "name": "空 query 的 score 全为 0 且 matchedFields 为空",
+      "ok": true,
+      "detail": "[{\"elementId\": 1, \"score\": 0, \"matchedFields\": [], \"element\": {\"tag\": \"a\", \"text\": \"前往 Example\", \"role\": null, \"visible\": true, \"inViewport\": true}}, {\"elementId\": 2, \"score\": 0, \"matchedFields\": [], \"element\": {\"tag\": \"a\", \"text\": \"页内锚点链接\", \"role\": null, \"visible\": true, \"inViewport\": true}}]"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-03c",
+      "name": "空 query 保持 DOM 顺序",
+      "ok": true,
+      "detail": "expected [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] got [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-04",
+      "name": "无结果 total=0",
+      "ok": true,
+      "detail": "expected 0 got 0"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-04b",
+      "name": "无结果 returned=0",
+      "ok": true,
+      "detail": "expected 0 got 0"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-04c",
+      "name": "无结果 truncated=false",
+      "ok": true,
+      "detail": "expected False got False"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-05",
+      "name": "limit=1 只返回 1 条",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-05b",
+      "name": "limit=100 生效",
+      "ok": true,
+      "detail": "expected 100 got 100"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-05c",
+      "name": "limit>100 被夹取到 100",
+      "ok": true,
+      "detail": "expected 100 got 100"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-05d",
+      "name": "limit=0 被夹取到 1",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-05e",
+      "name": "limit=-5 被夹取到 1",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-05f",
+      "name": "limit=abc 回退默认 20",
+      "ok": true,
+      "detail": "expected 20 got 20"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-05g",
+      "name": "limit 非法值回退后仍返回结果",
+      "ok": true,
+      "detail": "expected 20 got 20"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-06",
+      "name": "limit=100 时 total 仍为真实命中总数",
+      "ok": true,
+      "detail": "{\"query\": \"\", \"normalizedQuery\": \"\", \"keywords\": [], \"limit\": 100, \"total\": 28, \"returned\": 28, \"truncated\": false, \"durationMs\": 0, \"indexSize\": 28, "
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-06b",
+      "name": "truncated 正确反映截断",
+      "ok": true,
+      "detail": "{\"query\": \"\", \"normalizedQuery\": \"\", \"keywords\": [], \"limit\": 100, \"total\": 28, \"returned\": 28, \"truncated\": false, \"durationMs\": 0, \"indexSize\": 28, "
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-07",
+      "name": "结果按 score 降序",
+      "ok": true,
+      "detail": "[80, 80, 80, 60, 35, 35, 35, 30, 30, 20, 20, 20]"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-07b",
+      "name": "同分时按 elementId 升序（DOM 顺序）",
+      "ok": true,
+      "detail": "[[25, 80], [26, 80], [27, 80], [1, 60], [2, 35], [3, 35], [19, 35], [23, 30], [28, 30], [4, 20], [9, 20], [18, 20], [20, 20], [21, 20], [22, 20], [24, 20], [11, 18]]"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-08",
+      "name": "返回 durationMs（整数）",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "section": "SEARCH (real browser)",
+      "id": "SEARCH-08b",
+      "name": "matchedFields 只包含真实命中的字段",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-SCAN",
+      "name": "ranking fixture 扫描成功",
+      "ok": true,
+      "detail": "expected 15 got 15"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-f-text-exact",
+      "name": "f-text-exact score=100 field=text",
+      "ok": true,
+      "detail": "{\"elementId\": 1, \"score\": 100, \"matchedFields\": [\"text\"], \"element\": {\"tag\": \"a\", \"text\": \"工程师\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-f-text-prefix",
+      "name": "f-text-prefix score=80 field=text",
+      "ok": true,
+      "detail": "{\"elementId\": 2, \"score\": 80, \"matchedFields\": [\"text\"], \"element\": {\"tag\": \"a\", \"text\": \"工程师助理\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-f-text-contains",
+      "name": "f-text-contains score=60 field=text",
+      "ok": true,
+      "detail": "{\"elementId\": 3, \"score\": 60, \"matchedFields\": [\"text\"], \"element\": {\"tag\": \"a\", \"text\": \"高级工程师职位\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-f-ph-exact",
+      "name": "f-ph-exact score=100 field=text",
+      "ok": true,
+      "detail": "{\"elementId\": 4, \"score\": 100, \"matchedFields\": [\"text\"], \"element\": {\"tag\": \"input\", \"text\": \"工程师\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-f-ph-prefix",
+      "name": "f-ph-prefix score=80 field=text",
+      "ok": true,
+      "detail": "{\"elementId\": 5, \"score\": 80, \"matchedFields\": [\"text\"], \"element\": {\"tag\": \"input\", \"text\": \"工程师助理\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-f-ph-contains",
+      "name": "f-ph-contains score=60 field=text",
+      "ok": true,
+      "detail": "{\"elementId\": 6, \"score\": 60, \"matchedFields\": [\"text\"], \"element\": {\"tag\": \"input\", \"text\": \"高级工程师职位\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-f-aria-exact",
+      "name": "f-aria-exact score=55 field=ariaLabel",
+      "ok": true,
+      "detail": "{\"elementId\": 7, \"score\": 55, \"matchedFields\": [\"ariaLabel\"], \"element\": {\"tag\": \"button\", \"text\": \"A\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-f-aria-prefix",
+      "name": "f-aria-prefix score=45 field=ariaLabel",
+      "ok": true,
+      "detail": "{\"elementId\": 8, \"score\": 45, \"matchedFields\": [\"ariaLabel\"], \"element\": {\"tag\": \"button\", \"text\": \"B\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-f-title-exact",
+      "name": "f-title-exact score=45 field=title",
+      "ok": true,
+      "detail": "{\"elementId\": 9, \"score\": 45, \"matchedFields\": [\"title\"], \"element\": {\"tag\": \"button\", \"text\": \"C\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-f-class-contains",
+      "name": "f-class-contains score=20 field=className",
+      "ok": true,
+      "detail": "{\"elementId\": 10, \"score\": 20, \"matchedFields\": [\"className\"], \"element\": {\"tag\": \"button\", \"text\": \"D\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-tag",
+      "name": "tag 字段参与匹配 (button -> score>=35)",
+      "ok": true,
+      "detail": "{\"elementId\": 7, \"score\": 35, \"matchedFields\": [\"tag\"], \"element\": {\"tag\": \"button\", \"text\": \"A\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-id",
+      "name": "id 字段精确匹配 -> score 45",
+      "ok": true,
+      "detail": "{\"elementId\": 14, \"score\": 45, \"matchedFields\": [\"id\"], \"element\": {\"tag\": \"a\", \"text\": \"H\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-role",
+      "name": "role 字段精确匹配 -> score 40",
+      "ok": true,
+      "detail": "{\"elementId\": 11, \"score\": 40, \"matchedFields\": [\"role\"], \"element\": {\"tag\": \"button\", \"text\": \"E\", \"role\": \"link\", \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-href-minlen",
+      "name": "单字符关键词不参与 href 匹配",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-href",
+      "name": "href 参与匹配（ASCII 关键词，score=10）",
+      "ok": true,
+      "detail": "{\"elementId\": 13, \"score\": 10, \"matchedFields\": [\"href\"], \"element\": {\"tag\": \"a\", \"text\": \"G\", \"role\": null, \"visible\": true, \"inViewport\": true}}"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-href-encoded",
+      "name": "非 ASCII 关键词不匹配 href（element.href 被百分号编码）",
+      "ok": true,
+      "detail": "null"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-href-encoded-2",
+      "name": "确认 href 已被百分号编码",
+      "ok": true,
+      "detail": "https://example.com/%E5%B7%A5%E7%A8%8B%E5%B8%88/1"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-case",
+      "name": "大小写不敏感（大写同样命中 f-text-exact 的英文）",
+      "ok": true,
+      "detail": "english not present in fixture; covered by unit fixture"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "RANK-fullwidth-space",
+      "name": "全角空格被规范化为普通空白",
+      "ok": true,
+      "detail": "[\"\\u5de5\\u7a0b\\u5e08\"]"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "AND-01",
+      "name": "「AI 工程师」是 AND 语义，只命中同时包含两词的元素",
+      "ok": true,
+      "detail": "expected [1] got [1]"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "AND-01b",
+      "name": "AND 查询 keywords 分词正确",
+      "ok": true,
+      "detail": "expected ['ai', '工程师'] got ['ai', '工程师']"
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "AND-01c",
+      "name": "AI产品经理 未命中",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "AND-01d",
+      "name": "Java工程师 未命中",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "AND-01e",
+      "name": "产品运营 未命中",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "SEARCH ranking fixture (real DOM)",
+      "id": "AND-02",
+      "name": "bridge SEARCH 响应 indexSize 字段语义检查",
+      "ok": true,
+      "detail": "indexSize=2 total=2 returned=2 扫描总数已单独核对"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-01",
+      "name": "HIGHLIGHT 后真实 overlay 数量 == 1",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-02",
+      "name": "HIGHLIGHT 回执为 V1.1 契约 (success + elementId)",
+      "ok": true,
+      "detail": "{\"success\": true, \"elementId\": 25}"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-03",
+      "name": "overlay rect ≈ 目标元素 rect（容差 3px，同一帧内采样）",
+      "ok": true,
+      "detail": "overlay={'x': 279, 'y': 532, 'w': 202, 'h': 33} target={'x': 279, 'y': 532, 'w': 202, 'h': 33} delta=(0,0,0,0)"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-04",
+      "name": "overlay 标签显示 #id <tag> 文本",
+      "ok": true,
+      "detail": "\"#25 <input> Action 输入测试\""
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-05",
+      "name": "overlay 只创建自己的 2 个节点（框 + 标签），不修改页面元素",
+      "ok": true,
+      "detail": "expected 2 got 2"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-05b",
+      "name": "高亮不修改目标元素自身的样式",
+      "ok": true,
+      "detail": "{\"ok\": true, \"value\": null}"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-06",
+      "name": "连续高亮 5 次仍只有一个 overlay",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-07",
+      "name": "LOCATE 成功",
+      "ok": true,
+      "detail": "{\"success\": true, \"elementId\": 25}"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-07b",
+      "name": "LOCATE 后 overlay 数不变",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-08",
+      "name": "CLEAR_HIGHLIGHT 后 overlay == 0",
+      "ok": true,
+      "detail": "expected 0 got 0"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-08b",
+      "name": "CLEAR_HIGHLIGHT success",
+      "ok": true,
+      "detail": "{\"success\": true}"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-08c",
+      "name": "CLEAR_HIGHLIGHT 幂等（再次调用不报错）",
+      "ok": true,
+      "detail": "expected 'NO_ERROR' got 'NO_ERROR'"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-09",
+      "name": "非法 elementId（字符串 abc）-> INVALID_ELEMENT_ID",
+      "ok": true,
+      "detail": "expected 'INVALID_ELEMENT_ID' got 'INVALID_ELEMENT_ID'"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-09b",
+      "name": "elementId=0 -> INVALID_ELEMENT_ID",
+      "ok": true,
+      "detail": "expected 'INVALID_ELEMENT_ID' got 'INVALID_ELEMENT_ID'"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-09c",
+      "name": "elementId=-1 -> INVALID_ELEMENT_ID",
+      "ok": true,
+      "detail": "expected 'INVALID_ELEMENT_ID' got 'INVALID_ELEMENT_ID'"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-09d",
+      "name": "不存在的 elementId -> ELEMENT_NOT_FOUND",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-09e",
+      "name": "LOCATE 不存在的 elementId -> ELEMENT_NOT_FOUND",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "LOCATE / HIGHLIGHT / CLEAR",
+      "id": "HL-10",
+      "name": "数字字符串 elementId 被接受",
+      "ok": true,
+      "detail": "{\"success\": true, \"elementId\": 25}"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLICK",
+      "name": "CLICK 使真实计数器 +1",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLICK-b",
+      "name": "CLICK 回执 success/elementId/actionId",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_CLICK_ELEMENT\", \"actionId\": \"act_mulkin34_2iq30m\", \"timestamp\": 1790619331936, \"durationMs\": 1, \"elementId\": 1, \"rescanRecommended\": true, \"message\": \"Click completed\"}"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLICK-c",
+      "name": "CLICK 回执建议重新扫描",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLICK-20",
+      "name": "连续 20 次 CLICK 精确 +20",
+      "ok": true,
+      "detail": "expected 21 got 21"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLICK-disabled",
+      "name": "disabled 按钮 -> ELEMENT_DISABLED",
+      "ok": true,
+      "detail": "expected 'ELEMENT_DISABLED' got 'ELEMENT_DISABLED'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLICK-aria",
+      "name": "aria-disabled 按钮 -> ELEMENT_DISABLED",
+      "ok": true,
+      "detail": "expected 'ELEMENT_DISABLED' got 'ELEMENT_DISABLED'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLICK-notfound",
+      "name": "不存在的 elementId -> ELEMENT_NOT_FOUND",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLICK-invalid",
+      "name": "非法 elementId -> INVALID_ELEMENT_ID",
+      "ok": true,
+      "detail": "expected 'INVALID_ELEMENT_ID' got 'INVALID_ELEMENT_ID'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLICK-missing",
+      "name": "缺少 elementId -> INVALID_ELEMENT_ID",
+      "ok": true,
+      "detail": "expected 'INVALID_ELEMENT_ID' got 'INVALID_ELEMENT_ID'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT",
+      "name": "INPUT 后真实 input.value 正确",
+      "ok": true,
+      "detail": "expected 'AI应用工程师' got 'AI应用工程师'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT-b",
+      "name": "INPUT 触发真实 input 事件",
+      "ok": true,
+      "detail": "{\"input\": 1, \"change\": 1, \"keydown\": 0}"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT-c",
+      "name": "INPUT 触发真实 change 事件",
+      "ok": true,
+      "detail": "{\"input\": 1, \"change\": 1, \"keydown\": 0}"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT-d",
+      "name": "INPUT 回执 success/value",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_INPUT_ELEMENT\", \"actionId\": \"act_mulkin4r_kaf0xn\", \"timestamp\": 1790619331995, \"durationMs\": 1, \"elementId\": 4, \"rescanRecommended\": true, \"value\": \"AI应用工程师\", \"message\": \"Input completed\"}"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT-e",
+      "name": "INPUT 后页面回显文本更新",
+      "ok": true,
+      "detail": "expected 'change:1' got 'change:1'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT-area",
+      "name": "INPUT 支持 textarea",
+      "ok": true,
+      "detail": "expected '文本域内容' got '文本域内容'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT-ce",
+      "name": "INPUT 支持 contenteditable",
+      "ok": true,
+      "detail": "expected '可编辑内容' got '可编辑内容'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT-empty",
+      "name": "INPUT 允许空字符串",
+      "ok": true,
+      "detail": "expected '' got ''"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT-unsupported",
+      "name": "INPUT 到 button -> UNSUPPORTED_ELEMENT",
+      "ok": true,
+      "detail": "expected 'UNSUPPORTED_ELEMENT' got 'UNSUPPORTED_ELEMENT'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT-badvalue",
+      "name": "INPUT value 非字符串 -> INVALID_VALUE",
+      "ok": true,
+      "detail": "expected 'INVALID_VALUE' got 'INVALID_VALUE'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT-notfound",
+      "name": "INPUT 不存在元素 -> ELEMENT_NOT_FOUND",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-INPUT-disabled",
+      "name": "INPUT 到 disabled 元素 -> ELEMENT_DISABLED",
+      "ok": true,
+      "detail": "expected 'ELEMENT_DISABLED' got 'ELEMENT_DISABLED'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLEAR",
+      "name": "CLEAR 清空真实 input",
+      "ok": true,
+      "detail": "expected '' got ''"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLEAR-b",
+      "name": "CLEAR 回执 action 为 CLEAR_ELEMENT",
+      "ok": true,
+      "detail": "expected 'PAGESENSE_CLEAR_ELEMENT' got 'PAGESENSE_CLEAR_ELEMENT'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-CLEAR-notfound",
+      "name": "CLEAR 不存在元素 -> ELEMENT_NOT_FOUND",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-KEY-enter",
+      "name": "KEYPRESS Enter 被真实页面记录",
+      "ok": true,
+      "detail": "keydown:Enter,keyup:Enter"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-KEY-enter-b",
+      "name": "KEYPRESS 回执 key=Enter",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_KEYPRESS_ELEMENT\", \"actionId\": \"act_mulkin76_rls3we\", \"timestamp\": 1790619332082, \"durationMs\": 0, \"elementId\": 7, \"rescanRecommended\": true, \"key\": \"Enter\", \"message\": \"Keypress completed\"}"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-KEY-down",
+      "name": "KEYPRESS ArrowDown 被真实页面记录",
+      "ok": true,
+      "detail": "keydown:Enter,keyup:Enter,keydown:ArrowDown,keyup:ArrowDown"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-KEY-escape",
+      "name": "KEYPRESS Escape 被真实页面记录",
+      "ok": true,
+      "detail": "keydown:Enter,keyup:Enter,keydown:ArrowDown,keyup:ArrowDown,keydown:Escape,keyup:Escape"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-KEY-space",
+      "name": "KEYPRESS Space 别名被接受并规范化为 \" \"",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_KEYPRESS_ELEMENT\", \"actionId\": \"act_mulkinpl_o21j8o\", \"timestamp\": 1790619332745, \"durationMs\": 0, \"elementId\": 7, \"rescanRecommended\": true, \"key\": \"Space\", \"message\": \"Keypress completed\"}"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-KEY-invalid",
+      "name": "KEYPRESS FakeKey -> INVALID_KEY",
+      "ok": true,
+      "detail": "expected 'INVALID_KEY' got 'INVALID_KEY'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-KEY-invalid2",
+      "name": "KEYPRESS F1 -> INVALID_KEY",
+      "ok": true,
+      "detail": "expected 'INVALID_KEY' got 'INVALID_KEY'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-KEY-invalid3",
+      "name": "KEYPRESS 空 key -> INVALID_KEY",
+      "ok": true,
+      "detail": "expected 'INVALID_KEY' got 'INVALID_KEY'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-KEY-disabled",
+      "name": "KEYPRESS disabled 元素 -> ELEMENT_DISABLED",
+      "ok": true,
+      "detail": "expected 'ELEMENT_DISABLED' got 'ELEMENT_DISABLED'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-pre",
+      "name": "滚动前 scrollY=0",
+      "ok": true,
+      "detail": "expected 0 got 0"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-down",
+      "name": "SCROLL down 500 真实改变 scrollY",
+      "ok": true,
+      "detail": "scrollY=500 resp={\"success\": true, \"action\": \"PAGESENSE_SCROLL_PAGE\", \"actionId\": \"act_mulkinyy_ikj9ub\", \"timestamp\": 1790619333082, \"durationMs\": 1, \"elementId\": null, \"rescanRecommended\": false, \"before\": {\"x\": 0, \"y\": 0}, \"after\": {\"x\": 0, \"y\": 500}, \"moved\": true, \"message\": \"Scroll completed\"}"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-resp",
+      "name": "SCROLL 回执含 before/after/moved",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_SCROLL_PAGE\", \"actionId\": \"act_mulkinyy_ikj9ub\", \"timestamp\": 1790619333082, \"durationMs\": 1, \"elementId\": null, \"rescanRecommended\": false, \"before\": {\"x\": 0, \"y\": 0}, \"after\": {\"x\": 0, \"y\": 500}, \"moved\": true, \"message\": \"Scroll completed\"}"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-up",
+      "name": "SCROLL up 500 回到顶部",
+      "ok": true,
+      "detail": "scrollY 500 -> 0"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-amount-bounds",
+      "name": "amount 记录在回执中",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_SCROLL_PAGE\", \"actionId\": \"act_mulkioah_tblxjm\", \"timestamp\": 1790619333497, \"durationMs\": 0, \"elementId\": null, \"rescanRecommended\": false, \"before\": {\"x\": 0, \"y\": 500}, \"after\": {\"x\": 0, \"y\": 0}, \"moved\": true, \"message\": \"Scroll completed\"}"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-boundary",
+      "name": "顶部继续上滚 -> moved=false 且不算异常",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_SCROLL_PAGE\", \"actionId\": \"act_mulkiorw_f8nz4b\", \"timestamp\": 1790619334124, \"durationMs\": 0, \"elementId\": null, \"rescanRecommended\": false, \"before\": {\"x\": 0, \"y\": 0}, \"after\": {\"x\": 0, \"y\": 0}, \"moved\": false, \"message\": \"Already at scroll boundary\"}"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-方向非法",
+      "name": "SCROLL 方向非法 -> INVALID_VALUE",
+      "ok": true,
+      "detail": "expected 'INVALID_VALUE' got 'INVALID_VALUE'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-方向为空",
+      "name": "SCROLL 方向为空 -> INVALID_VALUE",
+      "ok": true,
+      "detail": "expected 'INVALID_VALUE' got 'INVALID_VALUE'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-amount=0",
+      "name": "SCROLL amount=0 -> INVALID_VALUE",
+      "ok": true,
+      "detail": "expected 'INVALID_VALUE' got 'INVALID_VALUE'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-amount 负数",
+      "name": "SCROLL amount 负数 -> INVALID_VALUE",
+      "ok": true,
+      "detail": "expected 'INVALID_VALUE' got 'INVALID_VALUE'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-amount 超上限",
+      "name": "SCROLL amount 超上限 -> INVALID_VALUE",
+      "ok": true,
+      "detail": "expected 'INVALID_VALUE' got 'INVALID_VALUE'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-amount 非数字",
+      "name": "SCROLL amount 非数字 -> INVALID_VALUE",
+      "ok": true,
+      "detail": "expected 'INVALID_VALUE' got 'INVALID_VALUE'"
+    },
+    {
+      "section": "ACTION: CLICK / INPUT / CLEAR / KEYPRESS / SCROLL",
+      "id": "ACT-SCROLL-max",
+      "name": "amount=5000（上限）被接受",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_SCROLL_PAGE\", \"actionId\": \"act_mulkiosa_xq7kb6\", \"timestamp\": 1790619334138, \"durationMs\": 0, \"elementId\": null, \"rescanRecommended\": false, \"before\": {\"x\": 0, \"y\": 0}, \"after\": {\"x\": 0, \"y\": 2278.666748046875}, \"moved\": true, \"message\": \"Scroll completed\"}"
+    },
+    {
+      "section": "elementId lifecycle / invalidation",
+      "id": "LIFE-01",
+      "name": "victim 节点已从真实 DOM 删除",
+      "ok": true,
+      "detail": "{\"ok\": true, \"value\": true}"
+    },
+    {
+      "section": "elementId lifecycle / invalidation",
+      "id": "LIFE-02",
+      "name": "删除后 CLICK -> ELEMENT_NOT_FOUND",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "elementId lifecycle / invalidation",
+      "id": "LIFE-02b",
+      "name": "删除后 INPUT -> ELEMENT_NOT_FOUND",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "elementId lifecycle / invalidation",
+      "id": "LIFE-02c",
+      "name": "删除后 HIGHLIGHT -> ELEMENT_NOT_FOUND",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "elementId lifecycle / invalidation",
+      "id": "LIFE-02d",
+      "name": "删除后 LOCATE -> ELEMENT_NOT_FOUND",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "elementId lifecycle / invalidation",
+      "id": "LIFE-02e",
+      "name": "删除后 CLEAR -> ELEMENT_NOT_FOUND",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "elementId lifecycle / invalidation",
+      "id": "LIFE-03",
+      "name": "同名/同文本元素被重新加入后，旧 elementId 仍然失效（不猜测）",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "elementId lifecycle / invalidation",
+      "id": "LIFE-04",
+      "name": "重新扫描后新元素获得新的 elementId",
+      "ok": true,
+      "detail": "{\"elementId\": 5, \"tag\": \"button\", \"text\": \"victim button\", \"id\": \"victim\", \"className\": null, \"name\": null, \"type\": null, \"role\": null, \"href\": null, \"placeholder\": null, \"ariaLabel\": null, \"title\": null, \"disabled\": false, \"contentEditable\": false, \"visible\": true, \"inViewport\": true, \"position\": {\"x\": 8, \"y\": 37, \"pageX\": 8, \"pageY\": 37, \"width\": 91, \"height\": 21, \"top\": 37, \"right\": 99, \"bottom\": 58, \"left\": 8}}"
+    },
+    {
+      "section": "elementId lifecycle / invalidation",
+      "id": "LIFE-04b",
+      "name": "重新扫描后映射数量与 stats.total 一致",
+      "ok": true,
+      "detail": "5 vs 5"
+    },
+    {
+      "section": "elementId lifecycle / invalidation",
+      "id": "LIFE-05",
+      "name": "搜索索引不包含扫描后新增的元素（索引与扫描绑定）",
+      "ok": true,
+      "detail": "{\"query\": \"added button\", \"normalizedQuery\": \"added button\", \"keywords\": [\"added\", \"button\"], \"limit\": 100, \"total\": 0, \"returned\": 0, \"truncated\": false, \"durationMs\": 0, \"indexSize\": 0, \"results\": ["
+    },
+    {
+      "section": "elementId lifecycle / invalidation",
+      "id": "LIFE-06",
+      "name": "重新扫描后新增元素可被搜索到",
+      "ok": true,
+      "detail": "{\"query\": \"added button\", \"normalizedQuery\": \"added button\", \"keywords\": [\"added\", \"button\"], \"limit\": 100, \"total\": 1, \"returned\": 1, \"truncated\": false, \"durationMs\": 0, \"indexSize\": 1, \"results\": ["
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-01",
+      "name": "同标签页导航到另一文档后旧 elementId 失效",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-02",
+      "name": "导航后重新扫描可用",
+      "ok": true,
+      "detail": "{\"matched\": 1, \"total\": 1, \"hidden\": 0, \"inViewport\": 1}"
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-02b",
+      "name": "导航后扫描的是新页面",
+      "ok": true,
+      "detail": "http://127.0.0.1:8799/f/noscroll"
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-02c",
+      "name": "新文档只有 1 个元素",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-09",
+      "name": "跨标签页复用旧 elementId 时不会静默命中另一个页面的元素",
+      "ok": false,
+      "detail": "code=NO_ERROR; 目标页上该 id 解析为={\"domId\": null, \"tag\": \"a\", \"text\": \"前往 Example\", \"value\": null, \"rect\": {\"x\": 279, \"y\": -2189, \"w\": 95, \"h\": 26}, \"pageX\": 279, \"pageY\": 217, \"hasOwnMappingAttr\": true}; demo clickTestBtn elementId=24; url http://127.0.0.1:8770/test/demo.html -> https://example.com/; clickCount 0 -> None; after_state_error=None"
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-09b",
+      "name": "跨标签页别名点击未导致 Controller 掉线或崩溃",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-04",
+      "name": "页面刷新后旧 elementId 失效",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-05",
+      "name": "刷新后 SCAN + SEARCH 恢复正常",
+      "ok": true,
+      "detail": "{\"query\": \"立即沟通\", \"normalizedQuery\": \"立即沟通\", \"keywords\": [\"立即沟通\"], \"limit\": 20, \"total\": 1, \"returned\": 1, \"truncated\": false, \"durationMs\": 0, \"index"
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-06",
+      "name": "刷新后 ACTION 恢复正常",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-07",
+      "name": "切换到新标签页后 SCAN 作用于新的活动标签页",
+      "ok": true,
+      "detail": "http://127.0.0.1:8799/f/noscroll"
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-07b",
+      "name": "新标签页只有 1 个元素",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "navigation / page reload / tab switch",
+      "id": "NAV-08",
+      "name": "切回 demo 后 SCAN 作用于 demo",
+      "ok": true,
+      "detail": "http://127.0.0.1:8770/test/demo.html"
+    },
+    {
+      "section": "restricted pages",
+      "id": "REST-01",
+      "name": "edge://extensions 上 SCAN -> RESTRICTED_PAGE",
+      "ok": true,
+      "detail": "expected 'RESTRICTED_PAGE' got 'RESTRICTED_PAGE'"
+    },
+    {
+      "section": "restricted pages",
+      "id": "REST-01b",
+      "name": "edge://extensions 上 SEARCH -> RESTRICTED_PAGE",
+      "ok": true,
+      "detail": "expected 'RESTRICTED_PAGE' got 'RESTRICTED_PAGE'"
+    },
+    {
+      "section": "restricted pages",
+      "id": "REST-01c",
+      "name": "edge://extensions 上 CLICK -> RESTRICTED_PAGE",
+      "ok": true,
+      "detail": "expected 'RESTRICTED_PAGE' got 'RESTRICTED_PAGE'"
+    },
+    {
+      "section": "restricted pages",
+      "id": "REST-02",
+      "name": "受限页面未使 Controller 崩溃",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "restricted pages",
+      "id": "REST-03",
+      "name": "受限页面未使扩展掉线",
+      "ok": true,
+      "detail": "expected 'CONNECTED' got 'CONNECTED'"
+    },
+    {
+      "section": "restricted pages",
+      "id": "REST-04",
+      "name": "受限页面未产生 Service Worker 未捕获异常",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "section": "restricted pages",
+      "id": "REST-05",
+      "name": "edge://settings 上 SCAN -> RESTRICTED_PAGE",
+      "ok": true,
+      "detail": "expected 'RESTRICTED_PAGE' got 'RESTRICTED_PAGE'"
+    },
+    {
+      "section": "restricted pages",
+      "id": "REST-06",
+      "name": "返回普通页面后 SCAN 恢复",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R1",
+      "name": "未知方法 -> UNKNOWN_METHOD",
+      "ok": true,
+      "detail": "expected 'UNKNOWN_METHOD' got 'UNKNOWN_METHOD'"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R2",
+      "name": "CALL 小写方法名 -> UNKNOWN_METHOD",
+      "ok": true,
+      "detail": "expected 'UNKNOWN_METHOD' got 'UNKNOWN_METHOD'"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R3",
+      "name": "缺少 elementId 的 CLICK -> INVALID_ELEMENT_ID",
+      "ok": true,
+      "detail": "expected 'INVALID_ELEMENT_ID' got 'INVALID_ELEMENT_ID'"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R4",
+      "name": "elementId 为字符串 abc -> INVALID_ELEMENT_ID",
+      "ok": true,
+      "detail": "expected 'INVALID_ELEMENT_ID' got 'INVALID_ELEMENT_ID'"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R5",
+      "name": "elementId 为 null -> INVALID_ELEMENT_ID",
+      "ok": true,
+      "detail": "expected 'INVALID_ELEMENT_ID' got 'INVALID_ELEMENT_ID'"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R6",
+      "name": "elementId 为超大整数 -> ELEMENT_NOT_FOUND",
+      "ok": true,
+      "detail": "expected 'ELEMENT_NOT_FOUND' got 'ELEMENT_NOT_FOUND'"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R7",
+      "name": "SCROLL 缺少 direction -> INVALID_VALUE",
+      "ok": true,
+      "detail": "expected 'INVALID_VALUE' got 'INVALID_VALUE'"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R8",
+      "name": "KEYPRESS 缺少 key -> INVALID_KEY",
+      "ok": true,
+      "detail": "expected 'INVALID_KEY' got 'INVALID_KEY'"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R9",
+      "name": "SEARCH 缺少 query 时按空 query 处理（返回全部）",
+      "ok": true,
+      "detail": "{\"query\": \"\", \"normalizedQuery\": \"\", \"keywords\": [], \"limit\": 20, \"total\": 28, \"returned\": 20, \"truncated\": true, \"durat"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R10",
+      "name": "连接在上面的错误之后仍然可用",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R11",
+      "name": "拓展记录最近请求日志且不超过 20 条",
+      "ok": true,
+      "detail": "len=20"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R12",
+      "name": "超时路径 -> REQUEST_TIMEOUT（不会永久挂起）",
+      "ok": true,
+      "detail": "expected 'REQUEST_TIMEOUT' got 'REQUEST_TIMEOUT'"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R13",
+      "name": "超时后连接仍可用",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R14",
+      "name": "一条 SCAN 消息只产生一个响应（无重复 listener）",
+      "ok": true,
+      "detail": "expected [1] got [1]"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R15",
+      "name": "一条 CLICK 消息只产生一个响应",
+      "ok": true,
+      "detail": "expected [1] got [1]"
+    },
+    {
+      "section": "protocol robustness against the real extension",
+      "id": "PROTO-R16",
+      "name": "连续 20 次 SCAN 每个请求恰好一个响应且数据自洽",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-01",
+      "name": "50 次 SCAN 全部成功",
+      "ok": true,
+      "detail": "0.1s"
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-01b",
+      "name": "50 次 SCAN 后真实映射数量与 stats.total 一致",
+      "ok": true,
+      "detail": "expected 8 got 8"
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-02",
+      "name": "50 次 SEARCH 全部成功",
+      "ok": true,
+      "detail": "0.1s"
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-03",
+      "name": "50 次 HIGHLIGHT 期间 overlay 始终为 1（不累积）",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-03b",
+      "name": "50 次 CLEAR_HIGHLIGHT 后 overlay == 0",
+      "ok": true,
+      "detail": "expected 0 got 0"
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-03c",
+      "name": "50 轮高亮/清除后无残留 overlay 节点",
+      "ok": true,
+      "detail": "expected 0 got 0"
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-04",
+      "name": "Bridge 请求日志被限制在 20 条",
+      "ok": true,
+      "detail": "len=20"
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-04b",
+      "name": "日志条目结构完整",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-05",
+      "name": "资源压力测试后 20 次 CLICK 仍然精确 +20",
+      "ok": true,
+      "detail": "expected 20 got 20"
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-06",
+      "name": "扩展只有一个 Service Worker 实例",
+      "ok": true,
+      "detail": "expected 1 got 1"
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-06b",
+      "name": "不存在挂起的未完成请求",
+      "ok": true,
+      "detail": "expected 0 got 0"
+    },
+    {
+      "section": "resource / leak checks",
+      "id": "RES-07",
+      "name": "重扫描后 data-pagesense-id 无重复",
+      "ok": true,
+      "detail": "expected 8 got 8"
+    },
+    {
+      "section": "search performance (real browser)",
+      "id": "PERF-100",
+      "name": "100 元素：扫描 12.5ms / 搜索 2.5ms (内部 durationMs=1)",
+      "ok": true,
+      "detail": "{\"elements\": 100, \"scanned\": 100, \"scanMs\": 12.5, \"searchMs\": 2.5, \"searchDurationMs\": 1, \"missMs\": 1.7, \"total\": 0, \"resultBytes\": 45271}"
+    },
+    {
+      "section": "search performance (real browser)",
+      "id": "PERF-500",
+      "name": "500 元素：扫描 23.8ms / 搜索 2.7ms (内部 durationMs=0)",
+      "ok": true,
+      "detail": "{\"elements\": 500, \"scanned\": 500, \"scanMs\": 23.8, \"searchMs\": 2.7, \"searchDurationMs\": 0, \"missMs\": 2.1, \"total\": 0, \"resultBytes\": 228004}"
+    },
+    {
+      "section": "search performance (real browser)",
+      "id": "PERF-1000",
+      "name": "1000 元素：扫描 35.8ms / 搜索 2.5ms (内部 durationMs=1)",
+      "ok": true,
+      "detail": "{\"elements\": 1000, \"scanned\": 1000, \"scanMs\": 35.8, \"searchMs\": 2.5, \"searchDurationMs\": 1, \"missMs\": 1.5, \"total\": 0, \"resultBytes\": 457956}"
+    },
+    {
+      "section": "search performance (real browser)",
+      "id": "PERF-5000",
+      "name": "5000 元素：扫描 150.9ms / 搜索 4.7ms (内部 durationMs=2)",
+      "ok": true,
+      "detail": "{\"elements\": 5000, \"scanned\": 5000, \"scanMs\": 150.9, \"searchMs\": 4.7, \"searchDurationMs\": 2, \"missMs\": 1.9, \"total\": 1, \"resultBytes\": 2319432}"
+    },
+    {
+      "section": "search performance (real browser)",
+      "id": "PERF-1000ms",
+      "name": "任意规模下搜索耗时 < 1000ms",
+      "ok": true,
+      "detail": "worst=5ms"
+    },
+    {
+      "section": "search performance (real browser)",
+      "id": "PERF-5000b",
+      "name": "5000 元素扫描耗时可接受 (<20s)",
+      "ok": true,
+      "detail": "150.9ms"
+    },
+    {
+      "section": "search performance (real browser)",
+      "id": "PERF-BUG003",
+      "name": "5000 元素扫描结果超过 1 MiB 且仍能通过桥接返回（BUG-003 回归）",
+      "ok": true,
+      "detail": "resultBytes=2319432"
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-01",
+      "name": "停止 Controller 后扩展离开 CONNECTED",
+      "ok": true,
+      "detail": "state=ERROR"
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-01b",
+      "name": "扩展不会继续显示假连接",
+      "ok": true,
+      "detail": "state=ERROR"
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-02",
+      "name": "相同 host/port/token 重启后扩展自动恢复 CONNECTED",
+      "ok": true,
+      "detail": "waited 1000ms"
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-02b",
+      "name": "重连后 PING 正常",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-02c",
+      "name": "重连后 SCAN 正常",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-02d",
+      "name": "重连无需重启浏览器 / 重新加载扩展 / 人工点连接",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-03",
+      "name": "token 不匹配时扩展不会错误显示 CONNECTED",
+      "ok": true,
+      "detail": "state=ERROR"
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-03b",
+      "name": "扩展记录了 UNAUTHORIZED 或连接错误",
+      "ok": true,
+      "detail": "{\"code\": \"UNAUTHORIZED\", \"message\": \"token 校验失败。\"}"
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-03c",
+      "name": "token 不匹配时 Controller 侧未建立会话",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-03d",
+      "name": "token 错误期间状态稳定（非每几百毫秒疯狂重连）",
+      "ok": true,
+      "detail": "samples=['ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR']"
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-04",
+      "name": "恢复正确 token 后扩展重新 CONNECTED",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-04b",
+      "name": "恢复后 SCAN 正常",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-05",
+      "name": "chrome.runtime.reload() 后 Service Worker 重建 WebSocket",
+      "ok": true,
+      "detail": "waited 3709ms"
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-05b",
+      "name": "扩展重载后 PING 正常",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-05c",
+      "name": "扩展重载后 SCAN 正常",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "recovery: server stop / restart / wrong token / extension reload",
+      "id": "REC-05d",
+      "name": "扩展重载未重启浏览器",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "browser console / uncaught errors",
+      "id": "CONSOLE-01",
+      "name": "Service Worker 无未捕获异常",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "section": "browser console / uncaught errors",
+      "id": "CONSOLE-02",
+      "name": "页面无未捕获异常 / 未处理 Promise rejection",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "section": "browser console / uncaught errors",
+      "id": "CONSOLE-03",
+      "name": "无严重 console.error（favicon 404 等资源噪声除外）",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "section": "V1 regression (scanner data model through the bridge)",
+      "id": "V1-01",
+      "name": "Scanner 输出 schemaVersion=1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "V1 regression (scanner data model through the bridge)",
+      "id": "V1-02",
+      "name": "page 字段含 title/url/domain/viewport/scroll",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "V1 regression (scanner data model through the bridge)",
+      "id": "V1-03",
+      "name": "position 含视口坐标与页面坐标",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "V1 regression (scanner data model through the bridge)",
+      "id": "V1-04",
+      "name": "序列化结果不含不可见元素",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "section": "V1 regression (scanner data model through the bridge)",
+      "id": "V1-05",
+      "name": "inViewport 元素数量与 stats 一致",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "V1 regression (scanner data model through the bridge)",
+      "id": "V1-06",
+      "name": "text 截断到 300 字符以内",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "V1 regression (scanner data model through the bridge)",
+      "id": "V1-07",
+      "name": "Raw JSON 可序列化（无循环引用）",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "V1 regression (scanner data model through the bridge)",
+      "id": "V1-08",
+      "name": "demo 上被 CSS 隐藏的元素未进入扫描结果",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "V1 regression (scanner data model through the bridge)",
+      "id": "V1-09",
+      "name": "disabled 元素仍被扫描（V1 语义）",
+      "ok": true,
+      "detail": "[\"area\", \"ariaDisabledBtn\", \"bottom\", \"btn\", \"ce\", \"disabledBtn\", \"keySink\", \"text\"]"
+    },
+    {
+      "section": "V1.2 regression (action envelope)",
+      "id": "V12-success",
+      "name": "Action 回执含 success",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_CLICK_ELEMENT\", \"actionId\": \"act_mulkjz6c_o9xcg1\", \"timestamp\": 1790619394260, \"durationMs\": 0, \"elementId\": 1,"
+    },
+    {
+      "section": "V1.2 regression (action envelope)",
+      "id": "V12-action",
+      "name": "Action 回执含 action",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_CLICK_ELEMENT\", \"actionId\": \"act_mulkjz6c_o9xcg1\", \"timestamp\": 1790619394260, \"durationMs\": 0, \"elementId\": 1,"
+    },
+    {
+      "section": "V1.2 regression (action envelope)",
+      "id": "V12-actionId",
+      "name": "Action 回执含 actionId",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_CLICK_ELEMENT\", \"actionId\": \"act_mulkjz6c_o9xcg1\", \"timestamp\": 1790619394260, \"durationMs\": 0, \"elementId\": 1,"
+    },
+    {
+      "section": "V1.2 regression (action envelope)",
+      "id": "V12-timestamp",
+      "name": "Action 回执含 timestamp",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_CLICK_ELEMENT\", \"actionId\": \"act_mulkjz6c_o9xcg1\", \"timestamp\": 1790619394260, \"durationMs\": 0, \"elementId\": 1,"
+    },
+    {
+      "section": "V1.2 regression (action envelope)",
+      "id": "V12-durationMs",
+      "name": "Action 回执含 durationMs",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_CLICK_ELEMENT\", \"actionId\": \"act_mulkjz6c_o9xcg1\", \"timestamp\": 1790619394260, \"durationMs\": 0, \"elementId\": 1,"
+    },
+    {
+      "section": "V1.2 regression (action envelope)",
+      "id": "V12-elementId",
+      "name": "Action 回执含 elementId",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_CLICK_ELEMENT\", \"actionId\": \"act_mulkjz6c_o9xcg1\", \"timestamp\": 1790619394260, \"durationMs\": 0, \"elementId\": 1,"
+    },
+    {
+      "section": "V1.2 regression (action envelope)",
+      "id": "V12-rescanRecommended",
+      "name": "Action 回执含 rescanRecommended",
+      "ok": true,
+      "detail": "{\"success\": true, \"action\": \"PAGESENSE_CLICK_ELEMENT\", \"actionId\": \"act_mulkjz6c_o9xcg1\", \"timestamp\": 1790619394260, \"durationMs\": 0, \"elementId\": 1,"
+    },
+    {
+      "section": "V1.2 regression (action envelope)",
+      "id": "V12-actionId-unique",
+      "name": "连续动作 actionId 唯一",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "V1.2 regression (action envelope)",
+      "id": "V12-timestamp",
+      "name": "timestamp 是毫秒时间戳",
+      "ok": true,
+      "detail": "1790619394260"
+    },
+    {
+      "section": "V1.2 regression (action envelope)",
+      "id": "V12-20click",
+      "name": "20 次 CLICK 精确 +20",
+      "ok": true,
+      "detail": "expected 26 got 26"
+    },
+    {
+      "section": "V1.2 regression (action envelope)",
+      "id": "V12-20input",
+      "name": "20 次 INPUT 每次都真实写入 DOM",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "evidence",
+      "id": "EVID-01",
+      "name": "已保存 popup 截图",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "section": "evidence",
+      "id": "EVID-02",
+      "name": "已保存高亮截图",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "recoveries": []
+}

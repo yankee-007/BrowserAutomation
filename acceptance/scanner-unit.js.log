@@ -1,0 +1,35 @@
+﻿PASS  U01 button: tag/text
+PASS  U02 link: tag/text/href
+PASS  U03 input: tag/placeholder
+PASS  U04 textarea: tag/placeholder
+PASS  U05a select 被识别
+PASS  U05b option 长沙 被识别（可见性跟随 select）
+PASS  U06 ARIA: role/ariaLabel/text
+PASS  U07a contenteditable: tag/text
+SKIP   U07b contenteditable 分类（jsdom 不实现 isContentEditable；由真实浏览器 E2E 覆盖）
+PASS  U08 display:none 被过滤
+PASS  U09 visibility:hidden 被过滤
+PASS  U10 opacity:0 被过滤
+PASS  U11 width/height=0 被过滤
+PASS  U12 混合: matched/total/hidden
+PASS  U13 elementId 1..N 唯一
+PASS  U14 text=提交
+PASS  U15 aria-label 回退=关闭
+PASS  U16 placeholder 回退=搜索职位
+PASS  U17 1000 字符截断为 300
+PASS  U18 value 优先于 placeholder
+PASS  U19 title 回退=提示
+PASS  U20 alt 回退=图片按钮
+PASS  U21 特殊字符 JSON roundtrip 成功且文本保留
+PASS  U22 page 字段完整
+PASS  U22b 顶层 page/stats/elements 存在
+PASS  U23a stats.total === elements.length
+PASS  U23b stats.inViewport 与数据一致
+PASS  U23c stats.matched/hidden 一致
+PASS  U24 空页面不崩溃，返回空 elements
+PASS  VT1 扫描后真实 DOM 写入映射，elementId 与属性一致
+PASS  VT2 映射唯一且每个 elementId 解析到对应节点
+PASS  VT2b 非法 elementId 返回 null
+PASS  VT3 重新扫描清理旧映射并正确重建
+
+SCANNER UNIT SUMMARY: ALL PASS

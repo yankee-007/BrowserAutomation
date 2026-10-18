@@ -1,0 +1,12 @@
+﻿PASS  VH1 highlight 返回 success
+PASS  VH2 Overlay 与标签被创建
+PASS  VH3 标签显示 #id <tag> 文本
+PASS  VH4 连续高亮后仅一个 Overlay，且属于最新元素
+PASS  VH5 CLEAR 移除 Overlay 且重复调用安全
+PASS  VH6 locate 存在元素 success
+PASS  VH7 locate 缺失元素返回 ELEMENT_NOT_FOUND
+PASS  VH8 非法 id 返回 INVALID_ELEMENT_ID
+PASS  VH9 高亮元素被删除后 Overlay 自动移除
+PASS  VH10 删除后再次定位返回 ELEMENT_NOT_FOUND
+
+HIGHLIGHTER UNIT SUMMARY: ALL PASS

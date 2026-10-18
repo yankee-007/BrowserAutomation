@@ -1,0 +1,125 @@
+{
+  "events": [
+    {
+      "t": 1790618395.57,
+      "event": "ping_only",
+      "ok": 10,
+      "of": 10,
+      "note": "仅 PING 不发 SCAN 时连接是否稳定"
+    },
+    {
+      "t": 1790618398.0,
+      "event": "scan",
+      "n": 2000,
+      "ok": true,
+      "ms": 64.1,
+      "total": 2000
+    },
+    {
+      "t": 1790618400.84,
+      "event": "scan",
+      "n": 2400,
+      "ok": true,
+      "ms": 71.1,
+      "total": 2400
+    },
+    {
+      "t": 1790618404.68,
+      "event": "scan",
+      "n": 2600,
+      "ok": false,
+      "ms": 67.3,
+      "code": "NOT_CONNECTED"
+    },
+    {
+      "t": 1790618408.63,
+      "event": "scan",
+      "n": 2800,
+      "ok": false,
+      "ms": 71.7,
+      "code": "NOT_CONNECTED"
+    },
+    {
+      "t": 1790618412.47,
+      "event": "scan",
+      "n": 2900,
+      "ok": false,
+      "ms": 77.4,
+      "code": "NOT_CONNECTED"
+    },
+    {
+      "t": 1790618415.22,
+      "event": "scan",
+      "n": 3000,
+      "ok": false,
+      "ms": 69.8,
+      "code": "NOT_CONNECTED"
+    },
+    {
+      "t": 1790618419.12,
+      "event": "scan",
+      "n": 3200,
+      "ok": false,
+      "ms": 86.6,
+      "code": "NOT_CONNECTED"
+    },
+    {
+      "t": 1790618423.02,
+      "event": "scan",
+      "n": 4000,
+      "ok": false,
+      "ms": 106.2,
+      "code": "NOT_CONNECTED"
+    }
+  ],
+  "bisect": [
+    {
+      "n": 2000,
+      "ok": true,
+      "ms": 64.1,
+      "total": 2000
+    },
+    {
+      "n": 2400,
+      "ok": true,
+      "ms": 71.1,
+      "total": 2400
+    },
+    {
+      "n": 2600,
+      "ok": false,
+      "ms": 67.3,
+      "code": "NOT_CONNECTED"
+    },
+    {
+      "n": 2800,
+      "ok": false,
+      "ms": 71.7,
+      "code": "NOT_CONNECTED"
+    },
+    {
+      "n": 2900,
+      "ok": false,
+      "ms": 77.4,
+      "code": "NOT_CONNECTED"
+    },
+    {
+      "n": 3000,
+      "ok": false,
+      "ms": 69.8,
+      "code": "NOT_CONNECTED"
+    },
+    {
+      "n": 3200,
+      "ok": false,
+      "ms": 86.6,
+      "code": "NOT_CONNECTED"
+    },
+    {
+      "n": 4000,
+      "ok": false,
+      "ms": 106.2,
+      "code": "NOT_CONNECTED"
+    }
+  ]
+}

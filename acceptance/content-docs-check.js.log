@@ -1,0 +1,42 @@
+﻿PASS  D01 demo: 普通链接
+PASS  D02 demo: 普通按钮
+PASS  D03 demo: disabled button
+PASS  D04 demo: input
+PASS  D05 demo: textarea
+PASS  D06 demo: select + option
+PASS  D07 demo: contenteditable
+PASS  D08 demo: ARIA button
+PASS  D09 demo: display:none
+PASS  D10 demo: visibility:hidden
+PASS  D11 demo: opacity:0
+PASS  D12 demo: 长页面 spacer
+PASS  D13 demo: 页面底部按钮
+PASS  D14 demo: hidden 属性场景
+PASS  D15 demo: 动态目标按钮
+PASS  D16 demo: 删除/恢复目标按钮
+PASS  D17 demo: 动态新增按钮
+PASS  R01 说明项目是什么
+PASS  R02 Chrome 加载方式
+PASS  R03 Edge 加载方式
+PASS  R04 如何扫描页面
+PASS  R05 demo 测试说明
+PASS  R06 当前能力
+PASS  R07 限制: 内部页面
+PASS  R08 限制: iframe
+PASS  R09 限制: Shadow DOM
+PASS  R10 限制: Canvas
+PASS  R11 限制: 虚拟列表
+PASS  R12 限制: 动态页面快照
+PASS  R13 安全边界说明
+PASS  R14 README 描述的权限与 manifest 一致（activeTab/scripting）
+PASS  R15 README 未声称 V1 具备自动操作能力
+PASS  R16 README 写明 V1.1 Mapping/定位/高亮
+PASS  R17 README 写明 elementId 生命周期（非永久 ID）
+PASS  R18 README 写明 Popup 关闭后高亮继续存在
+PASS  R19 README 项目结构含新模块
+PASS  C01 Popup 宽度在 500-650px
+PASS  C02 主体区域可滚动（max-height + overflow）
+PASS  C03 关键按钮未被隐藏
+PASS  C04 .hidden 工具类存在
+
+CONTENT/DOCS SUMMARY: ALL PASS

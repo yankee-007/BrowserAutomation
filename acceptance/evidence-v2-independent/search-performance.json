@@ -1,0 +1,42 @@
+[
+  {
+    "elements": 100,
+    "scanned": 100,
+    "scanMs": 12.5,
+    "searchMs": 2.5,
+    "searchDurationMs": 1,
+    "missMs": 1.7,
+    "total": 0,
+    "resultBytes": 45271
+  },
+  {
+    "elements": 500,
+    "scanned": 500,
+    "scanMs": 23.8,
+    "searchMs": 2.7,
+    "searchDurationMs": 0,
+    "missMs": 2.1,
+    "total": 0,
+    "resultBytes": 228004
+  },
+  {
+    "elements": 1000,
+    "scanned": 1000,
+    "scanMs": 35.8,
+    "searchMs": 2.5,
+    "searchDurationMs": 1,
+    "missMs": 1.5,
+    "total": 0,
+    "resultBytes": 457956
+  },
+  {
+    "elements": 5000,
+    "scanned": 5000,
+    "scanMs": 150.9,
+    "searchMs": 4.7,
+    "searchDurationMs": 2,
+    "missMs": 1.9,
+    "total": 1,
+    "resultBytes": 2319432
+  }
+]

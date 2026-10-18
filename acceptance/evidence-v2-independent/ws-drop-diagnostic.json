@@ -1,0 +1,145 @@
+[
+  {
+    "t": 1790618193.44,
+    "kind": "before",
+    "label": "3000 long text",
+    "log_len": 0,
+    "connected_since": 1790618191022,
+    "sw_target": "E32EBF3832013D24315B55F84141A9E8",
+    "sw_count": 1,
+    "state": "CONNECTED"
+  },
+  {
+    "t": 1790618193.53,
+    "kind": "scan_FAIL",
+    "label": "3000 long text",
+    "ms": 80.8,
+    "code": "NOT_CONNECTED",
+    "matched": 3000
+  },
+  {
+    "t": 1790618194.56,
+    "kind": "after_fail",
+    "label": "3000 long text",
+    "recovered": true,
+    "log_len": 1,
+    "connected_since": 1790618194533,
+    "sw_target": "E32EBF3832013D24315B55F84141A9E8",
+    "sw_count": 1,
+    "state": "CONNECTED"
+  },
+  {
+    "t": 1790618194.56,
+    "kind": "sw_restarted",
+    "label": "3000 long text",
+    "restarted": true
+  },
+  {
+    "t": 1790618197.43,
+    "kind": "before",
+    "label": "3000 short text",
+    "log_len": 1,
+    "connected_since": 1790618194533,
+    "sw_target": "E32EBF3832013D24315B55F84141A9E8",
+    "sw_count": 1,
+    "state": "CONNECTED"
+  },
+  {
+    "t": 1790618197.51,
+    "kind": "scan_FAIL",
+    "label": "3000 short text",
+    "ms": 68.2,
+    "code": "NOT_CONNECTED",
+    "matched": 3000
+  },
+  {
+    "t": 1790618198.52,
+    "kind": "after_fail",
+    "label": "3000 short text",
+    "recovered": true,
+    "log_len": 2,
+    "connected_since": 1790618198513,
+    "sw_target": "E32EBF3832013D24315B55F84141A9E8",
+    "sw_count": 1,
+    "state": "CONNECTED"
+  },
+  {
+    "t": 1790618198.52,
+    "kind": "sw_restarted",
+    "label": "3000 short text",
+    "restarted": true
+  },
+  {
+    "t": 1790618201.38,
+    "kind": "before",
+    "label": "6000 short text",
+    "log_len": 2,
+    "connected_since": 1790618198513,
+    "sw_target": "E32EBF3832013D24315B55F84141A9E8",
+    "sw_count": 1,
+    "state": "CONNECTED"
+  },
+  {
+    "t": 1790618201.5,
+    "kind": "scan_FAIL",
+    "label": "6000 short text",
+    "ms": 112.5,
+    "code": "NOT_CONNECTED",
+    "matched": 6000
+  },
+  {
+    "t": 1790618202.52,
+    "kind": "after_fail",
+    "label": "6000 short text",
+    "recovered": true,
+    "log_len": 3,
+    "connected_since": 1790618202505,
+    "sw_target": "E32EBF3832013D24315B55F84141A9E8",
+    "sw_count": 1,
+    "state": "CONNECTED"
+  },
+  {
+    "t": 1790618202.52,
+    "kind": "sw_restarted",
+    "label": "6000 short text",
+    "restarted": true
+  },
+  {
+    "t": 1790618205.39,
+    "kind": "before",
+    "label": "1500 long text",
+    "log_len": 3,
+    "connected_since": 1790618202505,
+    "sw_target": "E32EBF3832013D24315B55F84141A9E8",
+    "sw_count": 1,
+    "state": "CONNECTED"
+  },
+  {
+    "t": 1790618205.46,
+    "kind": "scan_ok",
+    "label": "1500 long text",
+    "ms": 47.6,
+    "total": 1500,
+    "payload_bytes": 689882,
+    "matched": 1500
+  },
+  {
+    "t": 1790618208.33,
+    "kind": "before",
+    "label": "2500 long text",
+    "log_len": 4,
+    "connected_since": 1790618202505,
+    "sw_target": "E32EBF3832013D24315B55F84141A9E8",
+    "sw_count": 1,
+    "state": "CONNECTED"
+  },
+  {
+    "t": 1790618208.43,
+    "kind": "scan_ok",
+    "label": "2500 long text",
+    "ms": 74.1,
+    "total": 2500,
+    "payload_bytes": 1153789,
+    "matched": 2500
+  }
+]
