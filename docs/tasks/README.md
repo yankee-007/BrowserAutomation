@@ -19,6 +19,8 @@ task-worktree 下任务记录通常先存在各自分支，集成分支 `main` �
 
 ## 已完成任务
 
+- [TASK-20261019-7bf19c8e3a42：元素工作台与 Python 定位流程](TASK-20261019-7bf19c8e3a42-ui-workbench.md)：三工作区、分布图、统一检查器、Python 代码生成、三种数据发送和页面句柄保护完成；Chrome 实测证据在 `acceptance/evidence-ui-workbench/`。
+
 - [TASK-20261018-2779796d58e0：页面点选元素](TASK-20261018-2779796d58e0-element-picker.md)：按钮、悬停预览、点选详情、取消与生命周期验证完成；证据在 `acceptance/evidence-element-picker/`。
 
 - [TASK-20261018-77a4dc51ddbe：页面内容与元素查询](TASK-20261018-77a4dc51ddbe-element-explorer.md)：三种扫描范围、18 类、分页与结构/CSS 查询、元素详情及 Python 接口验证完成；证据在 `acceptance/evidence-element-explorer/`。

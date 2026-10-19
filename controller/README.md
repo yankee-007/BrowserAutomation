@@ -51,7 +51,7 @@ Waiting for extension...
 ```
 
 > **token 每次启动随机生成**，不会写进任何源码。把这一行的 token 复制到
-> PageSense Popup 的 Controller 面板里，点击「连接 Controller」。
+> 侧栏“Python 对接”的连接配置里，点击「连接 Python」。
 
 可选参数：
 
@@ -69,9 +69,9 @@ python server.py --no-cli             # 只启动服务，不进入交互 CLI
 ## 连接扩展
 
 1. 浏览器加载 `pagesense/` 扩展（见上级 README）
-2. 打开 PageSense Popup → 展开 **Controller** 面板
+2. 打开 PageSense 侧栏 → **Python 对接** → 展开 **连接本地 Python**
 3. 填入 `server.py` 打印的 token，确认端口是 `8765`
-4. 点击 **连接 Controller**
+4. 点击 **连接 Python**
 
 连接成功后：
 
@@ -91,6 +91,41 @@ version=2.0.0
 连接状态只有四种：`DISCONNECTED` / `CONNECTING` / `CONNECTED` / `ERROR`。
 
 ---
+
+## 先选元素，再写 Python
+
+侧栏点选元素后可复制完整 Python 脚本，不需要先扫描。`client.locator(css)` 每次操作
+重新解析原生 CSS，要求唯一匹配，并将页面身份传入 Action Executor。它不包含自动等待或重试。
+
+```python
+target = client.locator('[data-testid="search-order"]')
+target.click()
+client.locator('input[name="order"]').input("PS-1001")
+text = client.locator("#status").text()
+```
+
+侧栏还可主动发送选中元素、整个扫描或筛选后的全部结果：
+
+```python
+snapshot = client.wait_for_export(timeout=120)
+element = snapshot["elements"][0]  # 业务代码自行选择目标
+client.element(element).locate()
+text = client.element(element).text()
+```
+
+这些示例使用已经启动且连接的 `client`。每个 `PageSenseClient` 自带本地服务，
+同端口不要与 `server.py` 同时启动。完整启动代码和 UI 流程见[元素工作台](../docs/element-workbench.md)。
+
+`client.element(element)` 和接受字典的 `click/inspect/input/clear/keypress/locate/highlight`
+携带 `pageId`，换页返回 `STALE_PAGE`。兼容旧式数字 ID 的接口仍不防跨页面误用；
+请传整个元素字典或使用 `locator()`。`read_text(element)` / `element.text()` 返回最多
+20000 字符，不操作系统剪贴板；`inspect()` 可查看截断标记。
+
+主动发送的协议为 `EXPORT {id, data}` / `EXPORT_ACK {id, success, error?}`，仅在认证连接上使用；
+ACK 表示进入内存收件箱，尚未执行。最多 8 份及总计 64 MiB，满时拒绝而不覆盖；
+`wait_for_export()` 默认等待 60 秒，超时抛 `TimeoutError`。停止服务后收件箱丢失。
+新 `RESOLVE_ELEMENT {selector}` 返回详情、候选定位器与页面句柄；零/多命中分别为
+`ELEMENT_NOT_FOUND` / `AMBIGUOUS_SELECTOR`，无效 CSS 为 `INVALID_SELECTOR`。
 
 ## CLI 命令
 

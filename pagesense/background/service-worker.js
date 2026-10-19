@@ -40,6 +40,16 @@ if (!self.__PAGESENSE_SW_READY__) {
     var bridge = self.PageSenseBridge;
 
     switch (message.type) {
+      case BRIDGE_MESSAGES.SEND_EXPORT:
+        // Only extension UI may export page data through the authenticated socket.
+        if (sender.tab || sender.url !== chrome.runtime.getURL("popup/popup.html")) return false;
+        bridge.sendExport(message.data).then(function (receipt) {
+          sendResponse({ ok: true, receipt: receipt });
+        }).catch(function (err) {
+          sendResponse({ ok: false, error: { code: err.code, message: err.message } });
+        });
+        return true;
+
       case BRIDGE_MESSAGES.GET_STATUS:
         sendResponse(bridge.getStatus());
         return false;

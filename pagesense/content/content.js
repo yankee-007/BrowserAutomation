@@ -150,10 +150,12 @@
         }
         domMatches = nodes.length;
         options.elementIds = Array.prototype.map.call(nodes, function (node) {
-          return Number(node.getAttribute(PS.PAGE_SENSE_ID_ATTR));
+          var id = Number(node.getAttribute(PS.PAGE_SENSE_ID_ATTR));
+          return global.PageSenseElementMap.getElementById(id) === node ? id : null;
         }).filter(Boolean);
       }
       var outcome = global.PageSenseElementSearch.search(message.query, options);
+      outcome.pageId = global.PageSenseScanner.pageId;
       if (domMatches !== null) outcome.domMatches = domMatches;
       if (!outcome.ok) {
         sendResponse({
@@ -194,7 +196,15 @@
       return false;
     }
 
+    if (message.pageId !== undefined && message.pageId !== global.PageSenseScanner.pageId) {
+      sendResponse({ ok: false, success: false, message: "页面已变化，请重新定位元素。", error: { code: "STALE_PAGE", message: "页面已变化，请重新定位元素。" } });
+      return false;
+    }
     switch (message.action) {
+      case ACTIONS.RESOLVE_ELEMENT:
+        try { sendResponse(global.PageSenseScanner.resolveElement(message.selector)); }
+        catch (error) { sendResponse({ ok: false, error: "INTERNAL_ERROR", message: error.message }); }
+        return false;
       case ACTIONS.SCAN_PAGE:
         // scanPage() is synchronous in V1.x; if it becomes async later,
         // return true and call sendResponse after the promise settles.

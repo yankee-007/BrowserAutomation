@@ -3,14 +3,15 @@
 PageSense Chrome / Edge Manifest V3 扩展与本地 Python Controller：扫描网页 DOM、搜索元素、定位/高亮并执行基本页面操作。当前实现为 V2.0.0，尚不含 LLM / Planner。
 
 侧栏支持手动/实时扫描交互控件、文本、媒体与语义结构，18 种细分类、分页搜索、
-标签/class/属性/CSS 查询和元素详情，见[页面内容与元素查询](docs/element-explorer.md)。
+标签/class/属性/CSS 查询和元素详情。新增三工作区、页面分布图、可复制的 Python 定位代码，
+可发送选中、全部或筛选结果到 Python，见[元素工作台](docs/element-workbench.md)。
 
-**当前质量状态**：既有[独立验收报告](PageSense-V2.0-INDEPENDENT-ACCEPTANCE-REPORT.md)结论为 FAIL；Controller 跨标签页元素 ID 与长断线自恢复问题未解决。本次侧栏相关检查通过，不替代全量产品验收。
+**当前质量状态**：既有[独立验收报告](PageSense-V2.0-INDEPENDENT-ACCEPTANCE-REPORT.md)结论为 FAIL；旧式纯数字 elementId 的跨标签页风险与长断线自恢复问题仍存在；新定位器和页面句柄会校验 pageId。本次侧栏相关检查通过，不替代全量产品验收。
 
 ## 使用与开发
 
 1. 按[扩展使用文档](pagesense/README.md)加载整个 `pagesense/` 目录；扩展本身不需要前端构建。
-2. 点击工具栏的 PageSense 图标打开浏览器侧栏。由旧版更新时，先在扩展管理页重新加载 PageSense。按[Controller 使用文档](controller/README.md)准备 Python 依赖，并在 `controller/` 运行 `python server.py`。将本次启动生成的 token 填入侧栏的 Controller 面板；不要把 token 写入共享文档。
+2. 点击工具栏的 PageSense 图标打开浏览器侧栏。由旧版更新时，先在扩展管理页重新加载 PageSense。按[Controller 使用文档](controller/README.md)准备 Python 依赖，并在 `controller/` 运行 `python server.py`。将本次启动生成的 token 填入侧栏“Python 对接”的连接配置；不要把 token 写入共享文档。
 3. 测试页面为 [demo.html](pagesense/test/demo.html)。需要 HTTP 服务时，可从项目根运行 `node acceptance/serve.js 8770`，然后在浏览器打开 `http://127.0.0.1:8770/test/demo.html`。Controller 默认使用 8765；两个服务不要占同一端口。
 4. 测试脚本在 `acceptance/` 与 `controller/`，环境要求和已知运行陷阱见[上下文的验证入口](PROJECT_CONTEXT.md#开发与验证入口)。侧栏可通过 `node acceptance/side-panel-browser.js acceptance/evidence-side-panel` 在独立 Edge 测试实例中验证，使用全新临时浏览器配置与自带 demo 页面。
 

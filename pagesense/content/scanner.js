@@ -185,6 +185,7 @@
     var text = getElementText(element);
     var record = {
       elementId: elementId,
+      pageId: pageId,
       tag: tag,
       text: text,
       ownText: ownText(element),
@@ -283,11 +284,51 @@
     return path;
   }
 
+
+  // Document identity is independent of tab IDs and changes after navigation.
+  var pageId = global.crypto && global.crypto.randomUUID ? global.crypto.randomUUID() :
+    Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+  function locatorCandidates(element) {
+    var candidates = [];
+    function add(label, selector, stability) {
+      if (candidates.some(function (item) { return item.selector === selector; })) return;
+      var matches = global.document.querySelectorAll(selector).length;
+      candidates.push({ label: label, selector: selector, matches: matches,
+        unique: matches === 1, stability: stability });
+    }
+    function quoted(value) {
+      return '"' + String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"')
+        .replace(/[\n\r\f]/g, function (c) { return "\\" + c.charCodeAt(0).toString(16) + " "; }) + '"';
+    }
+    ["data-testid", "data-test", "data-qa"].forEach(function (name) {
+      if (element.getAttribute(name)) add(name, "[" + name + "=" + quoted(element.getAttribute(name)) + "]", "attribute");
+    });
+    if (element.id) add("ID", "#" + cssEscape(element.id), "attribute");
+    ["name", "aria-label", "placeholder", "title"].forEach(function (name) {
+      if (element.getAttribute(name)) add(name, cssEscape(element.localName) + "[" + name + "=" + quoted(element.getAttribute(name)) + "]", "attribute");
+    });
+    add("DOM 路径", cssPath(element), "structure");
+    return candidates;
+  }
+
+  function resolveElement(selector) {
+    if (typeof selector !== "string" || !selector.trim()) return { ok: false, error: "INVALID_SELECTOR", message: "请提供非空 CSS 选择器。" };
+    var nodes;
+    try { nodes = global.document.querySelectorAll(selector); }
+    catch (error) { return { ok: false, error: "INVALID_SELECTOR", message: error.message }; }
+    var matches = Array.prototype.filter.call(nodes, function (node) { return !node.closest("[" + PS.OVERLAY_ATTR + "]"); });
+    if (matches.length !== 1) return { ok: false, error: matches.length ? "AMBIGUOUS_SELECTOR" : "ELEMENT_NOT_FOUND",
+      message: "CSS 匹配 " + matches.length + " 个元素，需要唯一匹配：" + selector };
+    return inspectTarget(matches[0]);
+  }
+
   function inspectElement(elementId) {
     if (!global.PageSenseElementMap.isValidId(elementId)) return { ok: false, error: "INVALID_ELEMENT_ID", message: "elementId 必须为正整数。" };
     var element = global.PageSenseElementMap.getElementById(elementId);
     if (!element) return { ok: false, error: "ELEMENT_NOT_FOUND", message: "元素已移除，请重新扫描。" };
     var selector = cssPath(element);
+    var locators = locatorCandidates(element);
     var clone = element.cloneNode(true);
     [clone].concat(Array.prototype.slice.call(clone.querySelectorAll("*"))).forEach(function (node) {
       node.removeAttribute(PS.PAGE_SENSE_ID_ATTR);
@@ -304,6 +345,9 @@
     var ancestors = [], parent = element.parentElement;
     while (parent && ancestors.length < 8) { ancestors.push(contextNode(parent)); parent = parent.parentElement; }
     return { ok: true, data: {
+      pageId: pageId, page: { url: global.location.href, title: global.document.title },
+      inspectedAt: new Date().toISOString(),
+      locators: locators, locator: locators.find(function (item) { return item.unique; }),
       element: serializeElement(element, Number(elementId)),
       selector: selector, selectorMatches: global.document.querySelectorAll(selector).length,
       text: text.slice(0, 20000), textLength: text.length, textTruncated: text.length > 20000,
@@ -391,12 +435,15 @@
 
     return {
       schemaVersion: 1,
+      pageId: pageId,
       scope: scope,
       scannedAt: new Date().toISOString(),
       page: {
         title: global.document.title || "",
         url: global.location.href,
         domain: global.location.hostname,
+        dimensions: { width: Math.max(global.innerWidth, global.document.documentElement.scrollWidth),
+          height: Math.max(global.innerHeight, global.document.documentElement.scrollHeight) },
         viewport: {
           width: global.innerWidth,
           height: global.innerHeight
@@ -422,6 +469,8 @@
   /* Exposed for content.js (and for manual debugging on the page). */
   global.PageSenseScanner = {
     scanPage: scanPage,
+    pageId: pageId,
+    resolveElement: resolveElement,
     isVisible: isVisible,
     isInViewport: isInViewport,
     getElementText: getElementText,

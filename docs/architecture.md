@@ -7,16 +7,16 @@
 | 模块 | 实际职责 |
 | --- | --- |
 | `manifest.json` | MV3 入口、2.0.0 版本、`activeTab/scripting/storage/sidePanel` 与 HTTP(S) host permissions；`side_panel.default_path` 指向现有界面 |
-| `popup/popup.html`、`popup.js`、`popup.css` | 原生侧栏界面、手动/实时扫描、结果展示/搜索/过滤、人工 Action、连接配置；所属窗口内切换/导航后使旧结果与异步响应失效 |
+| `popup/popup.html`、`popup.js`、`popup.css` | 三工作区、元素几何分布、手动/实时扫描、结果查询/检查与 Python 代码生成、主动发送及连接配置；所属窗口内切换/导航后使旧结果与异步响应失效 |
 | `shared/constants.js` | Action/Method/错误码、搜索配置、Bridge 配置与消息常量 |
-| `content/element-map.js`、`scanner.js` | 三种扫描范围、同文档节点 ID、18 类与属性/正文/CSS 路径提取、按需详情 |
+| `content/element-map.js`、`scanner.js` | 三种扫描范围、同文档节点 ID、pageId、真实节点绑定、18 类与属性/正文/CSS 路径提取、按需详情及原生 CSS 唯一解析 |
 | `content/element-search.js` | 纯快照索引，多词 AND、结构/分类/视口过滤、offset 分页与真实 indexSize |
 | `content/highlighter.js`、`action-executor.js` | 定位/Overlay，五类操作与结构化回执 |
 | `content/element-picker.js` | Port 生命周期的页面点选层、命中测试、事件拦截和选择/取消回传 |
 | `content/content.js` | 消息路由、重扫与索引更新；实时 Port 订阅和事件合并、统一错误响应 |
 | `background/service-worker.js`、`bridge/controller-bridge.js` | Worker 连接管理、认证、心跳/重连、活动 Tab 与协议转发 |
-| `controller/server.py`、`protocol.py` | 本地 WebSocket 服务、认证、请求 ID/超时、信封与错误码 |
-| `controller/pagesense.py`、`cli.py` | `PageSenseClient` 同步 API 与人工命令解析 |
+| `controller/server.py`、`protocol.py` | 本地 WebSocket 服务、认证、请求 ID/超时、EXPORT/ACK 内存收件箱与错误码 |
+| `controller/pagesense.py`、`cli.py` | `PageSenseClient` 同步 API、惰性 CSS 定位器/页面句柄与人工命令解析 |
 | `acceptance/content-files.js` | 从 Popup 和 Bridge 提取注入列表并核对一致性，仅属测试设施 |
 
 ## 关键数据流与调用关系
@@ -27,7 +27,7 @@
 人工 CLI / PageSenseClient
         ↓
 Python Controller（WebSocket Server，默认 127.0.0.1:8765）
-        ↕ HELLO/token、REQUEST/RESPONSE、HEARTBEAT
+        ↕ HELLO/token、REQUEST/RESPONSE、HEARTBEAT、EXPORT/EXPORT_ACK
 扩展 Service Worker → Controller Bridge（WebSocket Client）
         ↓ 按需注入、tabs.sendMessage
 Content Script Router → Scanner / Search / Highlighter / Action Executor
@@ -68,7 +68,12 @@ Picker 的全视口透明选择层捕获指针点击，临时关闭其命中属�
 侧栏独立显示所选快照，通过连接代次/pageRevision 防止迟到结果，Esc 和页面/侧栏关闭清理监听与 Overlay。
 选中快照不跟随实时扫描刷新；点选节点若在后续扫描范围之外，其临时映射可能被清理。
 
-侧栏选择所属窗口的活动 Tab，切换/导航后清空旧结果并丢弃迟到响应；开启实时模式时在新页就绪后重新连接。Controller 仍按当前活动 Tab 转发，elementId 不包含页面作用域；Controller 结构未提供跨标签页旧 ID 防误用保证。Controller 可传 scope 和结构/分页条件，新增 GET_ELEMENT_DETAILS；所有 DOM 工作仍走同一 Content Router。MV3 Worker 回收后内存计时器消失，长断线自恢复仍有已有缺陷。
+侧栏选择所属窗口的活动 Tab，切换/导航后清空旧结果并丢弃迟到响应；开启实时模式时在新页就绪后重新连接。Controller 仍按当前活动 Tab 转发。文档生成独立 pageId，SCAN/SEARCH/DETAIL 返回该身份，元素记录也带 pageId；原生 CSS 的 RESOLVE_ELEMENT 要求唯一 DOM 节点，无需扫描。新 Python 定位器先解析再带 pageId 调用既有执行层，页面句柄也校验原文档；旧式纯数字 ID 为兼容保留其跨页风险。Element Map 用原节点绑定解析 ID，DOM 上克隆的映射属性不能重定向句柄。Controller 可传 scope 和结构/分页条件，新增 GET_ELEMENT_DETAILS；所有 DOM 工作仍走同一 Content Router。MV3 Worker 回收后内存计时器消失，长断线自恢复仍有已有缺陷。
+
+侧栏可显式发送选中、全部扫描或筛选的完整跨页结果，经 Worker 转为认证 WebSocket 的
+EXPORT，Python 入箱后才返回 EXPORT_ACK；配置不包含 Token。收件箱线程安全，最多 8 份、
+总计 64 MiB，溢出拒绝、不覆盖；业务代码通过 wait_for_export() 消费。它只传数据，不排队执行动作。
+UI 等待回执 8 秒；断线/超时不自动重发。详见[工作台说明](element-workbench.md)。
 
 ## 状态、持久化与外部依赖
 
@@ -94,3 +99,5 @@ Picker 的全视口透明选择层捕获指针点击，临时关闭其命中属�
 未在用户个人浏览器代为重新加载扩展。
 
 本文仅记录真实存在的当前结构。空项目可明确尚未形成架构，不要求预设 UI、服务、模型或存储层。长期选择的理由见 [决策记录](decisions/README.md)。
+
+元素工作台的 Chrome 155 与 Python 实际链路证据见 `acceptance/evidence-ui-workbench/`，含旧句柄保护、三种数据发送、生成源码运行及各尺寸截图。旧式数字 ID 风险和 Worker 长断线恢复缺陷仍保留；用户个人浏览器需重新加载。

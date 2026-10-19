@@ -75,6 +75,11 @@
     controllerLog: document.getElementById("controllerLog")
   };
 
+  ["inspectEmpty", "exploreEmpty", "locatorCandidates", "locatorInput", "validateLocatorBtn",
+    "copyLocatorBtn", "sendPickedBtn", "locatorValidation", "pythonAction", "pythonCode", "copyPythonBtn",
+    "pageMap", "mapMode", "mapStatus", "pythonStatus", "exportTarget", "exportSummary", "sendPythonBtn",
+    "exportStatus", "receiverCode", "copyReceiverBtn"].forEach(function (id) { els[id] = document.getElementById(id); });
+
   /**
    * Files injected into the active tab, in dependency order.
    * Must stay in sync with PageSenseBridge.CONTENT_FILES so the Popup and the
@@ -256,6 +261,9 @@
         reject(new Error("ACTION_TIMEOUT: content script did not respond"));
       }, MESSAGE_TIMEOUT_MS);
 
+      if (payload.elementId !== undefined && payload.pageId === undefined) {
+        payload.pageId = (state.scan && state.scan.pageId) || (state.picked && state.picked.pageId);
+      }
       chrome.tabs.sendMessage(tabId, payload, function (response) {
         if (settled) return;
         settled = true;
@@ -387,6 +395,10 @@
       chip.classList.toggle("active", chip.getAttribute("data-filter") === state.filter);
     });
     els.resultPanel.classList.add("hidden");
+    els.exploreEmpty.classList.remove("hidden");
+    els.pageMap.innerHTML = "";
+    els.exportStatus.textContent = "";
+    updateExportSummary();
     els.elementList.innerHTML = "";
     els.rawJson.textContent = "";
     els.searchStatus.textContent = "";
@@ -457,6 +469,8 @@
     // from a previous DOM state.
     state.searchIndex = Search.buildIndex(scan.elements, scan.scannedAt);
     renderElementList();
+    renderPageMap();
+    updateExportSummary();
     drafts.forEach(function (draft) {
       var input = els.elementList.querySelector(draft.selector);
       if (!input) return;
@@ -488,6 +502,7 @@
     pendingLiveScan = null;
     state.scan = scan;
     els.resultPanel.classList.remove("hidden");
+    els.exploreEmpty.classList.add("hidden");
     els.copyBtn.disabled = false;
     els.exportBtn.disabled = false;
     els.clearHighlightBtn.disabled = false;
@@ -621,6 +636,7 @@
     if (el.textLength > PAGESENSE.MAX_TEXT_LENGTH) sub.push("文本 " + el.textLength + " 字符（卡片为预览）");
 
     var actionButtons = [];
+    actionButtons.push('<button type="button" class="element-action-btn element-action-primary" data-card-action="inspect" data-element-id="' + el.elementId + '">检查 / Python</button>');
     actionButtons.push(
       '<button type="button" class="element-action-btn" data-card-action="locate" ' +
         'data-element-id="' + el.elementId + '">定位</button>',
@@ -674,7 +690,8 @@
           '<span class="element-badges">' + badges.join("") + "</span>" +
         "</div>" +
         '<div class="element-text">' + textHtml + "</div>" +
-        '<div class="element-sub">' + sub.join("<br />") + "</div>" +
+        '<div class="element-selector-preview">' + escapeHtml(el.selector || "") + '</div>' +
+        '<details class="element-metadata"><summary>位置与属性</summary><div class="element-sub">' + sub.join("<br />") + '</div></details>' +
         matchHtml +
         '<div class="element-actions">' + actionButtons.join("") + "</div>" +
         textEntry +
@@ -730,6 +747,7 @@
       chip.classList.toggle("active", state.filter === filter);
       chip.setAttribute("aria-pressed", String(state.filter === filter));
     });
+    updateExportSummary();
     var options = {
       limit: Number(els.pageSize.value), offset: state.offset, type: state.filter,
       tag: els.tagFilter.value.trim(), className: els.classFilter.value.trim(),
@@ -809,6 +827,7 @@
   }
 
   function fallbackCopy(text) {
+    var previousFocus = document.activeElement;
     var ta = document.createElement("textarea");
     ta.value = text;
     ta.style.position = "fixed";
@@ -823,6 +842,7 @@
       ok = false;
     }
     document.body.removeChild(ta);
+    if (previousFocus && previousFocus.isConnected) previousFocus.focus({ preventScroll: true });
     return ok;
   }
 
@@ -913,6 +933,7 @@
   /* ---- Event wiring -------------------------------------------------- */
 
   els.scanBtn.addEventListener("click", function () {
+    setView("explore");
     runScan();
   });
 
@@ -963,6 +984,8 @@
     els.pickedElementPanel.classList.add("hidden");
     els.pickedElementSummary.textContent = "";
     els.pickedElementDetails.textContent = "";
+    els.inspectEmpty.classList.remove("hidden");
+    updateExportSummary();
   }
 
   async function startPicking() {
@@ -1010,14 +1033,8 @@
         } else if (message.type === "selected") {
           var data = message.data;
           stopPicking();
-          state.picked = data;
-          var element = data.element, rect = element.position;
-          els.pickedElementSummary.textContent = "<" + element.tag + "> · #" + element.elementId +
-            " · " + (PAGESENSE.FILTER_LABELS[element.category] || element.category) +
-            " · x: " + rect.x + ", y: " + rect.y + " · " + rect.width + " × " + rect.height;
-          els.pickedElementDetails.innerHTML = inspectorHtml(data, false);
-          els.pickedElementPanel.classList.remove("hidden");
-          els.pickedElementPanel.scrollIntoView({ block: "start" });
+          setSelected(data);
+          var element = data.element;
           els.pickStatus.textContent = "已选中 <" + element.tag + ">，信息已显示。";
         } else if (message.type === "cancelled") {
           stopPicking();
@@ -1106,6 +1123,7 @@
   document.addEventListener("keydown", function (event) {
     if ((event.ctrlKey || event.metaKey) && (event.key === "k" || event.key === "K")) {
       event.preventDefault();
+      setView("explore");
       els.searchInput.focus();
       els.searchInput.select();
       return;
@@ -1170,14 +1188,16 @@
   }
 
   function inspectorHtml(data, links) {
-    return "<strong>CSS 选择器（当前匹配 " + data.selectorMatches + " 个）</strong><pre>" + escapeHtml(data.selector) + "</pre>" +
-      "<strong>全部属性</strong><pre>" + escapeHtml(JSON.stringify(data.element.attributes, null, 2)) + "</pre>" +
-      "<strong>父级（由近到远，最多 8 层）</strong><div class='context-path'>" + contextHtml(data.ancestors, links) + "</div>" +
-      "<strong>直接子元素 " + data.childrenCount + " 个（最多显示 20 个）</strong><div class='context-path'>" +
-        contextHtml(data.children, links) + "</div>" +
-      "<strong>文本 " + data.textLength + " 字符" + (data.textTruncated ? "（显示前 20000）" : "") + "</strong><pre>" +
-        escapeHtml(data.text) + "</pre>" +
-      "<strong>HTML" + (data.htmlTruncated ? "（显示前 20000 字符）" : "") + "</strong><pre>" + escapeHtml(data.html) + "</pre>";
+    var el = data.element, rect = el.position;
+    return '<div class="property-grid"><span>标签 / 类型</span><code>' + escapeHtml(el.tag + " / " + (PAGESENSE.FILTER_LABELS[el.category] || el.category)) +
+      '</code><span>元素句柄</span><code>#' + el.elementId + '</code><span>视口坐标</span><code>' + rect.x + ', ' + rect.y +
+      '</code><span>页面坐标</span><code>' + rect.pageX + ', ' + rect.pageY + '</code><span>宽 × 高</span><code>' + rect.width + ' × ' + rect.height +
+      '</code><span>状态</span><span>' + (el.disabled ? '已禁用' : el.visible ? '可见' : '不可见') + (el.inViewport ? ' / 视口内' : ' / 视口外') + '</span></div>' +
+      '<details class="inspector-section" open><summary>全部属性</summary><pre>' + escapeHtml(JSON.stringify(el.attributes, null, 2)) + '</pre></details>' +
+      '<details class="inspector-section"><summary>父子层级</summary><strong>父级（由近到远，最多 8 层）</strong><div class="context-path">' + contextHtml(data.ancestors, links) +
+      '</div><strong>直接子元素 ' + data.childrenCount + ' 个（最多显示 20 个）</strong><div class="context-path">' + contextHtml(data.children, links) + '</div></details>' +
+      '<details class="inspector-section"><summary>文本 ' + data.textLength + ' 字符' + (data.textTruncated ? '（前 20000 字符）' : '') + '</summary><pre>' + escapeHtml(data.text) + '</pre></details>' +
+      '<details class="inspector-section"><summary>HTML' + (data.htmlTruncated ? '（前 20000 字符）' : '') + '</summary><pre>' + escapeHtml(data.html) + '</pre></details>';
   }
 
   els.elementList.addEventListener("toggle", async function (event) {
@@ -1243,6 +1263,10 @@
     if (!state.tab || !state.scan || !Number.isInteger(elementId)) return;
     var revision = state.pageRevision;
 
+    if (actionName === "inspect") {
+      await inspectRecord(elementId);
+      return;
+    }
     if (actionName === "copy-selector" || actionName === "copy-text") {
       var record = state.scan.elements.find(function (element) { return element.elementId === elementId; });
       if (!record) return;
@@ -1455,6 +1479,7 @@
   STATE_LABELS[PAGESENSE.BRIDGE_STATES.CONNECTED] = "● 已连接";
   STATE_LABELS[PAGESENSE.BRIDGE_STATES.ERROR] = "● 连接异常";
 
+  var bridgeConfigLoaded = false;
   function renderBridgeStatus(status) {
     if (!status) {
       els.controllerStateText.textContent = "Service Worker 未响应";
@@ -1467,7 +1492,13 @@
     els.controllerStateText.textContent = STATE_LABELS[state] || state;
     els.controllerStateInline.textContent = STATE_LABELS[state] || state;
     els.controllerEndpoint.textContent = status.host + ":" + status.port;
-    els.controllerPort.value = String(status.port);
+    if (!bridgeConfigLoaded) {
+      els.controllerPort.value = String(status.port);
+      bridgeConfigLoaded = true;
+      renderPython(); renderReceiver();
+    }
+    els.pythonStatus.textContent = state === PAGESENSE.BRIDGE_STATES.CONNECTED ? "Python 已连接" : "Python " + (STATE_LABELS[state] || state).replace(/[○◌●] /g, "");
+    els.pythonStatus.classList.toggle("is-connected", state === PAGESENSE.BRIDGE_STATES.CONNECTED);
 
     var dotClass = "controller-dot";
     if (state === PAGESENSE.BRIDGE_STATES.CONNECTED) {
@@ -1489,6 +1520,12 @@
       els.controllerError.textContent = "";
     }
 
+    if (state === PAGESENSE.BRIDGE_STATES.CONNECTED && !els.pythonStatus.dataset.wasConnected) {
+      els.pythonStatus.dataset.wasConnected = "true";
+      els.controllerPanel.open = false;
+      document.getElementById("connectionGuide").open = false;
+    }
+    if (state !== PAGESENSE.BRIDGE_STATES.CONNECTED) delete els.pythonStatus.dataset.wasConnected;
     renderControllerLog(status.recentRequests || []);
   }
 
@@ -1533,11 +1570,7 @@
   }
 
   els.controllerPanel.addEventListener("toggle", function () {
-    if (els.controllerPanel.open) {
-      startBridgePolling();
-    } else {
-      stopBridgePolling();
-    }
+    refreshBridgeStatus();
   });
 
   els.controllerConnectBtn.addEventListener("click", async function () {
@@ -1580,8 +1613,248 @@
     }
   });
 
+
+  /* ---- Element workbench --------------------------------------------- */
+  function setView(view) {
+    document.body.dataset.view = view;
+    document.querySelectorAll(".workspace-tab").forEach(function (button) {
+      var selected = button.dataset.view === view;
+      button.classList.toggle("active", selected);
+      button.setAttribute("aria-selected", String(selected));
+      button.tabIndex = selected ? 0 : -1;
+    });
+    document.querySelectorAll(".workspace-view").forEach(function (panel) {
+      panel.classList.toggle("hidden", panel.id !== "view-" + view);
+    });
+    document.querySelector(".app-main").scrollTop = 0;
+    updateExportSummary();
+  }
+  document.querySelectorAll(".workspace-tab").forEach(function (button) {
+    button.addEventListener("click", function () { setView(button.dataset.view); });
+    button.addEventListener("keydown", function (event) {
+      var buttons = Array.from(document.querySelectorAll(".workspace-tab"));
+      var index = buttons.indexOf(button);
+      if (event.key === "ArrowRight") index = (index + 1) % buttons.length;
+      else if (event.key === "ArrowLeft") index = (index + buttons.length - 1) % buttons.length;
+      else if (event.key === "Home") index = 0;
+      else if (event.key === "End") index = buttons.length - 1;
+      else return;
+      event.preventDefault(); setView(buttons[index].dataset.view); buttons[index].focus();
+    });
+  });
+  els.pythonStatus.addEventListener("click", function () { setView("python"); });
+
+  function setSelected(data) {
+    state.picked = data;
+    els.inspectEmpty.classList.add("hidden");
+    var el = data.element;
+    els.pickedElementSummary.textContent = (el.text || el.ariaLabel || el.placeholder || "<" + el.tag + ">").slice(0, 180);
+    els.pickedElementDetails.innerHTML = inspectorHtml(data, false);
+    els.pickedElementPanel.classList.remove("hidden");
+    var candidates = data.locators || [{ label: "DOM 路径", selector: data.selector, matches: data.selectorMatches, unique: data.selectorMatches === 1, stability: "structure" }];
+    var recommended = candidates.findIndex(function (item) { return item.unique; });
+    els.locatorCandidates.innerHTML = candidates.map(function (item, index) {
+      return '<option value="' + index + '">' + escapeHtml(item.label + " / " + item.matches + " 个匹配" + (index === recommended ? " / 推荐" : "")) + '</option>';
+    }).join("");
+    els.locatorCandidates.value = String(Math.max(0, recommended));
+    els.locatorInput.value = candidates[Math.max(0, recommended)].selector;
+    els.locatorValidation.textContent = "选择时匹配 " + candidates[Math.max(0, recommended)].matches + " 个元素。可重新验证；DOM 路径会受结构变化影响。";
+    els.pythonAction.value = PAGESENSE.isTextEntryElement(el) ? "input" : PAGESENSE.isClickableElement(el) ? "click" : "text";
+    renderPython(); updateExportSummary(); setView("inspect");
+  }
+
+  async function inspectRecord(elementId, highlight) {
+    if (!state.tab || !state.scan) return;
+    var revision = state.pageRevision;
+    try {
+      var response = await requestMessage(state.tab.id, { action: PAGESENSE.ACTIONS.GET_ELEMENT_DETAILS,
+        elementId: elementId, pageId: state.scan.pageId });
+      if (revision !== state.pageRevision) return;
+      if (!response.ok) throw new Error(response.message || (response.error && response.error.message) || response.error);
+      setSelected(response.data);
+      if (highlight) await requestMessage(state.tab.id, { action: PAGESENSE.ACTIONS.LOCATE_ELEMENT,
+        elementId: elementId, pageId: response.data.pageId });
+    } catch (error) { if (revision === state.pageRevision) showToast("读取失败：" + error.message, "error"); }
+  }
+
+  // JSON strings are also valid Python string literals; escape non-Python line separators explicitly.
+  function pyString(value) { return JSON.stringify(String(value)).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029"); }
+  function pythonPort() { var port = Number(els.controllerPort.value); return Number.isInteger(port) && port > 0 && port <= 65535 ? port : 8765; }
+  function pythonPreamble() {
+    return 'from pagesense import PageSenseClient\n\nwith PageSenseClient(port=' + pythonPort() + ') as client:\n' +
+      '    print("Token:", client.token, flush=True)\n' +
+      '    if not client.wait_for_extension(timeout=60):\n        raise TimeoutError("请在插件中连接 Python")\n';
+  }
+  function renderPython() {
+    if (!state.picked) { els.pythonCode.textContent = ""; return; }
+    var operation = { text: "text = target.text()\n    print(text)", click: "target.click()",
+      input: 'target.input("要输入的内容")', clear: "target.clear()", keypress: 'target.keypress("Enter")', locate: "target.locate()" }[els.pythonAction.value];
+    els.pythonCode.textContent = pythonPreamble() + '\n    target = client.locator(' + pyString(els.locatorInput.value) + ')\n    ' + operation + '\n';
+  }
+  function renderReceiver() {
+    els.receiverCode.textContent = pythonPreamble() + '\n    snapshot = client.wait_for_export(timeout=120)\n' +
+      '    print(snapshot["page"]["url"])\n    print("收到元素:", len(snapshot["elements"]))\n' +
+      '    # 由你决定流程；发送数据不会自动执行操作。\n' +
+      '    # element = snapshot["elements"][0]\n' +
+      '    # client.element(element).locate()  # 原页面中的句柄\n' +
+      '    # client.locator(element["selector"]).click()\n' +
+      '    # text = client.element(element).text()\n';
+  }
+  els.locatorCandidates.addEventListener("change", function () {
+    if (!state.picked) return;
+    var candidates = state.picked.locators || [{ selector: state.picked.selector }];
+    els.locatorInput.value = candidates[Number(els.locatorCandidates.value)].selector;
+    els.locatorInput.dispatchEvent(new Event("input"));
+  });
+  els.locatorInput.addEventListener("input", function () {
+    els.locatorValidation.textContent = "定位器已更改，点击“验证并高亮”检查当前页面。";
+    renderPython();
+  });
+  els.pythonAction.addEventListener("change", renderPython);
+  els.controllerPort.addEventListener("input", function () { renderPython(); renderReceiver(); });
+  els.validateLocatorBtn.addEventListener("click", async function () {
+    if (!state.picked || !state.tab) return;
+    var revision = state.pageRevision, selector = els.locatorInput.value, picked = state.picked;
+    els.validateLocatorBtn.disabled = true;
+    els.locatorValidation.textContent = "正在验证…";
+    try {
+      var response = await requestMessage(state.tab.id, { action: PAGESENSE.ACTIONS.RESOLVE_ELEMENT,
+        selector: selector, pageId: picked.pageId });
+      if (revision !== state.pageRevision || picked !== state.picked || selector !== els.locatorInput.value) return;
+      if (!response.ok) throw new Error(response.message || (response.error && response.error.message) || response.error);
+      setSelected(response.data);
+      els.locatorInput.value = selector; renderPython();
+      var result = await requestMessage(state.tab.id, { action: PAGESENSE.ACTIONS.LOCATE_ELEMENT,
+        elementId: response.data.element.elementId, pageId: response.data.pageId });
+      if (revision !== state.pageRevision) return;
+      if (!result.success) throw new Error((result.error || {}).message || "高亮失败");
+      els.locatorValidation.textContent = "唯一匹配 1 个元素，已在页面高亮。";
+    } catch (error) {
+      if (revision === state.pageRevision) els.locatorValidation.textContent = "验证失败：" + error.message;
+    } finally { els.validateLocatorBtn.disabled = false; }
+  });
+  [[els.copyPythonBtn, function () { return els.pythonCode.textContent; }],
+    [els.copyReceiverBtn, function () { return els.receiverCode.textContent; }],
+    [els.copyLocatorBtn, function () { return els.locatorInput.value; }]].forEach(function (pair) {
+    pair[0].addEventListener("click", async function () {
+      var ok = await copyText(pair[1]()); showToast(ok ? "已复制" : "复制失败", ok ? "success" : "error");
+    });
+  });
+
+  function renderPageMap() {
+    if (!state.scan) return;
+    var scan = state.scan, page = scan.page, elements = scan.elements;
+    var width = (page.dimensions || {}).width || page.viewport.width;
+    var height = (page.dimensions || {}).height || page.viewport.height;
+    var colors = { interactive: "#185adb", "text-content": "#18794e", "media-content": "#8550b0", structure: "#788896" };
+    var shown = (els.mapMode.value === "viewport" ? elements.filter(function (el) { return el.inViewport; }) : elements).slice(0, 800);
+    var viewport = els.mapMode.value === "viewport";
+    els.pageMap.setAttribute("viewBox", viewport ? page.scroll.x + " " + page.scroll.y + " " + page.viewport.width + " " + page.viewport.height : "0 0 " + width + " " + height);
+    els.pageMap.style.aspectRatio = viewport ? page.viewport.width + " / " + page.viewport.height : width + " / " + Math.min(height, width * 1.5);
+    var svg = '<rect class="map-background" x="0" y="0" width="' + width + '" height="' + height + '" fill="#fff"/>';
+    // Larger regions first so their children remain clickable above them.
+    shown.sort(function (a, b) { return b.position.width * b.position.height - a.position.width * a.position.height; });
+    svg += shown.map(function (el, index) {
+      var rect = el.position, group = Object.keys(colors).find(function (key) { return PAGESENSE.matchesFilter(el, key); }) || "structure";
+      return '<rect class="map-element" role="button" tabindex="' + (index === 0 ? '0' : '-1') + '" aria-label="' + escapeHtml('检查 ' + el.tag + ' ' + (el.text || el.ariaLabel || '').slice(0, 80)) + '" data-map-id="' + el.elementId + '" x="' + Math.max(0, rect.pageX) + '" y="' + Math.max(0, rect.pageY) +
+        '" width="' + Math.max(2, rect.width) + '" height="' + Math.max(2, rect.height) + '" fill="' + colors[group] + '" fill-opacity=".16" stroke="' + colors[group] +
+        '" vector-effect="non-scaling-stroke"><title>' + escapeHtml('<' + el.tag + '> ' + (el.text || el.ariaLabel || el.placeholder || "").slice(0, 80)) + '</title></rect>';
+    }).join("");
+    svg += '<rect class="map-viewport" x="' + page.scroll.x + '" y="' + page.scroll.y + '" width="' + page.viewport.width + '" height="' + page.viewport.height +
+      '" fill="none" stroke="#172b3a" stroke-dasharray="5 4" vector-effect="non-scaling-stroke" pointer-events="none"/>';
+    els.pageMap.innerHTML = svg;
+    els.mapStatus.textContent = '页面 ' + width + ' × ' + height + ' px；虚线框为当前视口。' +
+      (elements.length > 800 ? '分布图显示前 800 / ' + elements.length + ' 个，完整元素请使用列表。' : '共 ' + elements.length + ' 个元素。');
+  }
+  els.mapMode.addEventListener("change", renderPageMap);
+  els.pageMap.addEventListener("keydown", function (event) {
+    var nodes = Array.from(els.pageMap.querySelectorAll("[data-map-id]"));
+    var index = nodes.indexOf(event.target);
+    if (index < 0) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault(); inspectRecord(Number(event.target.dataset.mapId), true); return;
+    }
+    if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].indexOf(event.key) < 0) return;
+    event.preventDefault();
+    var next = (index + (event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1) + nodes.length) % nodes.length;
+    nodes[index].tabIndex = -1; nodes[next].tabIndex = 0; nodes[next].focus({ preventScroll: true });
+  });
+  els.pageMap.addEventListener("click", function (event) {
+    var node = event.target.closest("[data-map-id]");
+    if (node) inspectRecord(Number(node.dataset.mapId), true);
+  });
+
+  function exportSnapshot() {
+    var selected = els.exportTarget.value === "selected";
+    var picked = state.picked, scan = state.scan;
+    if (selected && !picked) throw new Error("请先在页面选择一个元素，或从列表打开检查器。");
+    if (!selected && !scan) throw new Error("请先扫描当前页面。");
+    var elements = selected ? [Object.assign({}, picked.element, { selector: (picked.locator || {}).selector || picked.selector })] : scan.elements;
+    var filters = { query: state.query, category: state.filter, tag: els.tagFilter.value.trim(),
+      className: els.classFilter.value.trim(), id: els.idFilter.value.trim(),
+      selector: els.cssFilter.value.trim(), attributeQuery: els.attributeFilter.value, inViewport: els.viewportFilter.checked };
+    if (els.exportTarget.value === "filtered") {
+      var options = Object.assign({}, filters, { type: state.filter, limit: 1, includeIds: true });
+      if (els.attributeFilter.value.trim()) options.attributes = JSON.parse(els.attributeFilter.value);
+      if (filters.selector) {
+        if (!state.cssMatch || state.cssMatch.scan !== scan || state.cssMatch.selector !== filters.selector || state.cssMatch.pending || state.cssMatch.error)
+          throw new Error("请等待 CSS 查询完成并修正错误。");
+        options.elementIds = state.cssMatch.ids;
+      }
+      var outcome = Search.search(state.query, options);
+      if (!outcome.ok) throw new Error(outcome.error.message);
+      var ids = new Set(outcome.matchingIds);
+      elements = elements.filter(function (el) { return ids.has(el.elementId); });
+      filters.attributes = options.attributes || {};
+    }
+    var snapshot = { schemaVersion: 1, kind: els.exportTarget.value,
+      exportedAt: new Date().toISOString(), pageId: selected ? picked.pageId : scan.pageId,
+      page: selected ? picked.page : scan.page, scannedAt: selected ? picked.inspectedAt : scan.scannedAt,
+      settings: { scope: selected ? "picked" : scan.scope, live: state.liveEnabled, filters: filters },
+      elements: elements };
+    if (selected) snapshot.details = picked;
+    return snapshot;
+  }
+  function updateExportSummary() {
+    if (!els.exportSummary) return;
+    try {
+      var data = exportSnapshot();
+      els.exportSummary.textContent = data.elements.length + ' 个元素 / ' + data.page.url + '。发送的是本次快照。';
+      els.sendPythonBtn.disabled = Boolean(exportInFlight);
+    } catch (error) { els.exportSummary.textContent = error.message; els.sendPythonBtn.disabled = true; }
+  }
+  var exportInFlight = false;
+  async function sendSnapshot() {
+    if (exportInFlight) return;
+    exportInFlight = true;
+    var revision = state.pageRevision;
+    els.sendPythonBtn.disabled = true; els.sendPickedBtn.disabled = true;
+    try {
+      var data = exportSnapshot();
+      els.exportStatus.textContent = "正在发送，等待 Python 确认…";
+      var response = await sendBridgeMessage({ type: PAGESENSE.BRIDGE_MESSAGES.SEND_EXPORT, data: data });
+      if (revision !== state.pageRevision) return;
+      if (!response.ok) throw new Error((response.error || {}).message || "Python 未响应");
+      els.exportStatus.textContent = "Python 已收到 " + data.elements.length + " 个元素（尚未执行操作）。";
+      showToast(els.exportStatus.textContent, "success");
+    } catch (error) {
+      if (revision === state.pageRevision) {
+        els.exportStatus.textContent = "发送失败：" + error.message;
+        showToast(els.exportStatus.textContent, "error");
+      }
+    } finally { exportInFlight = false; els.sendPickedBtn.disabled = false; updateExportSummary(); }
+  }
+  els.exportTarget.addEventListener("change", updateExportSummary);
+  els.sendPythonBtn.addEventListener("click", sendSnapshot);
+  els.sendPickedBtn.addEventListener("click", function () {
+    els.exportTarget.value = "selected"; setView("python"); sendSnapshot();
+  });
+  document.getElementById("copyStartupBtn").addEventListener("click", function () { els.copyReceiverBtn.click(); });
+  renderReceiver(); updateExportSummary();
+
   // Show the connection state even before the panel is expanded.
-  refreshBridgeStatus();
+  startBridgePolling();
+  window.addEventListener("pagehide", stopBridgePolling);
 
   /* ---- Keep the persistent panel in sync with its browser window ----- */
 

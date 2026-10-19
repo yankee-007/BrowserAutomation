@@ -15,6 +15,8 @@
 
   var PS = global.PAGESENSE;
   var ID_ATTR = PS.PAGE_SENSE_ID_ATTR;
+  // DOM attributes are inspectable metadata; only actual assigned nodes may execute.
+  var bindings = new Map();
 
   /** Only positive integers (number or numeric string) are accepted. */
   function isValidId(elementId) {
@@ -32,6 +34,7 @@
    * Called before each scan so stale ids never survive a rescan.
    */
   function clearMappings() {
+    bindings.clear();
     var nodes = global.document.querySelectorAll("[" + ID_ATTR + "]");
     Array.prototype.forEach.call(nodes, function (element) {
       element.removeAttribute(ID_ATTR);
@@ -44,6 +47,7 @@
       return false;
     }
     element.setAttribute(ID_ATTR, String(elementId));
+    bindings.set(String(elementId), new WeakRef(element));
     return true;
   }
 
@@ -55,8 +59,14 @@
     if (!isValidId(elementId)) {
       return null;
     }
-    var selector = "[" + ID_ATTR + '="' + String(elementId) + '"]';
-    return global.document.querySelector(selector);
+    var binding = bindings.get(String(elementId));
+    var element = binding && binding.deref();
+    if (!element || !element.isConnected || element.ownerDocument !== global.document ||
+        element.getAttribute(ID_ATTR) !== String(elementId)) {
+      bindings.delete(String(elementId));
+      return null;
+    }
+    return element;
   }
 
   global.PageSenseElementMap = {

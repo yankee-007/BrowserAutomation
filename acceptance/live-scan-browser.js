@@ -265,7 +265,7 @@ async function waitScan(predicate, ...args) {
   await waitScan(() => document.getElementById("rawJson").textContent.includes("刷新后实时变化"));
   pass("Tab switch releases the old observer; refresh reconnects and updates the new document");
 
-  await second.goto("edge://version");
+  await second.goto(EDGE.toLowerCase().includes("msedge") ? "edge://version" : "chrome://version");
   await waitScan(() => document.getElementById("liveScanStatus").textContent.includes("不支持"));
   assert.equal(await panel.$eval("#resultPanel", el => el.classList.contains("hidden")), true);
   await second.goto(demoUrl + "?returned");

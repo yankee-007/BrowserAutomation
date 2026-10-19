@@ -1,0 +1,46 @@
+{
+  "verifiedAt": "2026-10-19T09:20:22.693Z",
+  "browser": "Chrome/155.0.8059.84",
+  "node": "v24.20.0",
+  "results": [
+    {
+      "name": "Point selection without scanning opens a readable inspector and prioritizes unique test attributes"
+    },
+    {
+      "name": "Locator validation highlights one element and reports missing, ambiguous and invalid CSS without clicking"
+    },
+    {
+      "name": "UI connects Python; selected export is acknowledged and Python clicks, inputs, clears, reads and rejects ambiguous targets"
+    },
+    {
+      "name": "Page distribution opens elements; complete and filtered exports include all results across pagination"
+    },
+    {
+      "name": "A full Python inbox rejects exports explicitly and recovers after consumption"
+    },
+    {
+      "name": "All three workspaces fit 320/400/600px; keyboard tabs, reduced motion and generated Python syntax work"
+    },
+    {
+      "name": "Old snapshot handles fail after tab switch/navigation; fresh CSS locators work without a scan"
+    },
+    {
+      "name": "The exact copied Python script starts, authenticates and executes its generated click"
+    }
+  ],
+  "errors": [],
+  "sourceHashes": {
+    "pagesense/popup/popup.js": "3135e428dc66b75f99aa2e9018afb60c99da2b27926827e35e9307e7a9e58a2c",
+    "pagesense/popup/popup.css": "5b827029a95e5689add4fe2c8e62b8d4e88ef7d138b593a8d192943bcb04aaea",
+    "pagesense/popup/popup.html": "b6a4a48bcf1c330434fab24bcd64969b3b8c486ee7fcda5ced14a36150d71b49",
+    "pagesense/content/scanner.js": "c34bb58e60d5de9f6d1ae27e6be0d6745a00d6ba1af7a997b7c61390abeacfbf",
+    "pagesense/content/content.js": "9762c9ced9ce81f1435a92e2a7eff9331476caa83005789f56785ef371810f87",
+    "pagesense/content/element-map.js": "93a000a95d178e537cf980aa0331b919a0a6fe7b3459c08a5026fd2a13f000ab",
+    "pagesense/bridge/controller-bridge.js": "edf1cb4b1a9631379c791ab0e69fe51aaa7f1efa78ef93ecf37f8b1678fa8466",
+    "pagesense/background/service-worker.js": "7b99f2a7f62de6613771926c8de9f76db56dffdd7c97274d6894c2ac8b456ba7",
+    "pagesense/shared/constants.js": "53c1a1fab1ef60c778a502648f33da38660a571fad00fc874e403b82b970d301",
+    "controller/pagesense.py": "8570a6a32de4373feb021d5757106f19bf2b54a5e8b8a9a04e4dd1dae1b58715",
+    "controller/server.py": "c0196c5690f9af66448a3ec8cb6eaa45ee873541b0fbe2b2a0e01cb2fc77d26c",
+    "controller/protocol.py": "d6a0eea0875c99b49efdbc9793bc6a017a48e6541b4b0d43c07222e08c717532"
+  }
+}

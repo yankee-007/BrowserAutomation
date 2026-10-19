@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import queue
 import secrets
 import sys
 import threading
@@ -101,6 +102,9 @@ class ControllerServer:
         self._extension: ServerConnection | None = None
         self._pending: dict[str, asyncio.Future] = {}
         self._counter = 0
+        self._exports: queue.Queue = queue.Queue(maxsize=8)
+        self._export_bytes = 0
+        self._export_lock = threading.Lock()
         self._loop: asyncio.AbstractEventLoop | None = None
         self._server = None
         self._thread: threading.Thread | None = None
@@ -274,6 +278,25 @@ class ControllerServer:
         except (ValueError, TypeError):
             return
 
+        if isinstance(message, dict) and message.get("type") == P.TYPE_EXPORT:
+            export_id, data = message.get("id"), message.get("data")
+            valid = (isinstance(export_id, str) and 0 < len(export_id) <= 128
+                     and isinstance(data, dict) and isinstance(data.get("elements"), list)
+                     and isinstance(data.get("pageId"), str) and bool(data["pageId"]))
+            size = len(frame) if isinstance(frame, bytes) else len(frame.encode("utf-8"))
+            accepted = False
+            if valid:
+                with self._export_lock:
+                    if not self._exports.full() and self._export_bytes + size <= MAX_MESSAGE_SIZE:
+                        self._exports.put_nowait((dict(data, exportId=export_id), size))
+                        self._export_bytes += size
+                        accepted = True
+            await self._send({"type": P.TYPE_EXPORT_ACK, "id": export_id,
+                              "success": accepted,
+                              **({} if accepted else {"error": {"code": "EXPORT_REJECTED",
+                                  "message": "收件箱已满或数据格式无效，请先调用 wait_for_export()。"}})})
+            return
+
         if P.is_response(message):
             request_id = message.get("id")
             future = self._pending.pop(request_id, None)
@@ -302,6 +325,19 @@ class ControllerServer:
         if websocket is None:
             raise P.PageSenseError(P.ERR_NOT_CONNECTED, "PageSense Extension 未连接。")
         await websocket.send(json.dumps(payload))
+
+    def wait_for_export(self, timeout: float | None = 60) -> dict:
+        """Receive a user-sent snapshot; ACK means queued in memory, not executed.
+
+        The inbox holds at most 8 exports and 64 MiB total. No disk persistence.
+        """
+        try:
+            data, size = self._exports.get(timeout=timeout)
+        except queue.Empty:
+            raise TimeoutError("等待侧栏发送元素超时。") from None
+        with self._export_lock:
+            self._export_bytes -= size
+        return data
 
     def _next_request_id(self) -> str:
         self._counter += 1

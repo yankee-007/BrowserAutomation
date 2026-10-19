@@ -243,7 +243,17 @@
     }, delay);
   }
 
+  function rejectExports() {
+    if (!pendingExports) return;
+    pendingExports.forEach(function (pending) {
+      clearTimeout(pending.timer);
+      pending.reject(bridgeError("TRANSPORT_ERROR", "连接已中断，无法确认收件，请检查 Python。"));
+    });
+    pendingExports.clear();
+  }
+
   function closeSocket() {
+    rejectExports();
     if (!socket) {
       return;
     }
@@ -320,6 +330,7 @@
         return;
       }
       socket = null;
+      rejectExports();
       clearTimers();
       connectedSince = null;
       setState(manualStop ? STATES.DISCONNECTED : STATES.ERROR, lastError);
@@ -328,6 +339,24 @@
   }
 
   /* ---- Server message handling ------------------------------------------ */
+
+  var pendingExports = new Map();
+  function sendExport(data) {
+    if (connectionState !== STATES.CONNECTED) return Promise.reject(bridgeError("NOT_CONNECTED", "请先连接 Python。"));
+    if (!data || !Array.isArray(data.elements) || !data.pageId) return Promise.reject(bridgeError("INVALID_PARAMS", "导出内容缺少页面或元素。"));
+    var id = "export_" + crypto.randomUUID();
+    return new Promise(function (resolve, reject) {
+      var timer = setTimeout(function () {
+        pendingExports.delete(id);
+        reject(bridgeError("EXPORT_TIMEOUT", "Python 未确认收件；可检查 wait_for_export()，勿假定未收到。"));
+      }, 8000);
+      pendingExports.set(id, { resolve: resolve, reject: reject, timer: timer });
+      if (!sendJson({ type: TYPES.EXPORT, id: id, data: data })) {
+        clearTimeout(timer); pendingExports.delete(id);
+        reject(bridgeError("TRANSPORT_ERROR", "发送失败，请检查 Python 连接。"));
+      }
+    });
+  }
 
   function handleServerMessage(raw) {
     var message;
@@ -340,6 +369,14 @@
       return;
     }
 
+    if (message.type === TYPES.EXPORT_ACK) {
+      var pending = pendingExports.get(message.id);
+      if (!pending) return;
+      clearTimeout(pending.timer); pendingExports.delete(message.id);
+      if (message.success) pending.resolve({ id: message.id, received: true });
+      else pending.reject(bridgeError("EXPORT_REJECTED", (message.error || {}).message || "Python 拒绝收件。"));
+      return;
+    }
     if (message.type === TYPES.HELLO_ACK) {
       if (helloTimer) { clearTimeout(helloTimer); helloTimer = null; }
       if (message.success === true) {
@@ -468,6 +505,8 @@
   function buildActionMessage(method, params) {
     var A = PS.ACTIONS;
     switch (method) {
+      case PS.METHODS.RESOLVE_ELEMENT:
+        return { action: A.RESOLVE_ELEMENT, selector: params.selector };
       case PS.METHODS.SCAN_PAGE:
         return { action: A.SCAN_PAGE, scope: params.scope };
       case PS.METHODS.SEARCH_ELEMENTS:
@@ -525,6 +564,7 @@
       var scan = response.data;
       var out = tabSummary(tabInfo.tab, tabInfo.url);
       out.schemaVersion = scan.schemaVersion;
+      out.pageId = scan.pageId;
       out.scannedAt = scan.scannedAt;
       out.scope = scan.scope;
       out.page = scan.page;
@@ -533,7 +573,7 @@
       return out;
     }
 
-    if (method === PS.METHODS.GET_ELEMENT_DETAILS) {
+    if (method === PS.METHODS.GET_ELEMENT_DETAILS || method === PS.METHODS.RESOLVE_ELEMENT) {
       if (!response.ok) throw bridgeError(response.error || EC.BRIDGE_ERROR, response.message || "读取详情失败。");
       return response.data;
     }
@@ -544,6 +584,7 @@
       }
       var found = response.data;
       return {
+        pageId: found.pageId,
         query: found.query,
         normalizedQuery: found.normalizedQuery,
         keywords: found.keywords,
@@ -606,12 +647,16 @@
     }
 
     var message = buildActionMessage(method, params);
+    if (message && params.pageId !== undefined) message.pageId = params.pageId;
     if (!message) {
       return Promise.reject(bridgeError(EC.UNKNOWN_METHOD, "未知方法：" + String(method)));
     }
 
     return resolveActiveTab().then(function (info) {
       return sendToTab(info.tab.id, message).then(function (response) {
+        if (response && response.error && response.error.code === "STALE_PAGE") {
+          throw bridgeError("STALE_PAGE", response.error.message);
+        }
         return normalizeResult(method, info, response);
       });
     });
@@ -680,6 +725,7 @@
     getStatus: getStatus,
     saveConfig: saveConfig,
     loadConfig: loadConfig,
+    sendExport: sendExport,
     dispatch: dispatch,
     buildActionMessage: buildActionMessage,
     normalizeHost: normalizeHost,

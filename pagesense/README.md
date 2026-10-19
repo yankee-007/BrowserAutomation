@@ -21,6 +21,15 @@ PageSense 是一个基于 **Chrome / Edge + Manifest V3 + 原生 JavaScript** �
 
 ---
 
+## 元素工作台
+
+侧栏分为“页面概览 / 元素检查 / Python 对接”。概览显示页面几何分布、搜索和分页列表；
+点选网页或从列表“检查 / Python”进入统一检查器，查看唯一定位候选、属性、层级、坐标和 HTML，
+并复制可运行的 Python 代码。“Python 对接”可发送选中元素、完整扫描或跨分页的筛选结果，
+后端使用 `wait_for_export()` 收件，用 `client.element(element)` 或 `client.locator(css)` 操作。
+
+完整使用流程、发送范围与定位限制见[元素工作台说明](../docs/element-workbench.md)。
+
 ## 安装（加载已解压的扩展程序）
 
 ### Chrome
@@ -45,7 +54,7 @@ PageSense 是一个基于 **Chrome / Edge + Manifest V3 + 原生 JavaScript** �
 
 1. 打开任意普通网页（例如 `https://example.com`）
 2. 点击浏览器工具栏中的 **PageSense** 图标，在浏览器原生侧栏打开界面；操作网页时侧栏保持打开
-3. 选择 **扫描范围**（默认页面内容），点击 **扫描当前页面**，或勾选 **实时扫描** 持续更新
+3. 选择 **扫描范围**（默认页面内容），点击 **扫描当前页面**，或勾选 **实时** 持续更新
    - 也可直接点击 **在页面选择元素**，到网页中悬停并点击目标，无需先扫描
 4. 浏览元素卡片，或使用：
    - **搜索框**（V2.0 Element Search）：按文本 / 标签 / placeholder / aria-label /
@@ -72,7 +81,7 @@ PageSense 是一个基于 **Chrome / Edge + Manifest V3 + 原生 JavaScript** �
 pagesense_<domain>_<YYYY-MM-DD>_<HHMMSS>.json
 ```
 
-### 从弹窗版更新
+### 从旧版更新
 
 在扩展管理页找到 PageSense，点击 **重新加载/刷新**，再点击工具栏的 PageSense 图标即可打开侧栏。已有扫描、搜索、定位、高亮、人工操作和 Controller 配置入口都保留；侧栏可拖动边界调整宽度，底部按钮固定，内容区域独立滚动。
 
@@ -80,7 +89,7 @@ pagesense_<domain>_<YYYY-MM-DD>_<HHMMSS>.json
 
 ### 实时扫描
 
-勾选扫描按钮下的 **实时扫描** 后立即获取结果；页面增删元素、文本/属性变化、
+勾选扫描按钮下的 **实时** 后立即获取结果；页面增删元素、文本/属性变化、
 输入/选择、滚动和窗口尺寸变化会触发自动更新，连续变化按约 300ms 合并扫描。
 状态行显示监听状态和最近更新时间；页面静止时不重复扫描。
 

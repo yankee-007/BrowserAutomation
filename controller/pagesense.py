@@ -116,33 +116,57 @@ class PageSenseClient:
                          id=dom_id, attributes=attrs, selector=selector,
                          inViewport=in_viewport)
 
-    def inspect(self, element_id: int, timeout: float | None = None) -> dict:
-        """Read current attributes, selectors, text, HTML and tree context."""
-        return self.call("GET_ELEMENT_DETAILS", elementId=element_id, timeout=timeout)
+    def wait_for_export(self, timeout: float | None = 60) -> dict:
+        """Wait for selected elements or a complete snapshot sent from the panel."""
+        return self.server.wait_for_export(timeout)
 
-    # ---- per-element actions -------------------------------------------
+    def locator(self, selector: str) -> "Element":
+        """Resolve native CSS before each operation; exactly one match required."""
+        if not isinstance(selector, str) or not selector.strip():
+            raise ValueError("selector 必须为非空 CSS。")
+        return Element(self, selector=selector)
 
-    def locate(self, element_id: int, timeout: float | None = None) -> dict:
-        return self.call("LOCATE_ELEMENT", elementId=element_id, timeout=timeout)
+    def element(self, handle: dict) -> "Element":
+        """Bind a snapshot element to its original document (pageId required)."""
+        self._element_params(handle)
+        return Element(self, handle=dict(handle))
 
-    def highlight(self, element_id: int, timeout: float | None = None) -> dict:
-        return self.call("HIGHLIGHT_ELEMENT", elementId=element_id, timeout=timeout)
+    @staticmethod
+    def _element_params(element_id: int | dict) -> dict:
+        if isinstance(element_id, dict):
+            page_id, node_id = element_id.get("pageId"), element_id.get("elementId")
+            if not isinstance(page_id, str) or not page_id or type(node_id) is not int or node_id < 1:
+                raise ValueError("元素句柄必须包含正整数 elementId 和非空 pageId。")
+            return {"elementId": node_id, "pageId": page_id}
+        return {"elementId": element_id}
 
-    def click(self, element_id: int, timeout: float | None = None) -> dict:
-        return self.call("CLICK_ELEMENT", elementId=element_id, timeout=timeout)
+    def _element_call(self, method, element_id, timeout=None, **params):
+        return self.call(method, timeout=timeout, **self._element_params(element_id), **params)
 
-    def input(self, element_id: int, value: str,
-              timeout: float | None = None) -> dict:
-        return self.call("INPUT_ELEMENT", elementId=element_id, value=value,
-                         timeout=timeout)
+    def inspect(self, element_id: int | dict, timeout: float | None = None) -> dict:
+        return self._element_call("GET_ELEMENT_DETAILS", element_id, timeout)
 
-    def clear(self, element_id: int, timeout: float | None = None) -> dict:
-        return self.call("CLEAR_ELEMENT", elementId=element_id, timeout=timeout)
+    def read_text(self, element_id: int | dict, timeout: float | None = None) -> str:
+        """Read text into Python (up to 20000 characters); does not use OS clipboard."""
+        return self.inspect(element_id, timeout)["text"]
 
-    def keypress(self, element_id: int, key: str,
-                 timeout: float | None = None) -> dict:
-        return self.call("KEYPRESS_ELEMENT", elementId=element_id, key=key,
-                         timeout=timeout)
+    def locate(self, element_id: int | dict, timeout: float | None = None) -> dict:
+        return self._element_call("LOCATE_ELEMENT", element_id, timeout)
+
+    def highlight(self, element_id: int | dict, timeout: float | None = None) -> dict:
+        return self._element_call("HIGHLIGHT_ELEMENT", element_id, timeout)
+
+    def click(self, element_id: int | dict, timeout: float | None = None) -> dict:
+        return self._element_call("CLICK_ELEMENT", element_id, timeout)
+
+    def input(self, element_id: int | dict, value: str, timeout: float | None = None) -> dict:
+        return self._element_call("INPUT_ELEMENT", element_id, timeout, value=value)
+
+    def clear(self, element_id: int | dict, timeout: float | None = None) -> dict:
+        return self._element_call("CLEAR_ELEMENT", element_id, timeout)
+
+    def keypress(self, element_id: int | dict, key: str, timeout: float | None = None) -> dict:
+        return self._element_call("KEYPRESS_ELEMENT", element_id, timeout, key=key)
 
     def scroll(self, direction: str = "down", amount: int = 500,
                timeout: float | None = None) -> dict:
@@ -150,4 +174,41 @@ class PageSenseClient:
                          timeout=timeout)
 
 
-__all__ = ["PageSenseClient", "P"]
+class Element:
+    """A CSS locator, or a page-scoped snapshot handle. No implicit retries."""
+
+    def __init__(self, client, *, selector=None, handle=None):
+        self.client, self.selector, self.handle = client, selector, handle
+
+    def _target(self, timeout):
+        if self.handle is not None:
+            return self.handle
+        detail = self.client.call("RESOLVE_ELEMENT", selector=self.selector, timeout=timeout)
+        return {"elementId": detail["element"]["elementId"], "pageId": detail["pageId"]}
+
+    def inspect(self, timeout=None):
+        return self.client.inspect(self._target(timeout), timeout)
+
+    def text(self, timeout=None):
+        return self.inspect(timeout)["text"]
+
+    def click(self, timeout=None):
+        return self.client.click(self._target(timeout), timeout)
+
+    def input(self, value, timeout=None):
+        return self.client.input(self._target(timeout), value, timeout)
+
+    def clear(self, timeout=None):
+        return self.client.clear(self._target(timeout), timeout)
+
+    def keypress(self, key, timeout=None):
+        return self.client.keypress(self._target(timeout), key, timeout)
+
+    def locate(self, timeout=None):
+        return self.client.locate(self._target(timeout), timeout)
+
+    def highlight(self, timeout=None):
+        return self.client.highlight(self._target(timeout), timeout)
+
+
+__all__ = ["PageSenseClient", "Element", "P"]

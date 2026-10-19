@@ -33,6 +33,7 @@ async function openPanel(page) {
   await page.bringToFront();
   const target = await browser.waitForTarget(t => t !== helper.target() && t.url() === origin + "/popup/popup.html");
   panel = await target.asPage();
+  await panel.setViewport({ width: 400, height: 900 });
   panel.on("pageerror", error => errors.push(error.message));
   await wait(() => document.getElementById("currentPageUrl").textContent.startsWith("http://127.0.0.1:"));
 }
@@ -88,7 +89,7 @@ async function noOverlay(page) {
   assert.equal(await demo.evaluate(() => window.clicks), 0);
   await noOverlay(demo);
   const details = await panel.$eval("#pickedElementDetails", el => el.textContent);
-  assert.ok(details.includes("全部属性") && details.includes("HTML") && details.includes("CSS 选择器"));
+  assert.ok(details.includes("全部属性") && details.includes("HTML") && (await panel.$eval("#view-inspect", el => el.textContent)).includes("CSS 选择器"));
   assert.equal(await panel.$eval("#rawJson", el => el.textContent), "");
   await demo.click("#counter");
   assert.equal(await demo.evaluate(() => window.clicks), 1);
@@ -96,7 +97,7 @@ async function noOverlay(page) {
 
   await start(); await selected("linkText");
   assert.equal(await demo.url(), url);
-  assert.ok((await panel.$eval("#pickedElementSummary", el => el.textContent)).startsWith("<span>"));
+  assert.equal(await panel.$eval("#pickedElementSummary", el => el.textContent), "业务链接文本");
   await start(); await selected("check");
   assert.equal(await demo.$eval("#check", el => el.checked), false);
   pass("Nested link text is selected exactly; selection neither navigates nor toggles checkbox");
@@ -206,7 +207,7 @@ async function noOverlay(page) {
   await wait(() => document.getElementById("pickElementBtn").getAttribute("aria-pressed") === "false");
   await noOverlay(second);
   await start(); await selected("counter", second);
-  await second.goto("edge://version");
+  await second.goto(EDGE.toLowerCase().includes("msedge") ? "edge://version" : "chrome://version");
   // Internal-page URL/title may be withheld by the existing minimal tab
   // permissions. Assert the lifecycle behavior instead of assuming visibility.
   await wait(() => document.getElementById("pickedElementPanel").classList.contains("hidden") &&

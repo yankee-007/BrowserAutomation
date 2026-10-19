@@ -7,7 +7,7 @@ PageSense 将用户已打开网页中的交互控件、文本、媒体及语义�
 暴露结构化 API。当前磁盘实现为 V2.0.0，属于 Browser Runtime + Controller Transport；
 尚无 LLM / Planner / Agent 决策层。
 
-项目记忆与协作规则已初始化。当前界面使用浏览器原生侧栏，点击扩展图标打开；支持手动扫描和显式开启实时扫描，切换标签页、刷新或导航后清空旧结果，实时模式在新页面就绪后自动恢复。后续工作以用户当前需求和任务记录为准。
+项目记忆与协作规则已初始化。当前界面使用浏览器原生侧栏，点击扩展图标打开；分为页面概览、元素检查、Python 对接三个工作区，支持几何分布图、定位候选、代码生成和选中/完整/筛选快照主动发送；支持手动扫描和显式开启实时扫描，切换标签页、刷新或导航后清空旧结果，实时模式在新页面就绪后自动恢复。后续工作以用户当前需求和任务记录为准。
 
 ## 技术形态与核心能力
 
@@ -41,7 +41,7 @@ PageSense 将用户已打开网页中的交互控件、文本、媒体及语义�
 ## 业务规则、持久化与长期约束
 
 - Controller 仅允许 `127.0.0.1` / `localhost`，默认端口 8765；Python 为 Server，扩展为 Client。生产路径的 Python 不直接通过 Selenium / Playwright / CDP 驱动浏览器；测试 harness 使用 CDP 属观察与验收设施。
-- Bridge 复用原有 Content Script / Action Executor，不另建执行逻辑；默认只操作当前活动标签页。elementId 与最近扫描的 DOM 映射有关，失效时应返回错误，不能猜测替代目标；当前跨标签页防护缺口见下表。
+- Bridge 复用原有 Content Script / Action Executor，不另建执行逻辑；默认只操作当前活动标签页。elementId 与当前 DOM 映射有关，失效时应返回错误，不能猜测替代目标。新定位器和元素字典携带 pageId 保护；旧式纯数字 ID 仍有跨标签页防护缺口，见下表。
 - 当前不实现自动决策、Action Queue、search-and-click、批量投递或站点风控规避。副作用验证以自带 demo 为入口；真实提交、消息发送和账户操作需单独明确任务授权。
 - `chrome.storage.local` 保存 Controller host、port、用户输入 token 和 autoconnect 配置；扫描结果、映射、索引、最近请求日志主要在内存中。无数据库。不得把 token、浏览器 profile 或真实页面私密数据写入项目记忆。
 - `.edge-profile/`、`acceptance/edge-v2-indep-profile/`、已安装依赖、Python 字节码与本机 Agent 权限设置仅忽略，不删除。测试代码、锁文件、报告与证据保持可跟踪。
@@ -52,7 +52,7 @@ PageSense 将用户已打开网页中的交互控件、文本、媒体及语义�
 
 | 项目 | 已有证据与限制 |
 | --- | --- |
-| FINDING-001（P3，OPEN） | elementId 无页面作用域；跨标签页复用旧 ID 可静默命中其他元素并执行。更换标签页、导航、重扫与 ID 格式是易回归区域。 |
+| FINDING-001（P3，OPEN） | 旧式纯数字 elementId 无页面作用域；跨标签页复用旧 ID 可静默命中其他元素并执行。新 `client.locator(css)` 与 `client.element(element)` 已携带 pageId，真实 Chrome 验证换页/刷新后旧句柄返回 STALE_PAGE；不将历史缺陷整体标为已修复。更换标签页、导航、重扫与 ID 格式是易回归区域。 |
 | FINDING-003（P2，OPEN） | Controller 停机约 30 秒以上后 Worker 可能被回收；无法无人值守自恢复，需要一次浏览器交互唤醒。重连、心跳与 Worker 生命周期需真实浏览器验证。 |
 | FINDING-002（当前实现已修复） | SEARCH 的 `indexSize` 现在返回整个索引规模，`total` 为过滤后的命中数；元素查询任务通过真实 Python/WebSocket/扩展路径验证。历史报告保持原文。 |
 | 既有修复护栏 | 源码可见 UTF-8 token 字节比较和 64 MiB 入站 WebSocket 消息上限；独立报告称 BUG-001、BUG-003 已修复。本轮只核对实现，不重复宣称运行通过。 |
@@ -86,6 +86,7 @@ PageSense 将用户已打开网页中的交互控件、文本、媒体及语义�
   精确行内目标、克隆旧映射、跨扫描范围/搜索条件、Esc/按钮取消与切页/刷新/关闭/重新打开。
   复制仅验证载荷，选取外层 iframe/Shadow host 与窄栏已验证；
   证据在 `acceptance/evidence-element-picker/`，不替代完整独立验收。
+- 元素工作台：三工作区、页面分布、定位器唯一验证、Python 示例实际执行、选中/全部/跨分页筛选发送、收件 ACK/满箱和页面句柄保护已通过真实 Chrome 155 与 Python 3.14/websockets 17.2 验证，42 项 Python 回归通过，查询/点选/实时回归见 `acceptance/evidence-ui-workbench/`。Edge 独立测试进程启动失败，本轮使用 Chrome；系统剪贴板只校验载荷，用户个人浏览器与审美接受未代验。用法见[元素工作台](docs/element-workbench.md)。
 - 未知/未验证：用户浏览器加载状态、其运行进程、完整依赖与全量产品验收、人工接受及发布部署。GitHub 远端已由用户确认；上传快照不代表产品验收或部署。Python 命令可用，不代表 Controller 本轮已运行。
 - 本轮检查范围与逐项语义映射见[初始化核验记录](docs/agent/bootstrap-audit.md)。后续工作只依赖本项目文件，不依赖原聊天、工具包或本机缓存。
 
