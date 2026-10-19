@@ -1,0 +1,34 @@
+[
+  {
+    "n": 100,
+    "size": 100,
+    "buildMs": 0.5,
+    "searchMs": 0.4,
+    "missMs": 0.2,
+    "total": 0
+  },
+  {
+    "n": 500,
+    "size": 500,
+    "buildMs": 1.6,
+    "searchMs": 1,
+    "missMs": 0.8,
+    "total": 0
+  },
+  {
+    "n": 1000,
+    "size": 1000,
+    "buildMs": 3.1,
+    "searchMs": 1.9,
+    "missMs": 1.7,
+    "total": 0
+  },
+  {
+    "n": 5000,
+    "size": 5000,
+    "buildMs": 17.1,
+    "searchMs": 4.3,
+    "missMs": 1.5,
+    "total": 1
+  }
+]

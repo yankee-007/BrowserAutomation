@@ -1,0 +1,69 @@
+{
+  "verifiedAt": "2026-10-19T13:25:43.464Z",
+  "browser": "Chrome/155.0.8059.84",
+  "results": [
+    {
+      "name": "CSS/XPath find/findall without SCAN_PAGE; strict match, scoped and empty lists, syntax/type errors"
+    },
+    {
+      "name": "Minimal text/attribute/property reads, raw/resolved URLs, missing attributes, password masking and explicit truncation"
+    },
+    {
+      "name": "Bound element operations reuse existing Action Executor without scan or detail lookup"
+    },
+    {
+      "name": "Saved handles survive insertion and rescans, but reject replaced clones instead of retargeting"
+    },
+    {
+      "name": "Navigation loads a fresh content runtime and rejects old document and container handles"
+    },
+    {
+      "name": "Actual Native Messaging and Python client path",
+      "data": {
+        "methodCounts": {
+          "FIND_ELEMENTS": 26,
+          "READ_ELEMENT": 22,
+          "READ_ELEMENTS": 3,
+          "GET_ELEMENT_DETAILS": 2,
+          "INPUT_ELEMENT": 1,
+          "CLEAR_ELEMENT": 1,
+          "CLICK_ELEMENT": 5,
+          "SCAN_PAGE": 1,
+          "GET_STATUS": 1
+        }
+      }
+    },
+    {
+      "name": "Side panel starts live scanning by default with no manual scan/pause controls"
+    },
+    {
+      "name": "Default live scan reflects Python-triggered DOM mutations without manual refresh"
+    },
+    {
+      "name": "Live rescans preserve saved Python node references; explicit Python scope changes remain synchronized"
+    },
+    {
+      "name": "Picked XPath copies correctly, validates uniquely and exact generated Python executes"
+    },
+    {
+      "name": "XPath controls fit the existing inspector at 320/400/600px"
+    },
+    {
+      "name": "Automatic scanning resumes after tab switch and reload"
+    },
+    {
+      "name": "A disconnected content port automatically reconnects with no manual scan control"
+    }
+  ],
+  "errors": [],
+  "sourceHashes": {
+    "controller/pagesense.py": "b7643d750b5f6a43a8da7e5fe0aa581e59e91b7a28f28e3f454987161029a227",
+    "controller/protocol.py": "440a622038138cdf5ddba0d895d1217191f658a611d918c8c48649857cda8d0d",
+    "pagesense/content/scanner.js": "e8b65de2a0175fe6d7b9db93e6990be9534248829e89f44ac0b6db4a2e3ecc76",
+    "pagesense/content/content.js": "d6ffd738334958508347dc1365043c95e343e91e87bd6263323a46cc2f9436e2",
+    "pagesense/shared/constants.js": "433a66d3da4173225710735c752b5e644c734875e9697d2505177ad4e21b33c5",
+    "pagesense/bridge/controller-bridge.js": "9914b88b85f49aa45bdb515e0cb8a00aec7627eab9e657094e80aa184a187b21",
+    "pagesense/popup/popup.js": "4983f8adde740b2854b54b191fb3abb9639fd7d4ed5da9f18ad955c19d51829d",
+    "pagesense/popup/popup.html": "dc7ba8bb81ad55792b9c12879562fcaea7cea998120621220c1c7a013bede916"
+  }
+}

@@ -20,6 +20,8 @@
 
 ## Python 直接使用
 
+推荐使用[按需元素 API](element-api.md)：find/findall 支持 CSS/XPath 和容器查询，只传定位条件与动作，不需要先发送整页元素。
+
 在 `controller/` 中运行脚本：
 
 ```python
@@ -29,8 +31,8 @@ with PageSenseClient() as browser:
     page = browser.scan(scope="content")
     print(page["page"]["url"], len(page["elements"]))
     # 使用实际网页的唯一 CSS：
-    browser.locator('[data-testid="search-order"]').click()
-    text = browser.locator("#status").text()
+    browser.find("css_position", '[data-testid="search-order"]').click()
+    text = browser.find("css_position", "#status").get_text()
 ```
 
 `PageSenseClient()` 不再打开监听端口；`start()` / `with` 发现并连接浏览器已经启动的桥接。退出 `with` 只关闭业务连接，插件和收件箱仍可用。未打开桥接时抛 `BRIDGE_NOT_RUNNING`，不会偷偷启动另一个服务。断开后的操作失败，不自动重发副作用命令；恢复连接后可重新 `start()`。

@@ -200,9 +200,29 @@
       sendResponse({ ok: false, success: false, message: "页面已变化，请重新定位元素。", error: { code: "STALE_PAGE", message: "页面已变化，请重新定位元素。" } });
       return false;
     }
+    if (message.referenceId !== undefined) {
+      if (typeof message.pageId !== "string" || !message.pageId) {
+        sendResponse({ ok: false, success: false, error: { code: "INVALID_PARAMS", message: "节点引用必须包含 pageId。" } });
+        return false;
+      }
+      try { message.elementId = global.PageSenseScanner.resolveReference(message.referenceId); }
+      catch (error) {
+        sendResponse({ ok: false, success: false, error: { code: error.code || "ELEMENT_NOT_FOUND", message: error.message } });
+        return false;
+      }
+    }
     switch (message.action) {
+      case ACTIONS.FIND_ELEMENTS:
+      case ACTIONS.READ_ELEMENT:
+      case ACTIONS.READ_ELEMENTS:
+        try {
+          var method = message.action === ACTIONS.FIND_ELEMENTS ? "findElements" :
+            message.action === ACTIONS.READ_ELEMENT ? "readElement" : "readElements";
+          sendResponse({ ok: true, data: global.PageSenseScanner[method](message) });
+        } catch (error) { sendResponse({ ok: false, error: error.code || "INTERNAL_ERROR", message: error.message }); }
+        return false;
       case ACTIONS.RESOLVE_ELEMENT:
-        try { sendResponse(global.PageSenseScanner.resolveElement(message.selector)); }
+        try { sendResponse(global.PageSenseScanner.resolveElement(message.selector, message.by)); }
         catch (error) { sendResponse({ ok: false, error: "INTERNAL_ERROR", message: error.message }); }
         return false;
       case ACTIONS.SCAN_PAGE:

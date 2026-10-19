@@ -66,16 +66,18 @@ async function waitScan(predicate, ...args) {
   const panelTarget = await browser.waitForTarget(t =>
     t !== helper.target() && t.url() === origin + "/popup/popup.html");
   panel = await panelTarget.asPage();
+  // The setup tab also auto-subscribes now; close it before measuring panel cleanup.
+  await helper.close();
   panel.on("pageerror", error => errors.push(error.message));
   await waitScan(() => document.getElementById("currentPageUrl").textContent.startsWith("http://127.0.0.1:"));
-  assert.equal(await panel.$eval("#liveScanToggle", el => el.checked), false);
+  assert.equal(await panel.$("#liveScanToggle"), null);
+  assert.equal(await panel.$("#scanBtn"), null);
   // The dedicated element-explorer acceptance covers the new content default.
   await panel.select("#scanScope", "interactive");
-  await panel.click("#liveScanToggle");
   await waitScan(() => document.getElementById("liveScanStatus").textContent.startsWith("监听中"));
   const first = await snapshot();
   assert.ok(first.elements.length > 10);
-  pass("Toggle immediately scans in a real native side panel", { total: first.stats.total });
+  pass("Opening the native side panel automatically scans without manual controls", { total: first.stats.total });
 
   // Instrument only the test's isolated world to measure actual scans and idle
   // cleanup, independent of what the side panel chooses to render.
@@ -230,22 +232,12 @@ async function waitScan(predicate, ...args) {
   assert.ok(burstTimes.every((time, i) => !i || time - burstTimes[i - 1] >= 275));
   pass("Continuous changes are throttled and do not starve updates", { scans: burstTimes.length });
 
-  await panel.click("#liveScanToggle");
-  const paused = await snapshot();
-  const countAtPause = (await scans()).length;
-  await demo.$eval("#clickTestBtn", el => { el.textContent = "暂停期间变化"; });
-  await delay(800);
-  assert.deepEqual(await snapshot(), paused);
-  assert.equal((await scans()).length, countAtPause);
-  pass("Pause retains the last snapshot and stops actual scans");
-  await panel.click("#scanBtn");
+  await demo.$eval("#clickTestBtn", el => { el.textContent = "持续实时变化"; });
   await waitScan(() => {
     const raw = document.getElementById("rawJson").textContent;
-    return raw && JSON.parse(raw).elements.some(el => el.text === "暂停期间变化");
+    return raw && JSON.parse(raw).elements.some(el => el.text === "持续实时变化");
   });
-  pass("Manual scan still works while live scanning is paused");
-  await panel.click("#liveScanToggle");
-  await waitScan(() => document.getElementById("liveScanStatus").textContent.startsWith("监听中"));
+  pass("Live updates remain enabled with no manual pause or scan controls");
 
   const second = await browser.newPage();
   await second.goto(demoUrl + "?second");
@@ -314,7 +306,7 @@ async function waitScan(predicate, ...args) {
     console.error(await panel.$eval("#liveScanStatus", el => el.textContent).catch(() => ""));
     console.error(await panel.evaluate(() => ({
       error: document.getElementById("devLog").textContent,
-      scanButton: document.getElementById("scanBtn").outerHTML,
+      scanButtonRemoved: !document.getElementById("scanBtn"),
       sample: document.getElementById("rawJson").textContent &&
         JSON.parse(document.getElementById("rawJson").textContent).elements.filter(el => el.id === "clickTestBtn")
     })).catch(() => ""));

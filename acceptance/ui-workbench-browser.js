@@ -76,10 +76,10 @@ async function exportFromPanel(kind) {
   await demo.click("#search");
   await wait(() => document.getElementById("tab-inspect").getAttribute("aria-selected") === "true");
   assert.equal(await demo.evaluate(() => window.clicks), 0);
-  assert.equal(await panel.$eval("#rawJson", el => el.textContent), "");
+  await wait(() => !!document.getElementById("rawJson").textContent);
   assert.equal(await panel.$eval("#locatorInput", el => el.value), '[data-testid="search-order"]');
   assert.ok((await panel.$eval("#pickedElementDetails", el => el.textContent)).includes("页面坐标"));
-  pass("Point selection without scanning opens a readable inspector and prioritizes unique test attributes");
+  pass("Point selection during automatic scanning opens an inspector and prioritizes unique test attributes");
 
   await panel.evaluate(() => Object.defineProperty(navigator, "clipboard", { configurable: true,
     value: { writeText: async value => { window.__copied = value; } } }));
@@ -132,7 +132,6 @@ async function exportFromPanel(kind) {
   pass("UI connects Python; selected export is acknowledged and Python clicks, inputs, clears, reads and rejects ambiguous targets");
 
   await panel.click("#tab-explore");
-  await panel.click("#scanBtn");
   await wait(() => !!document.getElementById("rawJson").textContent);
   const scan = await panel.$eval("#rawJson", el => JSON.parse(el.textContent));
   assert.ok(scan.page.dimensions.height > scan.page.viewport.height);
@@ -196,7 +195,7 @@ async function exportFromPanel(kind) {
   await panel.click("#tab-explore"); await panel.focus("#tab-explore"); await panel.keyboard.press("ArrowRight");
   assert.equal(await panel.$eval("#tab-inspect", el => el.getAttribute("aria-selected")), "true");
   await panel.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
-  assert.equal(await panel.$eval("#scanBtn", el => getComputedStyle(el).transitionDuration), "0s");
+  assert.equal(await panel.$eval("#pickElementBtn", el => getComputedStyle(el).transitionDuration), "0s");
   await panel.click("#copyPythonBtn");
   assert.equal(await panel.evaluate(() => window.__copied), await panel.$eval("#pythonCode", el => el.textContent));
   pass("All three workspaces fit 320/400/600px; keyboard tabs, reduced motion and generated Python syntax work");

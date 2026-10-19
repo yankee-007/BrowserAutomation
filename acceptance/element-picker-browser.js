@@ -71,7 +71,7 @@ async function noOverlay(page) {
     document.querySelector(".app-header").appendChild(button);
   }, windowId);
   await openPanel(demo);
-  assert.equal(await panel.$eval("#rawJson", el => el.textContent), "");
+  await wait(() => !!document.getElementById("rawJson").textContent);
   await start();
   const rect = await demo.$eval("#counter", el => {
     const r = el.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height };
@@ -90,7 +90,7 @@ async function noOverlay(page) {
   await noOverlay(demo);
   const details = await panel.$eval("#pickedElementDetails", el => el.textContent);
   assert.ok(details.includes("全部属性") && details.includes("HTML") && (await panel.$eval("#view-inspect", el => el.textContent)).includes("CSS 选择器"));
-  assert.equal(await panel.$eval("#rawJson", el => el.textContent), "");
+  await wait(() => !!document.getElementById("rawJson").textContent);
   await demo.click("#counter");
   assert.equal(await demo.evaluate(() => window.clicks), 1);
   pass("Selection displays full details without triggering the page button; ordinary clicks resume afterward");
@@ -121,7 +121,6 @@ async function noOverlay(page) {
   pass("Escape/button cancellation and repeated sessions release event interception");
 
   await panel.select("#scanScope", "interactive");
-  await panel.click("#scanBtn");
   await wait(() => document.getElementById("rawJson").textContent);
   await panel.$eval("#searchInput", el => { el.value = "不存在的过滤条件"; el.dispatchEvent(new Event("input", { bubbles: true })); });
   assert.equal(await panel.$$eval(".element-card", cards => cards.length), 0);
@@ -148,7 +147,6 @@ async function noOverlay(page) {
   assert.equal(await panel.evaluate(() => window.__copied), "精确选择的文本");
   pass("Non-interactive node outside scan scope/filter gets its own details; CSS/text copy payloads are correct");
 
-  await panel.click("#liveScanToggle");
   await wait(() => document.getElementById("liveScanStatus").textContent.startsWith("监听中"));
   async function scanCounter(instrument) {
     return worker.evaluate(async instrument => {
@@ -174,7 +172,6 @@ async function noOverlay(page) {
   await demo.$eval("#counter", el => { el.textContent = "实时变化后的业务按钮"; });
   await wait(() => document.getElementById("rawJson").textContent.includes("实时变化后的业务按钮"));
   assert.ok((await panel.$eval("#pickedElementDetails", el => el.textContent)).includes("精确选择的文本"));
-  await panel.click("#liveScanToggle");
   pass("Picker overlay/mapping causes no live-scan loop; picked snapshot survives unrelated live updates");
 
   for (const width of [320, 400, 600]) {

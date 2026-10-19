@@ -82,7 +82,6 @@ function pass(name, details) {
   pass("Real native side panel opened for demo", { type: panelTarget.type() });
   // Keep this regression focused on the original interactive-only flow.
   await panel.select("#scanScope", "interactive");
-  await panel.click("#scanBtn");
   await panel.waitForFunction(() => !document.getElementById("resultPanel").classList.contains("hidden"));
   const total = await panel.$$eval(".element-card", cards => cards.length);
   assert.ok(total > 10);
@@ -130,18 +129,22 @@ function pass(name, details) {
     pass("Responsive panel layout " + width, layout);
   }
 
+  const oldPageId = await panel.$eval("#rawJson", el => JSON.parse(el.textContent).pageId);
   const second = await browser.newPage();
   await second.goto(demoUrl + "?second");
   await second.bringToFront();
   await panel.waitForFunction(() => document.getElementById("currentPageUrl").textContent.endsWith("?second"));
-  assert.equal(await panel.$$eval(".element-card", cards => cards.length), 0);
-  assert.equal(await panel.$eval("#copyBtn", el => el.disabled), true);
-  pass("Native panel persists and clears results on tab switch");
-  await panel.click("#scanBtn");
-  await panel.waitForFunction(() => !document.getElementById("resultPanel").classList.contains("hidden"));
+  await panel.waitForFunction(oldPageId => { const raw = document.getElementById("rawJson").textContent;
+    return raw && JSON.parse(raw).page.url.endsWith("?second") && JSON.parse(raw).pageId !== oldPageId;
+  }, {}, oldPageId);
+  assert.equal(await panel.$eval("#copyBtn", el => el.disabled), false);
+  pass("Native panel persists and automatically replaces old results on tab switch");
+  const beforeReload = await panel.$eval("#rawJson", el => JSON.parse(el.textContent).pageId);
   await second.reload();
-  await panel.waitForFunction(() => document.getElementById("resultPanel").classList.contains("hidden"));
-  pass("Navigation clears old results");
+  await panel.waitForFunction(beforeReload => { const raw = document.getElementById("rawJson").textContent;
+    return raw && JSON.parse(raw).pageId !== beforeReload;
+  }, {}, beforeReload);
+  pass("Navigation discards the old document and automatically scans the new one");
   assert.deepEqual(errors, []);
   const sourceHashes = Object.fromEntries([
     "manifest.json", "background/service-worker.js", "popup/popup.html",

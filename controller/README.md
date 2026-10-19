@@ -37,10 +37,12 @@ pip install -r requirements.txt
 from pagesense import PageSenseClient
 
 with PageSenseClient() as client:
-    page = client.scan(scope="content")
-    print(len(page["elements"]))
     # 用真实网页的唯一 CSS：
-    client.locator('[data-testid="search-order"]').click()
+    client.find("css_position", '[data-testid="search-order"]').click()
+    container = client.find("xpath_position", '//*[@id="content"]')
+    print(container.get_text())
+    for link in container.findall("css_position", "a"):
+        print(link.get("href"))
 ```
 
 `PageSenseClient()` 只连接浏览器自动启动的 Host，不监听端口，不需 server.py、手动 Token 或
@@ -50,7 +52,7 @@ with PageSenseClient() as client:
 ## 发送当前页面全部扫描元素
 
 插件“发送到 Python”默认会重新扫描当前页面，并发送当前扫描范围内全部元素，包含其他分页、
-不受搜索过滤影响。未手动扫描也可以直接发送，Python 未运行时先保存在本地 Host 的内存收件箱。
+不受搜索过滤影响。无需预先扫描也可以直接发送，Python 未运行时先保存在本地 Host 的内存收件箱。
 
 ```python
 from pagesense import PageSenseClient
@@ -68,6 +70,13 @@ ACK 只表示入箱，不代表已执行；最多 8 份、总计 64 MiB，满时
 扫描结果可超过 1 MiB；发往插件的单条命令受 Native Messaging 1 MiB 上限约束，超限执行前拒绝。
 
 ## 定位与读取
+
+推荐 `find("css_position", css)` / `find("xpath_position", xpath)` 获取绑定真实节点的元素对象，
+`findall(by, selector)` 获取 DOM 顺序列表；无需预先 scan 或手动发送。支持容器内 find/findall、
+get_text/get/get_all/get_attribute/get_property 与一次请求的 get_all_texts。默认要求单元素唯一匹配，
+显式 strict=False 可取首项；多元素空集返回 []。选择器错误、节点移除和页面变化明确报错。
+新 get_text 遇 20000 字符上限会抛 TEXT_TRUNCATED，get_all 保留详情截断标志。
+完整语义、返回值和示例见[按需元素 API](../docs/element-api.md)。
 
 `client.locator(css)` 每次操作解析原生 CSS，恰好一个节点才能执行，无需先扫描；不含自动等待。
 支持 click/input/clear/keypress/locate/highlight/inspect/text。`client.element(element)` 固定快照
@@ -278,6 +287,9 @@ Controller 校验 token 与协议版本：
 | `SCAN_PAGE` | 扫描活动页面 |
 | `SEARCH_ELEMENTS` | 在最近一次扫描结果中搜索 |
 | `GET_ELEMENT_DETAILS` | 按 elementId 读取当前属性、CSS 路径、文本/HTML 与父子上下文 |
+| `FIND_ELEMENTS` | 按 CSS/XPath 查找，返回一个或多个轻量节点句柄，支持容器范围 |
+| `READ_ELEMENT` | 按句柄只读取文本、HTML attribute 或白名单 DOM property |
+| `READ_ELEMENTS` | 查询容器/整页匹配节点并只返回文本列表 |
 | `LOCATE_ELEMENT` | 滚动到元素 |
 | `HIGHLIGHT_ELEMENT` | 高亮元素 |
 | `CLEAR_HIGHLIGHT` | 取消高亮 |

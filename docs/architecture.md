@@ -42,6 +42,8 @@ Content Router 调用 Scanner 时始终用 WeakMap 保留同文档存活节点 I
 使尚未刷新的卡片不会因同页自动重排而命中其他节点。SEARCH 读取最近扫描快照，
 不逐次全 DOM 扫描。CSS 条件例外：Content Router 先调用原生 querySelectorAll，
 将命中节点已有的映射 ID 传给纯快照 Search 求交，不建立第二套映射。
+FIND_ELEMENTS 直接按 CSS/XPath 查询，可限定父容器，只返回 pageId/elementId/referenceId 句柄；READ_ELEMENT 按需读取文本、原始属性或白名单 DOM property，READ_ELEMENTS 一次返回匹配文本列表。节点引用用文档内 WeakRef 注册表绑定原节点，执行前重建当前编号映射，因此不会因扫描编号、插入和重排而改指向。删除/克隆替换或换文档明确报错。get_all 复用已有详情，旧 locator 保留每次重新解析 CSS 的兼容行为。详见[元素 API](element-api.md)。
+
 动作经同一个 Executor 执行，返回包含 success/error、actionId、
 耗时及建议重扫等信息。Python 请求按 id 关联，默认超时 10 秒。
 
@@ -49,7 +51,7 @@ Content Router 调用 Scanner 时始终用 WeakMap 保留同文档存活节点 I
 input/change、scroll/resize 监听，300ms 合并变化后复用 Scanner/Search 并通过 Port
 发送完整快照。忽略自身 ID 属性和 Overlay 变动，空闲时不轮询。最后一个 Port 断开时
 释放 observer、事件和待执行计时器；侧栏关闭、切页或导航都会断开旧连接。
-实时开关只存在于本次侧栏会话；连接代次和 pageRevision 丢弃旧页/旧连接响应。
+侧栏打开即自动订阅，没有手动扫描按钮或实时开关；断线自动退避重连。连接代次和 pageRevision 丢弃旧页/旧连接响应。
 侧栏保存存活节点的操作输入草稿、焦点和滚动位置，再重绘更新后的卡片；
 composition 期间仅保留最新待更新快照，组词结束后再重绘。
 

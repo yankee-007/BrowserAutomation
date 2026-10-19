@@ -14,7 +14,6 @@
   var els = {
     currentPageTitle: document.getElementById("currentPageTitle"),
     currentPageUrl: document.getElementById("currentPageUrl"),
-    scanBtn: document.getElementById("scanBtn"),
     pickElementBtn: document.getElementById("pickElementBtn"),
     pickStatus: document.getElementById("pickStatus"),
     pickedElementPanel: document.getElementById("pickedElementPanel"),
@@ -22,9 +21,9 @@
     pickedElementDetails: document.getElementById("pickedElementDetails"),
     clearPickedBtn: document.getElementById("clearPickedBtn"),
     copyPickedCssBtn: document.getElementById("copyPickedCssBtn"),
+    copyPickedXPathBtn: document.getElementById("copyPickedXPathBtn"),
     copyPickedTextBtn: document.getElementById("copyPickedTextBtn"),
     scanScope: document.getElementById("scanScope"),
-    liveScanToggle: document.getElementById("liveScanToggle"),
     liveScanStatus: document.getElementById("liveScanStatus"),
     errorBox: document.getElementById("errorBox"),
     devLog: document.getElementById("devLog"),
@@ -52,8 +51,6 @@
     pageStatus: document.getElementById("pageStatus"),
     listMeta: document.getElementById("listMeta"),
     elementList: document.getElementById("elementList"),
-    rescanHint: document.getElementById("rescanHint"),
-    rescanHintBtn: document.getElementById("rescanHintBtn"),
     scrollControls: document.getElementById("scrollControls"),
     actionLogList: document.getElementById("actionLogList"),
     rawJson: document.getElementById("rawJson"),
@@ -75,7 +72,7 @@
     controllerLog: document.getElementById("controllerLog")
   };
 
-  ["inspectEmpty", "exploreEmpty", "locatorCandidates", "locatorInput", "validateLocatorBtn",
+  ["inspectEmpty", "exploreEmpty", "locatorCandidates", "locatorInput", "locatorType", "locatorInputLabel", "validateLocatorBtn",
     "copyLocatorBtn", "sendPickedBtn", "locatorValidation", "pythonAction", "pythonCode", "copyPythonBtn",
     "pageMap", "mapMode", "mapStatus", "pythonStatus", "exportTarget", "exportSummary", "sendPythonBtn",
     "exportStatus", "receiverCode", "copyReceiverBtn"].forEach(function (id) { els[id] = document.getElementById(id); });
@@ -107,8 +104,6 @@
     scan: null,
     filter: PAGESENSE.FILTERS.ALL,
     query: "",
-    scanning: false,
-    liveEnabled: false,
     offset: 0,
     cssMatch: null,
     picked: null,
@@ -123,6 +118,7 @@
   var livePort = null;
   var liveGeneration = 0;
   var liveConnectTimer = null;
+  var liveRetryTimer = null, liveRetryAttempt = 0;
   var composingInput = null;
   var pendingLiveScan = null;
   var selectorSequence = 0;
@@ -354,10 +350,6 @@
     }).join("");
   }
 
-  function showRescanHint(show) {
-    els.rescanHint.classList.toggle("hidden", !show);
-  }
-
   /* ---- Rendering ----------------------------------------------------- */
 
   function renderPageHeader(tab) {
@@ -373,7 +365,7 @@
     clearPickedElement();
     els.pickStatus.textContent = "点击按钮后，到网页中选择元素；Esc 取消。";
     stopLiveScan();
-    if (state.liveEnabled) els.liveScanStatus.textContent = "等待页面就绪…";
+    els.liveScanStatus.textContent = "等待页面就绪…";
     state.pageRevision++;
     state.tab = tab;
     state.scan = null;
@@ -413,10 +405,8 @@
       renderActionLog();
     }
     hideError();
-    showRescanHint(false);
     if (toastTimer) clearTimeout(toastTimer);
     els.toast.className = "toast hidden";
-    setScanning(false);
     renderPageHeader(tab || { title: "读取中…" });
   }
 
@@ -426,7 +416,7 @@
       if (revision !== state.pageRevision) return;
       state.tab = tab;
       renderPageHeader(tab);
-      if (state.liveEnabled) startLiveScan();
+      startLiveScan();
     }).catch(function (e) {
       if (revision !== state.pageRevision) return;
       els.currentPageTitle.textContent = "(无法读取当前标签页)";
@@ -508,7 +498,6 @@
     els.exportBtn.disabled = false;
     els.clearHighlightBtn.disabled = false;
     renderScan(scan, live);
-    showRescanHint(false);
     return true;
   }
 
@@ -520,18 +509,28 @@
     composingInput = null;
     clearTimeout(liveConnectTimer);
     liveConnectTimer = null;
+    clearTimeout(liveRetryTimer); liveRetryTimer = null;
     var port = livePort;
     livePort = null;
     if (port) port.disconnect();
   }
 
+  function retryLiveScan(message) {
+    stopLiveScan();
+    var generation = liveGeneration, revision = state.pageRevision;
+    var delay = Math.min(1000 * Math.pow(2, liveRetryAttempt++), 30000);
+    els.liveScanStatus.textContent = message + "，将自动重连…";
+    liveRetryTimer = setTimeout(function () {
+      if (generation === liveGeneration && revision === state.pageRevision) startLiveScan();
+    }, delay);
+  }
+
   async function startLiveScan() {
     stopLiveScan();
-    if (!state.liveEnabled) return;
     var generation = liveGeneration;
     var revision = state.pageRevision;
     function current() {
-      return state.liveEnabled && generation === liveGeneration && revision === state.pageRevision;
+      return generation === liveGeneration && revision === state.pageRevision;
     }
     els.liveScanStatus.textContent = "正在连接…";
     try {
@@ -553,24 +552,25 @@
       var port = chrome.tabs.connect(tab.id, { name: PAGESENSE.LIVE_SCAN.PORT_NAME });
       livePort = port;
       els.liveScanStatus.textContent = "正在扫描…";
-      // Bound the first response just like a manual scan.
+      // Bound the first response; transient failures recover without a manual control.
       liveConnectTimer = setTimeout(function () {
         if (!current() || livePort !== port) return;
-        stopLiveScan();
-        els.liveScanStatus.textContent = "连接超时，点击扫描重试";
+        retryLiveScan("连接超时");
       }, MESSAGE_TIMEOUT_MS);
       port.onMessage.addListener(function (response) {
         if (!current() || livePort !== port) return;
-        if (response.ok && response.data.scope && response.data.scope !== els.scanScope.value) return;
+        // Explicit Python scans share the runtime scope and index. Reflect that
+        // scope rather than silently dropping every subsequent live snapshot.
+        if (response.ok && response.data.scope) els.scanScope.value = response.data.scope;
         clearTimeout(liveConnectTimer);
         liveConnectTimer = null;
         if (!response.ok) {
-          stopLiveScan();
-          els.liveScanStatus.textContent = "扫描失败，点击扫描重试";
+          retryLiveScan("扫描失败");
           showError("Live scan failed: " + response.error);
           return;
         }
         hideError();
+        liveRetryAttempt = 0;
         var rendered = acceptScan(response.data, true);
         els.liveScanStatus.textContent = rendered
           ? "监听中 · 更新于 " + logTime(new Date(response.data.scannedAt))
@@ -579,15 +579,13 @@
       port.onDisconnect.addListener(function () {
         var error = chrome.runtime.lastError;
         if (!current() || livePort !== port) return;
-        stopLiveScan();
-        els.liveScanStatus.textContent = "连接中断，点击扫描重试";
+        retryLiveScan("连接中断");
         if (error) showError("Live scan disconnected: " + error.message);
       });
       port.postMessage({ scope: els.scanScope.value });
     } catch (error) {
       if (!current()) return;
-      stopLiveScan();
-      els.liveScanStatus.textContent = "无法连接，点击扫描重试";
+      retryLiveScan("无法连接");
       showError("Live scan failed: " + error.message);
     }
   }
@@ -870,90 +868,11 @@
     return fileName;
   }
 
-  /* ---- Scan orchestration -------------------------------------------- */
-
-  function setScanning(scanning) {
-    state.scanning = scanning;
-    els.scanBtn.disabled = scanning;
-    els.scanScope.disabled = scanning;
-    els.pickElementBtn.disabled = scanning;
-    els.scanBtn.textContent = scanning ? "扫描中…" : "扫描当前页面";
-  }
-
-  async function runScan() {
-    if (state.scanning) return;
-    var revision = state.pageRevision;
-    hideError();
-    showRescanHint(false);
-    setScanning(true);
-
-    var tab;
-    var inspection;
-    try {
-      tab = await getActiveTab();
-      if (revision !== state.pageRevision) return;
-      resetPage(tab, state.tab && state.tab.id === tab.id && state.tab.url === tab.url);
-      revision = state.pageRevision;
-      setScanning(true);
-      renderPageHeader(tab);
-
-      if (typeof tab.id !== "number") {
-        throw new Error("Active tab has no numeric id");
-      }
-
-      inspection = PAGESENSE.inspectUrl(tab.url);
-      if (inspection.restricted) {
-        throw new Error("URL pre-check blocked injection: " + inspection.reason);
-      }
-
-      await injectContentScripts(tab.id);
-      if (revision !== state.pageRevision) return;
-      var scan = await requestScan(tab.id);
-      if (revision !== state.pageRevision) return;
-
-      acceptScan(scan, false);
-      showToast("扫描完成：" + scan.stats.total + " 个元素", "success");
-      if (state.liveEnabled) startLiveScan();
-    } catch (e) {
-      if (revision !== state.pageRevision) return;
-      var detail = "URL: " + (tab ? tab.url : "(unavailable)") +
-        "\nURL check: " + JSON.stringify(inspection) +
-        "\nError: " + e.message;
-      if (inspection && inspection.reason === "FILE_URL_MAY_NEED_ACCESS_TOGGLE") {
-        detail += "\nHint: enable 'Allow access to file URLs' for PageSense " +
-          "on the extensions page.";
-      }
-      showError(detail);
-      showToast("扫描失败", "error");
-      if (state.liveEnabled) els.liveScanStatus.textContent = "扫描失败，点击扫描重试";
-    } finally {
-      if (revision === state.pageRevision) setScanning(false);
-    }
-  }
-
-  /* ---- Event wiring -------------------------------------------------- */
-
-  els.scanBtn.addEventListener("click", function () {
-    setView("explore");
-    runScan();
-  });
+  /* ---- Automatic live scanning: no manual scan or pause controls ---- */
 
   els.scanScope.addEventListener("change", function () {
-    if (state.scanning) return;
-    if (state.liveEnabled) {
-      resetPage(state.tab, true);
-      startLiveScan();
-    } else if (state.scan) runScan();
-  });
-
-  els.liveScanToggle.addEventListener("change", function () {
-    state.liveEnabled = els.liveScanToggle.checked;
-    if (state.liveEnabled) {
-      startLiveScan();
-    } else {
-      stopLiveScan();
-      els.liveScanStatus.textContent = "已暂停 · 保留最近结果";
-    }
+    resetPage(state.tab, true);
+    startLiveScan();
   });
 
   window.addEventListener("pagehide", stopLiveScan);
@@ -1070,11 +989,12 @@
     clearPickedElement();
     els.pickStatus.textContent = "已清除选择，可重新选择其他元素。";
   });
-  [els.copyPickedCssBtn, els.copyPickedTextBtn].forEach(function (button) {
+  [els.copyPickedCssBtn, els.copyPickedXPathBtn, els.copyPickedTextBtn].forEach(function (button) {
     button.addEventListener("click", async function () {
       var picked = state.picked;
       if (!picked) return;
-      var copied = await copyText(button === els.copyPickedCssBtn ? picked.selector : picked.text);
+      var copied = await copyText(button === els.copyPickedCssBtn ? picked.selector :
+        button === els.copyPickedXPathBtn ? picked.xpath : picked.text);
       if (picked === state.picked) showToast(copied ? "已复制" : "复制失败", copied ? "success" : "error");
     });
   });
@@ -1342,9 +1262,6 @@
 
       if (result.success) {
         showToast(label + " #" + elementId + " 成功", "success");
-        if (result.rescanRecommended) {
-          showRescanHint(true);
-        }
       } else {
         var code = result.error ? result.error.code : "UNKNOWN";
         showToast(label + "失败：" + code, "error");
@@ -1394,13 +1311,6 @@
     } finally {
       button.disabled = false;
     }
-  });
-
-  /* ---- Rescan hint button --------------------------------------------- */
-
-  els.rescanHintBtn.addEventListener("click", function () {
-    showRescanHint(false);
-    runScan();
   });
 
   els.clearHighlightBtn.addEventListener("click", async function () {
@@ -1661,13 +1571,15 @@
     els.pickedElementSummary.textContent = (el.text || el.ariaLabel || el.placeholder || "<" + el.tag + ">").slice(0, 180);
     els.pickedElementDetails.innerHTML = inspectorHtml(data, false);
     els.pickedElementPanel.classList.remove("hidden");
-    var candidates = data.locators || [{ label: "DOM 路径", selector: data.selector, matches: data.selectorMatches, unique: data.selectorMatches === 1, stability: "structure" }];
+    var candidates = inspectorLocators(data);
     var recommended = candidates.findIndex(function (item) { return item.unique; });
     els.locatorCandidates.innerHTML = candidates.map(function (item, index) {
       return '<option value="' + index + '">' + escapeHtml(item.label + " / " + item.matches + " 个匹配" + (index === recommended ? " / 推荐" : "")) + '</option>';
     }).join("");
     els.locatorCandidates.value = String(Math.max(0, recommended));
     els.locatorInput.value = candidates[Math.max(0, recommended)].selector;
+    els.locatorType.value = candidates[Math.max(0, recommended)].by || "css_position";
+    syncLocatorLabel();
     els.locatorValidation.textContent = "选择时匹配 " + candidates[Math.max(0, recommended)].matches + " 个元素。可重新验证；DOM 路径会受结构变化影响。";
     els.pythonAction.value = PAGESENSE.isTextEntryElement(el) ? "input" : PAGESENSE.isClickableElement(el) ? "click" : "text";
     renderPython(); updateExportSummary(); setView("inspect");
@@ -1699,11 +1611,22 @@
     return 'from pagesense import PageSenseClient\n\nwith PageSenseClient() as client:\n';
   }
 
+  function inspectorLocators(data) {
+    var candidates = (data.locators || [{ label: "DOM 路径", selector: data.selector,
+      matches: data.selectorMatches, unique: data.selectorMatches === 1 }]).slice();
+    if (data.xpath) candidates.push({ label: "XPath 路径", selector: data.xpath, by: "xpath_position", matches: 1, unique: true });
+    return candidates;
+  }
+
+  function syncLocatorLabel() {
+    els.locatorInputLabel.textContent = els.locatorType.value === "xpath_position" ? "XPath 表达式" : "CSS 选择器";
+  }
+
   function renderPython() {
     if (!state.picked) { els.pythonCode.textContent = ""; return; }
-    var operation = { text: "text = target.text()\n    print(text)", click: "target.click()",
+    var operation = { text: "text = target.get_text()\n    print(text)", click: "target.click()",
       input: 'target.input("要输入的内容")', clear: "target.clear()", keypress: 'target.keypress("Enter")', locate: "target.locate()" }[els.pythonAction.value];
-    els.pythonCode.textContent = pythonPreamble() + '\n    target = client.locator(' + pyString(els.locatorInput.value) + ')\n    ' + operation + '\n';
+    els.pythonCode.textContent = pythonPreamble() + '\n    target = client.find(' + pyString(els.locatorType.value) + ', ' + pyString(els.locatorInput.value) + ')\n    ' + operation + '\n';
   }
   function renderReceiver() {
     els.receiverCode.textContent = pythonPreamble() + '\n    snapshot = client.wait_for_export(timeout=120)\n' +
@@ -1716,8 +1639,16 @@
   }
   els.locatorCandidates.addEventListener("change", function () {
     if (!state.picked) return;
-    var candidates = state.picked.locators || [{ selector: state.picked.selector }];
-    els.locatorInput.value = candidates[Number(els.locatorCandidates.value)].selector;
+    var candidate = inspectorLocators(state.picked)[Number(els.locatorCandidates.value)];
+    els.locatorInput.value = candidate.selector;
+    els.locatorType.value = candidate.by || "css_position";
+    syncLocatorLabel();
+    els.locatorInput.dispatchEvent(new Event("input"));
+  });
+  els.locatorType.addEventListener("change", function () {
+    if (!state.picked) return;
+    els.locatorInput.value = els.locatorType.value === "xpath_position" ? state.picked.xpath : state.picked.selector;
+    syncLocatorLabel();
     els.locatorInput.dispatchEvent(new Event("input"));
   });
   els.locatorInput.addEventListener("input", function () {
@@ -1728,16 +1659,16 @@
   els.controllerPort.addEventListener("input", function () { renderPython(); renderReceiver(); });
   els.validateLocatorBtn.addEventListener("click", async function () {
     if (!state.picked || !state.tab) return;
-    var revision = state.pageRevision, selector = els.locatorInput.value, picked = state.picked;
+    var revision = state.pageRevision, selector = els.locatorInput.value, picked = state.picked, by = els.locatorType.value;
     els.validateLocatorBtn.disabled = true;
     els.locatorValidation.textContent = "正在验证…";
     try {
       var response = await requestMessage(state.tab.id, { action: PAGESENSE.ACTIONS.RESOLVE_ELEMENT,
-        selector: selector, pageId: picked.pageId });
-      if (revision !== state.pageRevision || picked !== state.picked || selector !== els.locatorInput.value) return;
+        selector: selector, by: by, pageId: picked.pageId });
+      if (revision !== state.pageRevision || picked !== state.picked || selector !== els.locatorInput.value || by !== els.locatorType.value) return;
       if (!response.ok) throw new Error(response.message || (response.error && response.error.message) || response.error);
       setSelected(response.data);
-      els.locatorInput.value = selector; renderPython();
+      els.locatorInput.value = selector; els.locatorType.value = by; syncLocatorLabel(); renderPython();
       var result = await requestMessage(state.tab.id, { action: PAGESENSE.ACTIONS.LOCATE_ELEMENT,
         elementId: response.data.element.elementId, pageId: response.data.pageId });
       if (revision !== state.pageRevision) return;
@@ -1824,7 +1755,7 @@
     var snapshot = { schemaVersion: 1, kind: els.exportTarget.value,
       exportedAt: new Date().toISOString(), pageId: selected ? picked.pageId : scan.pageId,
       page: selected ? picked.page : scan.page, scannedAt: selected ? picked.inspectedAt : scan.scannedAt,
-      settings: { scope: selected ? "picked" : scan.scope, live: state.liveEnabled, filters: filters },
+      settings: { scope: selected ? "picked" : scan.scope, live: true, filters: filters },
       elements: elements };
     if (selected) snapshot.details = picked;
     return snapshot;
@@ -1925,7 +1856,7 @@
       state.tab = tab;
       renderPageHeader(tab);
     }
-    if (state.liveEnabled && tab.status !== "loading" && !livePort) startLiveScan();
+    if (tab.status !== "loading" && !livePort) startLiveScan();
   });
 
   chrome.tabs.onRemoved.addListener(function (tabId) {

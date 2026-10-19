@@ -134,6 +134,54 @@ class PageSenseClient:
             raise ValueError("selector 必须为非空 CSS。")
         return Element(self, selector=selector)
 
+    @staticmethod
+    def _query_params(by, selector):
+        aliases = {"css_position": "css_position", "css_positon": "css_position",
+                   "css": "css_position", "css_selector": "css_position",
+                   "xpath_position": "xpath_position", "xpath": "xpath_position"}
+        if not isinstance(by, str) or by not in aliases:
+            raise ValueError("by 必须为 css_position 或 xpath_position。")
+        if not isinstance(selector, str) or not selector.strip():
+            raise ValueError("selector 必须为非空字符串。")
+        return {"by": aliases[by], "selector": selector}
+
+    def _find(self, by, selector, *, multiple, strict=True, scope=None, timeout=None):
+        if type(strict) is not bool:
+            raise ValueError("strict 必须为布尔值。")
+        params = self._query_params(by, selector)
+        params.update(multiple=multiple, strict=strict)
+        if scope is not None:
+            params.update(scope=scope, pageId=scope["pageId"])
+        result = self.call("FIND_ELEMENTS", timeout=timeout, **params)
+        return [self.element(handle) for handle in result["elements"]]
+
+    def find(self, by, selector, timeout=None, *, strict=True) -> "Element":
+        """Find now, without a scan. The returned handle pins the actual node."""
+        return self._find(by, selector, multiple=False, strict=strict, timeout=timeout)[0]
+
+    def findall(self, by, selector, timeout=None) -> list["Element"]:
+        """Return a DOM-order snapshot of node handles, or [] for no matches."""
+        return self._find(by, selector, multiple=True, timeout=timeout)
+
+    find_all = findall
+
+    def css_position(self, selector, timeout=None) -> "Element":
+        return self.find("css_position", selector, timeout)
+
+    def xpath_position(self, selector, timeout=None) -> "Element":
+        return self.find("xpath_position", selector, timeout)
+
+    @staticmethod
+    def _read_value(result):
+        if result.get("truncated"):
+            raise P.PageSenseError("TEXT_TRUNCATED", "读取结果超过 20000 字符；请缩小容器，或使用 get_all() 查看长度与截断标志。")
+        return result["value"]
+
+    def get_all_texts(self, selector, by="css_position", timeout=None) -> list[str]:
+        params = self._query_params(by, selector)
+        result = self.call("READ_ELEMENTS", timeout=timeout, **params)
+        return [self._read_value(item) for item in result["items"]]
+
     def element(self, handle: dict) -> "Element":
         """Bind a snapshot element to its original document (pageId required)."""
         self._element_params(handle)
@@ -145,7 +193,13 @@ class PageSenseClient:
             page_id, node_id = element_id.get("pageId"), element_id.get("elementId")
             if not isinstance(page_id, str) or not page_id or type(node_id) is not int or node_id < 1:
                 raise ValueError("元素句柄必须包含正整数 elementId 和非空 pageId。")
-            return {"elementId": node_id, "pageId": page_id}
+            params = {"elementId": node_id, "pageId": page_id}
+            if "referenceId" in element_id:
+                reference_id = element_id["referenceId"]
+                if not isinstance(reference_id, str) or not reference_id:
+                    raise ValueError("referenceId 必须为非空字符串。")
+                params["referenceId"] = reference_id
+            return params
         return {"elementId": element_id}
 
     def _element_call(self, method, element_id, timeout=None, **params):
@@ -199,6 +253,45 @@ class Element:
 
     def text(self, timeout=None):
         return self.inspect(timeout)["text"]
+
+    def get_text(self, timeout=None):
+        return self._read("text", timeout=timeout)
+
+    def _read(self, mode, name=None, timeout=None):
+        target = self._target(timeout)
+        result = self.client.call("READ_ELEMENT", timeout=timeout, **target, mode=mode, name=name)
+        return self.client._read_value(result)
+
+    def get_attribute(self, name, timeout=None):
+        return self._read("attribute", name, timeout)
+
+    def get_property(self, name, timeout=None):
+        return self._read("property", name, timeout)
+
+    def get(self, name, timeout=None):
+        """'text' reads text; other names read raw HTML attributes (missing: None)."""
+        return self.get_text(timeout) if name == "text" else self.get_attribute(name, timeout)
+
+    def get_all(self, timeout=None):
+        """Return existing detail data, including explicit text/HTML truncation flags."""
+        return self.inspect(timeout)
+
+    def find(self, by, selector, timeout=None, *, strict=True):
+        return self.client._find(by, selector, multiple=False, strict=strict,
+                                 scope=self._target(timeout), timeout=timeout)[0]
+
+    def findall(self, by, selector, timeout=None):
+        return self.client._find(by, selector, multiple=True,
+                                 scope=self._target(timeout), timeout=timeout)
+
+    find_all = findall
+
+    def get_all_texts(self, selector, by="css_position", timeout=None):
+        params = self.client._query_params(by, selector)
+        scope = self._target(timeout)
+        result = self.client.call("READ_ELEMENTS", timeout=timeout, **params,
+                                  scope=scope, pageId=scope["pageId"])
+        return [self.client._read_value(item) for item in result["items"]]
 
     def click(self, timeout=None):
         return self.client.click(self._target(timeout), timeout)

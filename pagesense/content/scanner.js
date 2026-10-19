@@ -288,6 +288,145 @@
   // Document identity is independent of tab IDs and changes after navigation.
   var pageId = global.crypto && global.crypto.randomUUID ? global.crypto.randomUUID() :
     Date.now().toString(36) + Math.random().toString(36).slice(2);
+  // Public query handles outlive scan numbering. Never resolve a saved list by index.
+  var referenceIds = new WeakMap(), references = new Map(), nextReference = 1;
+
+  function queryError(code, message) {
+    var error = new Error(message); error.code = code; throw error;
+  }
+
+  function bindTarget(element, cleanClones) {
+    var id = scanIds.get(element);
+    var mapped = id && global.PageSenseElementMap.getElementById(id);
+    if (!id || (mapped && mapped !== element)) {
+      id = nextId++; scanIds.set(element, id);
+    }
+    if (cleanClones) global.document.querySelectorAll("[" + PS.PAGE_SENSE_ID_ATTR + '="' + id + '"]').forEach(function (node) {
+      if (node !== element) node.removeAttribute(PS.PAGE_SENSE_ID_ATTR);
+    });
+    global.PageSenseElementMap.assignId(element, id);
+    return id;
+  }
+
+  function referenceTarget(referenceId) {
+    if (typeof referenceId !== "string" || !referenceId) queryError("INVALID_PARAMS", "无效的节点引用。");
+    var weak = references.get(referenceId), node = weak && weak.deref();
+    if (!node || !node.isConnected || node.ownerDocument !== global.document || node.closest("[" + PS.OVERLAY_ATTR + "]")) {
+      references.delete(referenceId);
+      queryError("ELEMENT_NOT_FOUND", "原节点已移除，请重新查找；不会猜测替代节点。");
+    }
+    return node;
+  }
+
+  function makeHandle(node) {
+    var referenceId = referenceIds.get(node);
+    if (!referenceId) {
+      referenceId = "node_" + nextReference++;
+      referenceIds.set(node, referenceId);
+    }
+    references.set(referenceId, new WeakRef(node));
+    return { pageId: pageId, elementId: bindTarget(node), referenceId: referenceId };
+  }
+
+  function handleTarget(handle) {
+    if (!handle || handle.pageId !== pageId) queryError("STALE_PAGE", "页面已变化，请重新查找元素。");
+    var node = handle.referenceId !== undefined ? referenceTarget(handle.referenceId) :
+      global.PageSenseElementMap.getElementById(handle.elementId);
+    if (!node) queryError("ELEMENT_NOT_FOUND", "元素已移除，请重新查找。");
+    return node;
+  }
+
+  function queryNodes(options) {
+    var by = options.by || "css_position", selector = options.selector;
+    if (typeof selector !== "string" || !selector.trim()) queryError("INVALID_SELECTOR", "定位器必须为非空字符串。");
+    var root = options.scope ? handleTarget(options.scope) : global.document;
+    var nodes = [];
+    try {
+      if (by === "css_position" || by === "css" || by === "css_selector") {
+        nodes = Array.prototype.slice.call(root.querySelectorAll(selector));
+      } else if (by === "xpath_position" || by === "xpath") {
+        var result = global.document.evaluate(selector, root, null, global.XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+        for (var i = 0; i < result.snapshotLength; i++) {
+          var node = result.snapshotItem(i);
+          if (node.nodeType !== 1) queryError("INVALID_SELECTOR", "XPath 必须返回元素节点，不能返回属性或文本节点。");
+          if (root === global.document || root.contains(node)) nodes.push(node);
+        }
+      } else queryError("INVALID_LOCATOR", "定位方式必须为 css_position 或 xpath_position。");
+    } catch (error) {
+      if (error.code === "INVALID_LOCATOR" || error.code === "INVALID_SELECTOR") throw error;
+      queryError("INVALID_SELECTOR", error.message);
+    }
+    nodes = nodes.filter(function (node) { return !node.closest("[" + PS.OVERLAY_ATTR + "]"); });
+    if (nodes.length > 10000) queryError("TOO_MANY_ELEMENTS", "匹配超过 10000 个元素，请缩小容器或定位范围。");
+    return nodes;
+  }
+
+  function findElements(options) {
+    var nodes = queryNodes(options);
+    if (options.multiple !== true) {
+      if (!nodes.length) queryError("ELEMENT_NOT_FOUND", "定位器未匹配任何元素。");
+      if (options.strict !== false && nodes.length !== 1) queryError("AMBIGUOUS_SELECTOR", "匹配 " + nodes.length + " 个元素，需要唯一匹配或使用 findall。");
+      nodes = nodes.slice(0, 1);
+    }
+    references.forEach(function (weak, key) {
+      var node = weak.deref(); if (!node || !node.isConnected) references.delete(key);
+    });
+    return { pageId: pageId, elements: nodes.map(makeHandle) };
+  }
+
+  function readNode(node, options) {
+    var mode = options.mode || "text", name = options.name, value;
+    var password = node.type === "password";
+    if (mode === "text") {
+      value = password ? "[密码已隐藏]" : String(node.innerText || node.textContent || node.value || "");
+    } else if (mode === "attribute") {
+      if (typeof name !== "string" || !name.trim()) queryError("INVALID_PARAMS", "属性名必须为非空字符串。");
+      value = password && name.toLowerCase() === "value" ? "[密码已隐藏]" : node.getAttribute(name);
+    } else if (mode === "property") {
+      if (["href", "src", "value", "checked", "disabled", "selected", "id", "className", "tagName", "textContent", "innerText"].indexOf(name) < 0) {
+        queryError("INVALID_PARAMS", "不支持读取该 DOM 属性。");
+      }
+      value = password && (name === "value" || name === "textContent" || name === "innerText") ? "[密码已隐藏]" : node[name];
+      if (value === undefined) value = null;
+      if (value !== null && ["string", "boolean", "number"].indexOf(typeof value) < 0) queryError("INVALID_PARAMS", "属性不是可传输的标量。");
+    } else queryError("INVALID_PARAMS", "未知读取方式。");
+    var length = typeof value === "string" ? value.length : null;
+    return { value: length > 20000 ? value.slice(0, 20000) : value,
+      length: length, truncated: length > 20000 };
+  }
+
+  function readElement(options) {
+    return readNode(handleTarget(options), options);
+  }
+
+  function readElements(options) {
+    var totalLength = 0;
+    var items = queryNodes(options).map(function (node) {
+      var item = readNode(node, { mode: "text" });
+      totalLength += item.value.length;
+      if (totalLength > 2000000) queryError("RESULT_TOO_LARGE", "文本结果超过 200 万字符，请缩小查询范围。");
+      return item;
+    });
+    return { pageId: pageId, items: items };
+  }
+
+  function xpathLiteral(value) {
+    if (value.indexOf("'") < 0) return "'" + value + "'";
+    if (value.indexOf('"') < 0) return '"' + value + '"';
+    return "concat(" + value.split("'").map(function (part) { return "'" + part + "'"; }).join(', "\'", ') + ")";
+  }
+
+  function xpathPath(element) {
+    if (element.id && global.document.querySelectorAll("#" + cssEscape(element.id)).length === 1) return "//*[@id=" + xpathLiteral(element.id) + "]";
+    var parts = [], node = element;
+    while (node && node.nodeType === 1) {
+      var index = 1, sibling = node.previousElementSibling;
+      while (sibling) { if (sibling.localName === node.localName && sibling.namespaceURI === node.namespaceURI) index++; sibling = sibling.previousElementSibling; }
+      parts.unshift("*[local-name()=" + xpathLiteral(node.localName) + " and namespace-uri()=" + xpathLiteral(node.namespaceURI || "") + "][" + index + "]");
+      node = node.parentElement;
+    }
+    return "/" + parts.join("/");
+  }
 
   function locatorCandidates(element) {
     var candidates = [];
@@ -312,11 +451,11 @@
     return candidates;
   }
 
-  function resolveElement(selector) {
+  function resolveElement(selector, by) {
     if (typeof selector !== "string" || !selector.trim()) return { ok: false, error: "INVALID_SELECTOR", message: "请提供非空 CSS 选择器。" };
     var nodes;
-    try { nodes = global.document.querySelectorAll(selector); }
-    catch (error) { return { ok: false, error: "INVALID_SELECTOR", message: error.message }; }
+    try { nodes = queryNodes({ selector: selector, by: by }); }
+    catch (error) { return { ok: false, error: error.code || "INVALID_SELECTOR", message: error.message }; }
     var matches = Array.prototype.filter.call(nodes, function (node) { return !node.closest("[" + PS.OVERLAY_ATTR + "]"); });
     if (matches.length !== 1) return { ok: false, error: matches.length ? "AMBIGUOUS_SELECTOR" : "ELEMENT_NOT_FOUND",
       message: "CSS 匹配 " + matches.length + " 个元素，需要唯一匹配：" + selector };
@@ -350,6 +489,7 @@
       locators: locators, locator: locators.find(function (item) { return item.unique; }),
       element: serializeElement(element, Number(elementId)),
       selector: selector, selectorMatches: global.document.querySelectorAll(selector).length,
+      xpath: xpathPath(element),
       text: text.slice(0, 20000), textLength: text.length, textTruncated: text.length > 20000,
       html: html.slice(0, 20000), htmlLength: html.length, htmlTruncated: html.length > 20000,
       ancestors: ancestors, children: Array.prototype.slice.call(element.children, 0, 20).map(contextNode),
@@ -363,17 +503,7 @@
         element.closest("[" + PS.OVERLAY_ATTR + "]")) {
       return { ok: false, error: "ELEMENT_NOT_FOUND", message: "所选元素已不存在。" };
     }
-    var elementId = scanIds.get(element);
-    if (!elementId) {
-      elementId = nextId++;
-      scanIds.set(element, elementId);
-    }
-    // Page code can clone an earlier mapping attribute. An explicit selection
-    // must resolve to the chosen node, rather than the first such clone.
-    global.document.querySelectorAll("[" + PS.PAGE_SENSE_ID_ATTR + '="' + elementId + '"]').forEach(function (node) {
-      if (node !== element) node.removeAttribute(PS.PAGE_SENSE_ID_ATTR);
-    });
-    global.PageSenseElementMap.assignId(element, elementId);
+    var elementId = bindTarget(element, true);
     return inspectElement(elementId);
   }
 
@@ -477,6 +607,10 @@
     serializeElement: serializeElement,
     inspectElement: inspectElement,
     inspectTarget: inspectTarget,
+    findElements: findElements,
+    readElement: readElement,
+    readElements: readElements,
+    resolveReference: function (referenceId) { return bindTarget(referenceTarget(referenceId)); },
     cssPath: cssPath
   };
 })(typeof window !== "undefined" ? window : globalThis);

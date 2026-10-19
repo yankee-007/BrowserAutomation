@@ -2,9 +2,11 @@
 
 PageSense Chrome / Edge Manifest V3 扩展与本地 Python Controller：扫描网页 DOM、搜索元素、定位/高亮并执行基本页面操作。当前实现为 V2.0.0，尚不含 LLM / Planner。
 
-侧栏支持手动/实时扫描交互控件、文本、媒体与语义结构，18 种细分类、分页搜索、
+侧栏打开即自动实时扫描交互控件、文本、媒体与语义结构，没有手动扫描或实时开关；支持 18 种细分类、分页搜索、
 标签/class/属性/CSS 查询和元素详情。新增三工作区、页面分布图、可复制的 Python 定位代码，
 默认发送当前页面全部扫描元素，也可发送选中或筛选结果。插件自动启动本地桥接，Python 默认直接连接，见[自动桥接说明](docs/native-bridge.md)与[元素工作台](docs/element-workbench.md)。
+
+Python 推荐使用 [find / findall 元素对象 API](docs/element-api.md)：CSS/XPath 单/多元素、容器查询、按需读取文本和属性，不需要扫描或发送整页元素。
 
 **当前质量状态**：既有[独立验收报告](PageSense-V2.0-INDEPENDENT-ACCEPTANCE-REPORT.md)结论为 FAIL；旧式纯数字 elementId 的跨标签页风险与长断线自恢复问题仍存在；新定位器和页面句柄会校验 pageId。本次侧栏相关检查通过，不替代全量产品验收。
 

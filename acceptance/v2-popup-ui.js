@@ -56,8 +56,42 @@ pageWorld.Element.prototype.getBoundingClientRect = function () {
   return R(8, 8, 120, 40);
 };
 pageWorld.chrome = {
-  runtime: { onMessage: { addListener(fn) { pageWorld.__psListener = fn; } } }
+  runtime: {
+    onMessage: { addListener(fn) { pageWorld.__psListener = fn; } },
+    onConnect: { addListener(fn) { pageWorld.__onConnect = fn; } }
+  }
 };
+
+/* Fake live-scan Port connecting the real popup.js to the real content.js. */
+let holdLive = false, heldLive = null, latestDisconnects = [];
+function connectLivePort(tabId, info) {
+  const popupMessages = [], popupDisconnects = [];
+  latestDisconnects = popupDisconnects;
+  const pagePort = {
+    name: info && info.name,
+    messageListeners: [], disconnectListeners: [],
+    onMessage: { addListener(fn) { pagePort.messageListeners.push(fn); } },
+    onDisconnect: { addListener(fn) { pagePort.disconnectListeners.push(fn); } },
+    postMessage(data) {
+      const deliver = () => popupMessages.forEach((fn) => fn(data));
+      if (holdLive) { holdLive = false; heldLive = deliver; return; }
+      deliver();
+    }
+  };
+  if (pageWorld.__onConnect) pageWorld.__onConnect(pagePort);
+  return {
+    onMessage: { addListener(fn) { popupMessages.push(fn); } },
+    onDisconnect: { addListener(fn) { popupDisconnects.push(fn); } },
+    postMessage(message) { pagePort.messageListeners.forEach((fn) => fn(message)); },
+    disconnect() { pagePort.disconnectListeners.forEach((fn) => fn()); }
+  };
+}
+function holdNextLiveResponse() {
+  holdLive = true; heldLive = null;
+  return () => { const deliver = heldLive; heldLive = null; if (deliver) deliver(); };
+}
+/* A real navigation/reload drops the content port; jsdom needs it simulated. */
+function simulateContentDisconnect() { latestDisconnects.slice().forEach((fn) => fn()); }
 
 /* ---- Popup world ------------------------------------------------------- */
 
@@ -82,7 +116,6 @@ const tabEvents = {};
 const tabEvent = (name) => ({ addListener(fn) { tabEvents[name] = fn; } });
 let activeTab = { id: 1, windowId: 7, title: "Fixture", url: "https://fixture.test/" };
 let lastTabQuery;
-let pendingScan = null;
 
 popupWorld.chrome = {
   windows: { getCurrent() { return Promise.resolve({ id: 7 }); } },
@@ -113,12 +146,9 @@ popupWorld.chrome = {
     sendMessage(tabId, message, cb) {
       let response;
       pageWorld.__psListener(message, {}, (r) => { response = r; });
-      if (pendingScan && message.action === popupWorld.PAGESENSE.ACTIONS.SCAN_PAGE) {
-        pendingScan.resolve = () => cb(response);
-      } else {
-        cb(response);
-      }
-    }
+      cb(response);
+    },
+    connect: connectLivePort
   },
   scripting: {
     executeScript({ files }) {
@@ -135,6 +165,14 @@ popupWorld.eval(popupSrc);
 const doc = popupWorld.document;
 const $ = (id) => doc.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(predicate, timeout = 5000) {
+  const start = Date.now();
+  while (Date.now() - start < timeout) {
+    if (predicate()) return;
+    await sleep(25);
+  }
+  throw new Error("waitFor 超时: " + predicate.toString());
+}
 
 function setSearch(value) {
   const el = $("searchInput");
@@ -155,13 +193,11 @@ function matches() {
 }
 
 (async () => {
-  /* ---- scan ----------------------------------------------------------- */
-  $("scanBtn").click();
-  for (let i = 0; i < 60; i++) {
-    if (!$("resultPanel").className.includes("hidden")) break;
-    await sleep(50);
-  }
-  eq("V2P-01", "扫描渲染 8 张卡片", cardCount(), 8);
+  /* ---- automatic scan -------------------------------------------------- */
+  check("V2P-00", "侧栏已移除手动扫描按钮与实时开关",
+    $("scanBtn") === null && $("liveScanToggle") === null);
+  await waitFor(() => !$("resultPanel").className.includes("hidden") && cardCount() === 8);
+  eq("V2P-01", "自动实时扫描渲染 8 张卡片", cardCount(), 8);
 
   /* ---- 18 search status ------------------------------------------------ */
   check("V2P-02", "未搜索时状态行显示扫描元素总数",
@@ -231,7 +267,7 @@ function matches() {
   const staleQuery = "搜索";
   setSearch(staleQuery);
   const before = cardCount();
-  // Delete the matched elements from the fixture, then rescan.
+  // Delete the matched elements from the fixture; live scanning rebuilds the index.
   await pageWorld.eval(`
     (function(){
       document.getElementById("btnSearch").remove();
@@ -239,13 +275,12 @@ function matches() {
       document.getElementById("jobInput").remove();
     })();
   `);
-  $("scanBtn").click();
-  await sleep(600);
+  await waitFor(() => /扫描元素：\s*5\s*个/.test($("searchStatus").textContent));
   const afterRescan = cardCount();
-  check("V2P-20", "重新扫描后搜索索引重建（旧结果不再出现）",
+  check("V2P-20", "实时更新后搜索索引重建（旧结果不再出现）",
     afterRescan < before, `before=${before} after=${afterRescan}`);
   setSearch("");
-  eq("V2P-21", "重新扫描后全量列表同步减少", cardCount(), 5);
+  eq("V2P-21", "实时更新后全量列表同步减少", cardCount(), 5);
 
   /* ---- 56 Controller panel ---------------------------------------------- */
   check("V2P-22", "Controller 面板存在且默认可折叠",
@@ -297,44 +332,48 @@ function matches() {
 
   activeTab = { id: 2, windowId: 7, title: "Second", url: "https://second.test/" };
   tabEvents.activated({ windowId: 7, tabId: 2 });
-  await sleep(0);
-  eq("SP-03", "切换标签页更新标题", $("currentPageTitle").textContent, "Second");
-  check("SP-04", "切换后旧卡片、原始数据与操作入口清空",
-    cardCount() === 0 && $("rawJson").textContent === "" &&
-    $("resultPanel").classList.contains("hidden") &&
-    $("copyBtn").disabled && $("exportBtn").disabled && $("clearHighlightBtn").disabled);
+  await waitFor(() => $("currentPageTitle").textContent === "Second" && cardCount() === 5);
+  check("SP-03", "切换标签页更新标题、URL 并自动扫描",
+    $("currentPageUrl").textContent === activeTab.url && cardCount() === 5);
+  check("SP-04", "自动扫描结果进入面板与原始数据",
+    !$("resultPanel").classList.contains("hidden") && !!$("rawJson").textContent);
 
-  pendingScan = {};
-  $("scanBtn").click();
-  await sleep(0);
-  check("SP-05", "扫描请求正在等待响应", typeof pendingScan.resolve === "function");
+  // Freeze one live response, then switch tabs: the old page's late result must not render.
+  pageWorld.document.getElementById("btnLogin").textContent = "旧页面内容";
+  const releaseStale = holdNextLiveResponse();
+  $("scanScope").dispatchEvent(new popupWorld.Event("change", { bubbles: true }));
+  await waitFor(() => $("liveScanStatus").textContent === "正在扫描…");
+  pageWorld.document.getElementById("btnLogin").textContent = "新页面内容";
   activeTab = { id: 3, windowId: 7, title: "Third", url: "https://third.test/" };
   tabEvents.activated({ windowId: 7, tabId: 3 });
-  await sleep(0);
-  pendingScan.resolve();
-  pendingScan = null;
-  await sleep(0);
-  check("SP-06", "丢弃切换前迟到的扫描结果",
-    cardCount() === 0 && $("resultPanel").classList.contains("hidden") && !$("scanBtn").disabled);
+  await waitFor(() => cardCount() === 5 && $("currentPageTitle").textContent === "Third");
+  await waitFor(() => JSON.parse($("rawJson").textContent).elements.some((el) => el.text === "新页面内容"));
+  releaseStale();
+  await sleep(50);
+  const latest = JSON.parse($("rawJson").textContent);
+  check("SP-05", "切换标签页丢弃旧页面迟到的扫描结果",
+    latest.elements.some((el) => el.text === "新页面内容") &&
+    !latest.elements.some((el) => el.text === "旧页面内容"));
 
-  $("scanBtn").click();
-  await sleep(0);
-  eq("SP-07", "新标签页可以重新扫描", cardCount(), 5);
-  tabEvents.updated(3, { status: "loading" }, activeTab);
-  check("SP-08", "刷新立即清空旧结果", cardCount() === 0 && $("copyBtn").disabled);
-  $("scanBtn").click();
-  await sleep(0);
+  simulateContentDisconnect();
+  tabEvents.updated(3, { status: "loading" }, Object.assign({}, activeTab, { status: "loading" }));
+  check("SP-06", "刷新立即清空旧结果", cardCount() === 0 && $("copyBtn").disabled);
+  tabEvents.updated(3, { status: "complete" }, Object.assign({}, activeTab, { status: "complete" }));
+  await waitFor(() => cardCount() === 5);
+  check("SP-07", "页面就绪后自动恢复扫描", cardCount() === 5);
+
+  simulateContentDisconnect();
   activeTab = Object.assign({}, activeTab, { url: "https://third.test/next" });
   tabEvents.updated(3, { url: activeTab.url }, activeTab);
-  check("SP-09", "同标签页导航清空结果并更新 URL",
+  check("SP-08", "同标签页导航清空结果并更新 URL",
     cardCount() === 0 && $("currentPageUrl").textContent === activeTab.url);
-  $("scanBtn").click();
-  await sleep(0);
+  await waitFor(() => cardCount() === 5);
+
   activeTab = { id: 4, windowId: 7, title: "Fourth", url: "https://fourth.test/" };
   tabEvents.removed(3);
-  await sleep(0);
-  check("SP-10", "关闭当前标签页清空结果并切换标题",
-    cardCount() === 0 && $("currentPageTitle").textContent === "Fourth");
+  check("SP-09", "关闭当前标签页切回空状态", cardCount() === 0);
+  await waitFor(() => $("currentPageTitle").textContent === "Fourth" && cardCount() === 5);
+  check("SP-10", "关闭当前标签页后自动扫描新页面", cardCount() === 5);
 
   console.log(`\nV2 POPUP UI SUMMARY: ${failures === 0 ? "ALL PASS" : failures + " FAILURE(S)"}`);
   process.exit(failures === 0 ? 0 : 1);

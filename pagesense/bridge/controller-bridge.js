@@ -506,7 +506,15 @@
     var A = PS.ACTIONS;
     switch (method) {
       case PS.METHODS.RESOLVE_ELEMENT:
-        return { action: A.RESOLVE_ELEMENT, selector: params.selector };
+        return { action: A.RESOLVE_ELEMENT, selector: params.selector, by: params.by };
+      case PS.METHODS.FIND_ELEMENTS:
+      case PS.METHODS.READ_ELEMENT:
+      case PS.METHODS.READ_ELEMENTS:
+        var query = { action: A[method] };
+        ["by", "selector", "scope", "multiple", "strict", "elementId", "mode", "name"].forEach(function (key) {
+          if (params[key] !== undefined) query[key] = params[key];
+        });
+        return query;
       case PS.METHODS.SCAN_PAGE:
         return { action: A.SCAN_PAGE, scope: params.scope };
       case PS.METHODS.SEARCH_ELEMENTS:
@@ -555,6 +563,15 @@
   function normalizeResult(method, tabInfo, response) {
     if (!response) {
       throw bridgeError(EC.BRIDGE_ERROR, "Content Script 未返回任何内容。");
+    }
+    if ((response.ok === false || response.success === false) && response.error) {
+      throw bridgeError(typeof response.error === "string" ? response.error : response.error.code || EC.BRIDGE_ERROR,
+        response.message || response.error.message || "请求失败。");
+    }
+
+    if (method === PS.METHODS.FIND_ELEMENTS || method === PS.METHODS.READ_ELEMENT || method === PS.METHODS.READ_ELEMENTS) {
+      if (!response.ok) throw bridgeError(EC.BRIDGE_ERROR, "元素查询未返回有效结果。");
+      return response.data;
     }
 
     if (method === PS.METHODS.SCAN_PAGE) {
@@ -648,6 +665,7 @@
 
     var message = buildActionMessage(method, params);
     if (message && params.pageId !== undefined) message.pageId = params.pageId;
+    if (message && params.referenceId !== undefined) message.referenceId = params.referenceId;
     if (!message) {
       return Promise.reject(bridgeError(EC.UNKNOWN_METHOD, "未知方法：" + String(method)));
     }

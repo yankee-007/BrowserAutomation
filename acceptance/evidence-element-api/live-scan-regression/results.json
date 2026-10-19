@@ -1,0 +1,103 @@
+{
+  "verifiedAt": "2026-10-19T13:33:55.523Z",
+  "browser": "Chrome/155.0.8059.84",
+  "node": "v24.20.0",
+  "sourceHashes": {
+    "shared/constants.js": "433a66d3da4173225710735c752b5e644c734875e9697d2505177ad4e21b33c5",
+    "content/scanner.js": "e8b65de2a0175fe6d7b9db93e6990be9534248829e89f44ac0b6db4a2e3ecc76",
+    "content/content.js": "d6ffd738334958508347dc1365043c95e343e91e87bd6263323a46cc2f9436e2",
+    "popup/popup.html": "dc7ba8bb81ad55792b9c12879562fcaea7cea998120621220c1c7a013bede916",
+    "popup/popup.css": "b5c90d15fe088d33f3077092f6c3c4d3cacd31b7be419d5714aa113deaa88405",
+    "popup/popup.js": "4983f8adde740b2854b54b191fb3abb9639fd7d4ed5da9f18ad955c19d51829d"
+  },
+  "results": [
+    {
+      "name": "Opening the native side panel automatically scans without manual controls",
+      "details": {
+        "total": 28
+      }
+    },
+    {
+      "name": "Idle page and mapping attributes do not trigger rescan loops"
+    },
+    {
+      "name": "Add/remove/text update both indexes; surviving IDs stable and removed IDs never retarget"
+    },
+    {
+      "name": "Visibility and disabled attribute changes update without manual scanning"
+    },
+    {
+      "name": "Input/change refresh results while retaining search, filter, draft, focus and selection"
+    },
+    {
+      "name": "Input event without a DOM attribute or text mutation refreshes its value"
+    },
+    {
+      "name": "Composition events defer card replacement until IME input finishes"
+    },
+    {
+      "name": "Manual input action remains usable during live scanning"
+    },
+    {
+      "name": "Highlight survives updates and its overlay causes no scan feedback"
+    },
+    {
+      "name": "Scrolling refreshes coordinates and viewport flags",
+      "details": {
+        "scroll": {
+          "x": 0,
+          "y": 2658
+        }
+      }
+    },
+    {
+      "name": "Page resize refreshes viewport dimensions"
+    },
+    {
+      "name": "Continuous changes are throttled and do not starve updates",
+      "details": {
+        "scans": 3
+      }
+    },
+    {
+      "name": "Live updates remain enabled with no manual pause or scan controls"
+    },
+    {
+      "name": "Tab switch releases the old observer; refresh reconnects and updates the new document"
+    },
+    {
+      "name": "Restricted page clears results; returning to an ordinary page and closing a tab resume scanning"
+    },
+    {
+      "name": "Live controls fit panel width 320",
+      "details": {
+        "width": 320,
+        "documentWidth": 320,
+        "mainWidth": 305,
+        "mainScrollWidth": 305
+      }
+    },
+    {
+      "name": "Live controls fit panel width 400",
+      "details": {
+        "width": 400,
+        "documentWidth": 400,
+        "mainWidth": 385,
+        "mainScrollWidth": 385
+      }
+    },
+    {
+      "name": "Live controls fit panel width 600",
+      "details": {
+        "width": 600,
+        "documentWidth": 600,
+        "mainWidth": 585,
+        "mainScrollWidth": 585
+      }
+    },
+    {
+      "name": "Closing the native side panel releases the live observer"
+    }
+  ],
+  "errors": []
+}

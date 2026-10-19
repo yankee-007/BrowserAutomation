@@ -74,7 +74,6 @@ async function rpc(method, params) {
   panel.on("pageerror", e => errors.push(e.message));
   await wait(() => document.getElementById("currentPageUrl").textContent.includes("/fixture"));
   assert.equal(await panel.$eval("#scanScope", el => el.value), "content");
-  await panel.click("#scanBtn");
   await wait(() => document.getElementById("rawJson").textContent);
   const initial = await raw();
   assert.ok(initial.stats.total > 270);
@@ -140,7 +139,6 @@ async function rpc(method, params) {
   await fill("#cssFilter", "p.price");
   await wait(() => !document.getElementById("elementList").classList.contains("is-query-pending") &&
     document.querySelectorAll(".element-card").length === 1);
-  await panel.click("#liveScanToggle");
   await wait(() => document.getElementById("liveScanStatus").textContent.startsWith("监听中"));
   const beforeId = (await raw()).elements.find(el => el.id === "price:a.1").elementId;
   await demo.evaluate(() => {
@@ -151,7 +149,6 @@ async function rpc(method, params) {
   await wait(() => document.querySelectorAll(".element-card").length === 2 &&
     !document.getElementById("elementList").classList.contains("is-query-pending"));
   assert.equal((await raw()).elements.find(el => el.id === "price:a.1").elementId, beforeId);
-  await panel.click("#liveScanToggle");
   pass("CSS result membership refreshes with live content changes and stable IDs");
 
   await panel.select("#scanScope", "interactive");

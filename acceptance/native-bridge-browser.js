@@ -71,7 +71,7 @@ async function fill(selector, value) { await panel.$eval(selector, (el, value) =
   pass("Browser starts the actual registered native host; legacy Python server is absent");
 
   // Queue data before Python starts. The default action performs its own scan.
-  assert.equal(await panel.$eval("#rawJson", el => el.textContent), "");
+  await wait(() => !!document.getElementById("rawJson").textContent);
   await panel.click("#sendPythonBtn");
   await wait(() => document.getElementById("exportStatus").textContent.startsWith("本地收件箱已收到"));
   const firstScan = await panel.$eval("#rawJson", el => JSON.parse(el.textContent));

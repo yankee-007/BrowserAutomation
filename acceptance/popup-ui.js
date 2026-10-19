@@ -57,14 +57,36 @@ pageWorld.Element.prototype.getBoundingClientRect = function () {
   return R(8, 8, 120, 40);
 };
 
-/* Fake chrome for the page world: capture the content.js listener. */
+/* Fake chrome for the page world: capture the content.js listeners. */
 pageWorld.chrome = {
   runtime: {
     onMessage: {
       addListener(fn) { pageWorld.__psListener = fn; }
+    },
+    onConnect: {
+      addListener(fn) { pageWorld.__onConnect = fn; }
     }
   }
 };
+
+/* Fake live-scan Port connecting the real popup.js to the real content.js. */
+function connectLivePort(tabId, info) {
+  const popupMessages = [], popupDisconnects = [];
+  const pagePort = {
+    name: info && info.name,
+    messageListeners: [], disconnectListeners: [],
+    onMessage: { addListener(fn) { pagePort.messageListeners.push(fn); } },
+    onDisconnect: { addListener(fn) { pagePort.disconnectListeners.push(fn); } },
+    postMessage(data) { popupMessages.forEach((fn) => fn(data)); }
+  };
+  if (pageWorld.__onConnect) pageWorld.__onConnect(pagePort);
+  return {
+    onMessage: { addListener(fn) { popupMessages.push(fn); } },
+    onDisconnect: { addListener(fn) { popupDisconnects.push(fn); } },
+    postMessage(message) { pagePort.messageListeners.forEach((fn) => fn(message)); },
+    disconnect() { pagePort.disconnectListeners.forEach((fn) => fn()); }
+  };
+}
 
 /* ---- Popup world with fake chrome ----------------------------------- */
 
@@ -88,7 +110,8 @@ popupWorld.chrome = {
       let response;
       pageWorld.__psListener(message, {}, (r) => { response = r; });
       cb(response);
-    }
+    },
+    connect: connectLivePort
   },
   scripting: {
     executeScript({ files }) {
@@ -126,14 +149,15 @@ function cardTexts() {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 (async () => {
-  /* Real click on the real scan button. */
-  popupWorld.document.getElementById("scanBtn").click();
+  /* The panel starts live scanning by itself; no manual scan button exists. */
+  check("P00", "侧栏已移除手动扫描按钮",
+    popupWorld.document.getElementById("scanBtn") === null);
 
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 100; i++) {
     if (!popupWorld.document.getElementById("resultPanel").className.includes("hidden")) break;
     await sleep(50);
   }
-  check("P01", "扫描后面板显示且渲染 8 张卡片",
+  check("P01", "自动实时扫描后面板显示且渲染 8 张卡片",
     !popupWorld.document.getElementById("resultPanel").className.includes("hidden") &&
     cardCount() === 8, "cards=" + cardCount());
 

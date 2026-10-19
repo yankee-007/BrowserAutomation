@@ -33,7 +33,6 @@
     <section class="capture-tools" aria-label="页面工具">
       <div class="capture-actions">
         <button class="btn btn-primary btn-pick" id="pickElementBtn" type="button" aria-pressed="false" aria-describedby="pickStatus">在页面选择元素</button>
-        <button class="btn btn-secondary btn-scan" id="scanBtn" type="button">扫描当前页面</button>
       </div>
       <div class="scan-options">
         <label class="scan-scope-label" for="scanScope">范围</label>
@@ -42,10 +41,9 @@
           <option value="interactive">仅交互控件</option>
           <option value="all">全部可见 DOM</option>
         </select>
-        <label class="live-scan-toggle"><input id="liveScanToggle" type="checkbox" aria-describedby="liveScanStatus" />实时</label>
       </div>
       <div id="pickStatus" class="pick-status" role="status">像 F12 一样选取页面元素，直接获取定位信息。</div>
-      <span id="liveScanStatus" class="live-scan-status" role="status">未开启实时扫描</span>
+      <span id="liveScanStatus" class="live-scan-status" role="status">自动实时扫描 · 等待页面就绪…</span>
     </section>
 
     <section id="view-inspect" class="workspace-view hidden" role="tabpanel" aria-labelledby="tab-inspect">
@@ -58,19 +56,21 @@
       <div class="picked-summary" id="pickedElementSummary"></div>
       <div class="element-actions">
         <button type="button" class="element-action-btn" id="copyPickedCssBtn">复制 CSS</button>
+        <button type="button" class="element-action-btn" id="copyPickedXPathBtn">复制 XPath</button>
         <button type="button" class="element-action-btn" id="copyPickedTextBtn">复制文本</button>
       </div>
       <section class="locator-section" aria-label="自动化定位">
         <h2>定位到 Python</h2>
         <p class="section-help">优先使用测试属性或 ID；DOM 路径会受页面结构变化影响。</p>
         <label for="locatorCandidates">可用定位器</label><select id="locatorCandidates"></select>
-        <label for="locatorInput">CSS 选择器</label>
+        <label for="locatorType">定位方式</label><select id="locatorType"><option value="css_position">CSS</option><option value="xpath_position">XPath</option></select>
+        <label for="locatorInput" id="locatorInputLabel">CSS 选择器</label>
         <textarea id="locatorInput" rows="2" spellcheck="false"></textarea>
         <div class="element-actions"><button type="button" id="validateLocatorBtn" class="element-action-btn">验证并高亮</button><button type="button" id="copyLocatorBtn" class="element-action-btn">复制定位器</button><button type="button" id="sendPickedBtn" class="element-action-btn element-action-primary">发送此元素到 Python</button></div>
         <p id="locatorValidation" class="inline-status" role="status"></p>
         <div class="code-heading"><label for="pythonAction">Python 操作</label><select id="pythonAction"><option value="text">读取文本</option><option value="click">点击</option><option value="input">输入文本</option><option value="clear">清空</option><option value="keypress">按 Enter</option><option value="locate">定位</option></select><button type="button" class="element-action-btn" id="copyPythonBtn">复制 Python</button></div>
         <pre id="pythonCode" class="code-block" tabindex="0" aria-label="Python 示例代码"></pre>
-        <p class="section-help">在 controller 目录运行。先打开插件，Python 自动连接。每次操作重新定位，必须唯一匹配；读取文本最多 20000 字符。</p>
+        <p class="section-help">在 controller 目录运行。find 按唯一定位器绑定节点，无需扫描或发送元素。按需读取，文本超过 20000 字符会明确报错。</p>
       </section>
       <div class="inspector-body" id="pickedElementDetails"></div>
     </section>
@@ -187,11 +187,6 @@
         <button type="button" class="filter-chip" data-filter="other">其他</button>
         </div>
        </details>
-      </div>
-
-      <div class="rescan-hint hidden" id="rescanHint" role="status">
-        <span>页面可能已变化，建议重新扫描。</span>
-        <button type="button" class="rescan-hint-btn" id="rescanHintBtn">重新扫描</button>
       </div>
 
       <div class="scroll-controls" id="scrollControls">
