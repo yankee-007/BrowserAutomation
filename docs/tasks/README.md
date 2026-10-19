@@ -1,12 +1,11 @@
 # 活动任务
 
-当前活动任务见下表。已完成任务见下方历史导航。
+当前无已登记活动任务。已完成任务见下方历史导航。
 
 有效 `TASK_TRACKING_POLICY=adaptive`：复杂、跨阶段、易中断或需接力的实际任务建立记录；简单修改可走轻量路径。治理初始化已完成，业务任务按实际需求登记。若未来明确关闭跟踪，保留已有记录并停止创建/更新任务及活动表，同时说明恢复能力限制。
 
 | Task ID | 标题 | 工作状态 | 分支或范围 | 文件 |
 | --- | --- | --- | --- | --- |
-| TASK-20261019-ab138219e257 | 按需 CSS / XPath 元素对象 API（二次迭代：短 XPath、元素 HTML 代码视图） | active | task/20261019-ab138219e257-element-api | [任务记录](TASK-20261019-ab138219e257-element-api.md) |
 
 索引只表示当前版本可见的任务，不是跨分支实时调度表。任务文件记录上次核验的快照，接手时与实际代码和 Git 核对。
 
@@ -20,7 +19,7 @@ task-worktree 下任务记录通常先存在各自分支，集成分支 `main` �
 
 ## 已完成任务
 
-- [TASK-20261019-ab138219e257：按需 CSS / XPath 元素对象 API](TASK-20261019-ab138219e257-element-api.md)：find/findall 的 CSS/XPath、容器查询、按需读取与节点引用保护完成；侧栏改为打开即自动实时扫描；Chrome 证据在 `acceptance/evidence-element-api/`，用户浏览器需重新加载扩展。
+- [TASK-20261019-ab138219e257：按需 CSS / XPath 元素对象 API](TASK-20261019-ab138219e257-element-api.md)：find/findall 的 CSS/XPath、容器查询、按需读取与节点引用保护完成；侧栏改为打开即自动实时扫描；二次迭代补齐短 XPath（唯一 ID 锚点）与整元素 HTML 可折叠高亮代码视图；Chrome 证据在 `acceptance/evidence-element-api/`，用户浏览器需重新加载扩展。
 
 - [TASK-20261019-c82ab49d1e06：插件自动桥接与默认整页发送](TASK-20261019-c82ab49d1e06-native-bridge.md)：Native Messaging 启动 Host、Python 默认客户端、默认完整重扫发送、Windows 注册器和兼容模式完成；真实浏览器与 Python 证据在 `acceptance/evidence-native-bridge/`。
 
