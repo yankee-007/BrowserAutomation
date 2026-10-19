@@ -84,6 +84,42 @@ function snippet(source) { return python(["-u", "-c", source]); }
   const clicks = await snippet('from pagesense import PageSenseClient\nwith PageSenseClient() as c:\n print(c.find("css_position", "#clicks").get_text())');
   assert.equal(clicks.trim(), "1");
   pass("Picked XPath copies correctly, validates uniquely and exact generated Python executes");
+  // A non-id element gets a short id-anchored path without namespace boilerplate.
+  await panel.click("#pickElementBtn"); await wait(() => document.getElementById("pickStatus").textContent.includes("悬停并点击"));
+  await demo.click("#root p");
+  await wait(() => { const code = document.querySelector("#pickedElementDetails [data-code-viewer]"); return code && code.textContent.includes("<p"); });
+  await panel.click("#copyPickedXPathBtn");
+  assert.equal(await panel.evaluate(() => window.__copied), "//*[@id='root']/p[1]");
+  await panel.click("#validateLocatorBtn");
+  await wait(() => document.getElementById("locatorValidation").textContent.includes("唯一匹配 1"));
+  pass("Non-id element copies a short id-anchored XPath without namespace boilerplate");
+  // Picking the container renders the whole element as a foldable code view.
+  await panel.click("#pickElementBtn"); await wait(() => document.getElementById("pickStatus").textContent.includes("悬停并点击"));
+  await demo.$eval("#root", el => el.scrollIntoView({ block: "center" }));
+  const rootBox = await demo.$eval("#root", el => { const r = el.getBoundingClientRect(); return { x: r.x + 3, y: r.y + 3 }; });
+  await demo.mouse.click(rootBox.x, rootBox.y);
+  await wait(() => { const code = document.querySelector("#pickedElementDetails [data-code-viewer]"); return code && code.textContent.includes("<section"); });
+  const viewer = await panel.evaluate(() => {
+    const code = document.querySelector("#pickedElementDetails [data-code-viewer]");
+    return {
+      text: code.querySelector(".code-tree").textContent,
+      tags: code.querySelectorAll(".tok-tag").length,
+      attrs: code.querySelectorAll(".tok-attr").length,
+      strings: code.querySelectorAll(".tok-str").length,
+      folds: code.querySelectorAll("[data-code-fold]").length
+    };
+  });
+  assert.ok(viewer.text.includes("</section>") && viewer.text.includes("段落一") && viewer.text.includes("第一条"), viewer.text);
+  assert.ok(viewer.tags >= 6 && viewer.attrs >= 2 && viewer.strings >= 2 && viewer.folds >= 1, JSON.stringify(viewer));
+  await panel.click("#pickedElementDetails [data-code-fold]");
+  await wait(() => document.querySelector("#pickedElementDetails .code-branch").classList.contains("is-collapsed"));
+  assert.equal(await panel.evaluate(() => document.querySelector("#pickedElementDetails [data-code-fold]").getAttribute("aria-expanded")), "false");
+  await panel.click("#pickedElementDetails [data-code-fold-all]");
+  await wait(() => document.querySelectorAll("#pickedElementDetails .code-branch:not(.is-collapsed)").length === 0);
+  await panel.click("#pickedElementDetails [data-code-unfold-all]");
+  await wait(() => document.querySelectorAll("#pickedElementDetails .code-branch.is-collapsed").length === 0);
+  await panel.screenshot({ path: path.join(EVIDENCE, "element-code-view.png") });
+  pass("Picked element HTML renders whole tags and text in a foldable highlighted code view");
   for (const width of [320, 400, 600]) {
     await panel.setViewport({ width, height: 900 });
     const metrics = await panel.evaluate(() => ({ width: document.querySelector(".app-main").clientWidth, scroll: document.querySelector(".app-main").scrollWidth }));

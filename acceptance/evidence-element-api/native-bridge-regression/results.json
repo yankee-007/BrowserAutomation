@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-19T13:27:54.388Z",
+  "verifiedAt": "2026-10-19T13:53:33.306Z",
   "browser": "Chrome/155.0.8059.84",
   "results": [
     {
@@ -37,9 +37,9 @@
   "sourceHashes": {
     "pagesense/bridge/native-bridge.js": "987f97180c66cebf4640f0da33ce0e572c4243f60e38bcbe05ed0a965b7718d2",
     "pagesense/background/service-worker.js": "24e5edd32207dee53fbdab473b90c479793e80f3bdceb7a07264e481356afb81",
-    "pagesense/popup/popup.js": "4983f8adde740b2854b54b191fb3abb9639fd7d4ed5da9f18ad955c19d51829d",
+    "pagesense/popup/popup.js": "d66af75003a77a7cf593bb70ebcd60b0c779336400a4a86f589c34fab1eda9f6",
     "pagesense/popup/popup.html": "dc7ba8bb81ad55792b9c12879562fcaea7cea998120621220c1c7a013bede916",
-    "pagesense/popup/popup.css": "b5c90d15fe088d33f3077092f6c3c4d3cacd31b7be419d5714aa113deaa88405",
+    "pagesense/popup/popup.css": "b573a0a9ed78d66a3d20df564daf86e6bdb267d6705d887c8276e1d5902fccc7",
     "pagesense/manifest.json": "fba08d60031cba45f34f4209960dbdade8d8550d99255cfa15b08c389e810afe",
     "controller/native_host.py": "43b3dc1208c1a8c656bac7bb077b15ec82cc73b45adbec42e90a57db9f112f61",
     "controller/native_client.py": "8ab26116406cd56be74f56ca8d9e7900a2337b80d4a18f54ae2bde04c5d151f4",

@@ -1108,17 +1108,120 @@
     }).join(" → ") || "无";
   }
 
+  var CODE_VOID_ELEMENTS = /^(?:area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/;
+  var CODE_MAX_LINES = 1200;
+
+  function codeLine(depth, source, foldable) {
+    var gutter = foldable
+      ? '<button type="button" class="code-fold" data-code-fold aria-expanded="true" aria-label="折叠子节点" title="折叠 / 展开">▾</button>'
+      : '<span class="code-fold-spacer" aria-hidden="true"></span>';
+    return '<div class="code-line" style="--code-depth:' + depth + '">' + gutter +
+      '<code class="code-source">' + source + '</code></div>';
+  }
+
+  function codeOpenTag(element, selfClosing) {
+    var out = ['<span class="tok-punct">&lt;</span><span class="tok-tag">' + escapeHtml(element.localName) + "</span>"];
+    Array.prototype.forEach.call(element.attributes, function (attribute) {
+      out.push(' <span class="tok-attr">' + escapeHtml(attribute.name) + '</span><span class="tok-punct">=</span>' +
+        '<span class="tok-str">"' + escapeHtml(attribute.value) + '"</span>');
+    });
+    out.push('<span class="tok-punct">' + (selfClosing ? " /&gt;" : "&gt;") + "</span>");
+    return out.join("");
+  }
+
+  function codeCloseTag(element) {
+    return '<span class="tok-punct">&lt;/</span><span class="tok-tag">' + escapeHtml(element.localName) +
+      '</span><span class="tok-punct">&gt;</span>';
+  }
+
+  /** Render the picked element's outer HTML as a foldable, highlighted tree. */
+  function renderElementCode(html, truncated) {
+    var template = document.createElement("template");
+    template.innerHTML = String(html == null ? "" : html);
+    var used = 0, clipped = false;
+    function take() {
+      if (used >= CODE_MAX_LINES) { clipped = true; return false; }
+      used++;
+      return true;
+    }
+    function textLines(text, depth) {
+      return String(text).split(/\r?\n/).filter(function (line) { return line.trim(); }).map(function (line) {
+        return take() ? codeLine(depth, '<span class="tok-text">' + escapeHtml(line) + "</span>") : "";
+      }).join("");
+    }
+    function walk(node, depth) {
+      if (node.nodeType === 3) return textLines(node.nodeValue, depth);
+      if (node.nodeType === 8) {
+        return take() ? codeLine(depth, '<span class="tok-comment">&lt;!--' + escapeHtml(node.nodeValue) + "--&gt;</span>") : "";
+      }
+      if (node.nodeType !== 1) return "";
+      if (CODE_VOID_ELEMENTS.test(node.localName)) return take() ? codeLine(depth, codeOpenTag(node, true)) : "";
+      var children = Array.prototype.slice.call(node.childNodes).filter(function (child) {
+        return child.nodeType === 1 || child.nodeType === 8 || (child.nodeType === 3 && child.nodeValue.trim());
+      });
+      var text = node.textContent || "";
+      if (children.every(function (child) { return child.nodeType === 3; }) &&
+          text.length <= 240 && text.indexOf("\n") < 0) {
+        return take() ? codeLine(depth, codeOpenTag(node, false) +
+          '<span class="tok-text">' + escapeHtml(text) + "</span>" + codeCloseTag(node)) : "";
+      }
+      if (!take()) return "";
+      var open = codeLine(depth, codeOpenTag(node, false), true);
+      var inner = children.map(function (child) { return walk(child, depth + 1); }).join("");
+      if (!take()) return open + '<div class="code-children"></div>';
+      return '<div class="code-branch">' + open + '<div class="code-children">' + inner + "</div>" +
+        codeLine(depth, codeCloseTag(node)) + "</div>";
+    }
+    var roots = Array.prototype.slice.call(template.content.childNodes).filter(function (node) {
+      return node.nodeType === 1 || node.nodeType === 8 || (node.nodeType === 3 && node.nodeValue.trim());
+    });
+    var tree = roots.map(function (node) { return walk(node, 0); }).join("");
+    if (!tree) tree = codeLine(0, '<span class="tok-text">' + escapeHtml(html) + "</span>");
+    var meta = used + " 行" + (clipped || truncated ? " · 已截断显示" : "");
+    return '<section class="code-viewer" data-code-viewer aria-label="元素 HTML">' +
+      '<div class="code-toolbar"><span class="code-title">元素 HTML</span>' +
+      '<span class="code-meta">' + meta + "</span>" +
+      '<button type="button" class="code-action" data-code-unfold-all>展开全部</button>' +
+      '<button type="button" class="code-action" data-code-fold-all>折叠全部</button></div>' +
+      '<div class="code-tree" tabindex="0">' + tree + "</div></section>";
+  }
+
+  function setCodeFolded(branch, collapsed) {
+    branch.classList.toggle("is-collapsed", collapsed);
+    var button = branch.querySelector("[data-code-fold]");
+    if (!button) return;
+    button.setAttribute("aria-expanded", String(!collapsed));
+    button.textContent = collapsed ? "▸" : "▾";
+  }
+
+  document.addEventListener("click", function (event) {
+    var fold = event.target.closest("[data-code-fold]");
+    if (fold) {
+      var branch = fold.closest(".code-branch");
+      if (branch) setCodeFolded(branch, !branch.classList.contains("is-collapsed"));
+      return;
+    }
+    var action = event.target.closest("[data-code-fold-all],[data-code-unfold-all]");
+    if (!action) return;
+    var viewer = action.closest("[data-code-viewer]");
+    if (!viewer) return;
+    var collapse = action.hasAttribute("data-code-fold-all");
+    Array.prototype.forEach.call(viewer.querySelectorAll(".code-branch"), function (item) {
+      setCodeFolded(item, collapse);
+    });
+  });
+
   function inspectorHtml(data, links) {
     var el = data.element, rect = el.position;
     return '<div class="property-grid"><span>标签 / 类型</span><code>' + escapeHtml(el.tag + " / " + (PAGESENSE.FILTER_LABELS[el.category] || el.category)) +
       '</code><span>元素句柄</span><code>#' + el.elementId + '</code><span>视口坐标</span><code>' + rect.x + ', ' + rect.y +
       '</code><span>页面坐标</span><code>' + rect.pageX + ', ' + rect.pageY + '</code><span>宽 × 高</span><code>' + rect.width + ' × ' + rect.height +
       '</code><span>状态</span><span>' + (el.disabled ? '已禁用' : el.visible ? '可见' : '不可见') + (el.inViewport ? ' / 视口内' : ' / 视口外') + '</span></div>' +
+      renderElementCode(data.html, data.htmlTruncated) +
       '<details class="inspector-section" open><summary>全部属性</summary><pre>' + escapeHtml(JSON.stringify(el.attributes, null, 2)) + '</pre></details>' +
       '<details class="inspector-section"><summary>父子层级</summary><strong>父级（由近到远，最多 8 层）</strong><div class="context-path">' + contextHtml(data.ancestors, links) +
       '</div><strong>直接子元素 ' + data.childrenCount + ' 个（最多显示 20 个）</strong><div class="context-path">' + contextHtml(data.children, links) + '</div></details>' +
-      '<details class="inspector-section"><summary>文本 ' + data.textLength + ' 字符' + (data.textTruncated ? '（前 20000 字符）' : '') + '</summary><pre>' + escapeHtml(data.text) + '</pre></details>' +
-      '<details class="inspector-section"><summary>HTML' + (data.htmlTruncated ? '（前 20000 字符）' : '') + '</summary><pre>' + escapeHtml(data.html) + '</pre></details>';
+      '<details class="inspector-section"><summary>文本 ' + data.textLength + ' 字符' + (data.textTruncated ? '（前 20000 字符）' : '') + '</summary><pre>' + escapeHtml(data.text) + '</pre></details>';
   }
 
   els.elementList.addEventListener("toggle", async function (event) {

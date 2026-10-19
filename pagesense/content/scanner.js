@@ -410,22 +410,79 @@
     return { pageId: pageId, items: items };
   }
 
+  var HTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
+
   function xpathLiteral(value) {
     if (value.indexOf("'") < 0) return "'" + value + "'";
     if (value.indexOf('"') < 0) return '"' + value + '"';
     return "concat(" + value.split("'").map(function (part) { return "'" + part + "'"; }).join(', "\'", ') + ")";
   }
 
-  function xpathPath(element) {
-    if (element.id && global.document.querySelectorAll("#" + cssEscape(element.id)).length === 1) return "//*[@id=" + xpathLiteral(element.id) + "]";
+  function xpathUniqueId(node) {
+    return node.id && global.document.querySelectorAll("#" + cssEscape(node.id)).length === 1 ? node.id : "";
+  }
+
+  function xpathSegment(node, namespaceAware) {
+    var name = namespaceAware ?
+      "*[local-name()=" + xpathLiteral(node.localName) + " and namespace-uri()=" + xpathLiteral(node.namespaceURI || "") + "]" :
+      node.localName;
+    var index = 1, same = 0, sibling = node.previousElementSibling;
+    while (sibling) {
+      if (sibling.localName === node.localName && sibling.namespaceURI === node.namespaceURI) index++;
+      sibling = sibling.previousElementSibling;
+    }
+    sibling = node.nextElementSibling;
+    while (sibling) {
+      if (sibling.localName === node.localName && sibling.namespaceURI === node.namespaceURI) same++;
+      sibling = sibling.nextElementSibling;
+    }
+    return name + (index + same > 1 ? "[" + index + "]" : "");
+  }
+
+  function xpathBuild(element, anchor, forceNamespace) {
     var parts = [], node = element;
-    while (node && node.nodeType === 1) {
-      var index = 1, sibling = node.previousElementSibling;
-      while (sibling) { if (sibling.localName === node.localName && sibling.namespaceURI === node.namespaceURI) index++; sibling = sibling.previousElementSibling; }
-      parts.unshift("*[local-name()=" + xpathLiteral(node.localName) + " and namespace-uri()=" + xpathLiteral(node.namespaceURI || "") + "][" + index + "]");
+    var htmlDocument = global.document.contentType === "text/html";
+    while (node && node !== anchor) {
+      var simple = !forceNamespace && htmlDocument && node.namespaceURI === HTML_NAMESPACE;
+      parts.unshift(xpathSegment(node, !simple));
       node = node.parentElement;
     }
-    return "/" + parts.join("/");
+    var base = anchor ? "//*[@id=" + xpathLiteral(anchor.id) + "]" : "";
+    return base + (parts.length ? "/" + parts.join("/") : "");
+  }
+
+  function xpathSelects(expression, element) {
+    try {
+      var result = global.document.evaluate(expression, global.document, null,
+        global.XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+      return result.snapshotLength === 1 && result.snapshotItem(0) === element;
+    } catch (error) { return false; }
+  }
+
+  // Prefer short paths: nearest unique ancestor id, plain HTML names and no
+  // redundant [1]. Namespace-aware forms remain the fallback for SVG/MathML
+  // and XML documents, where an unprefixed name would not match.
+  function xpathPath(element) {
+    var selfId = xpathUniqueId(element);
+    if (selfId) {
+      var idExpression = "//*[@id=" + xpathLiteral(selfId) + "]";
+      if (xpathSelects(idExpression, element)) return idExpression;
+    }
+    var anchor = element.parentElement, candidates = [];
+    while (anchor && anchor.nodeType === 1) {
+      if (xpathUniqueId(anchor)) {
+        candidates.push(xpathBuild(element, anchor, false));
+        candidates.push(xpathBuild(element, anchor, true));
+        break;
+      }
+      anchor = anchor.parentElement;
+    }
+    candidates.push(xpathBuild(element, null, false));
+    candidates.push(xpathBuild(element, null, true));
+    for (var i = 0; i < candidates.length; i++) {
+      if (xpathSelects(candidates[i], element)) return candidates[i];
+    }
+    return candidates[candidates.length - 1];
   }
 
   function locatorCandidates(element) {

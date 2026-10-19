@@ -65,5 +65,31 @@ assert.equal(w.document.evaluate(detail.xpath, w.document, null, w.XPathResult.F
 const html = fs.readFileSync(path.resolve(__dirname, "../pagesense/popup/popup.html"), "utf8");
 assert.ok(!html.includes('id="scanBtn"') && !html.includes('id="liveScanToggle"') && !html.includes('id="rescanHintBtn"'));
 assert.ok(html.includes('id="copyPickedXPathBtn"') && html.includes('id="locatorType"'));
+
+/* Short XPath: nearest unique id anchor, plain HTML names and no redundant [1]. */
+const secondParagraph = w.document.querySelectorAll("#root p")[1];
+const shortDetail = scanner.inspectTarget(secondParagraph).data;
+assert.equal(shortDetail.xpath, "//*[@id='root']/p[2]");
+assert.equal(w.document.evaluate(shortDetail.xpath, w.document, null, w.XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue, secondParagraph);
+const svg = w.document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.appendChild(w.document.createElementNS("http://www.w3.org/2000/svg", "circle"));
+w.document.getElementById("root").appendChild(svg);
+const circlePath = scanner.inspectTarget(svg.firstChild).data.xpath;
+assert.ok(circlePath.includes("local-name()='svg'") && circlePath.includes("local-name()='circle'"), circlePath);
+// jsdom's XPath engine cannot evaluate namespace-uri() on foreign nodes; Chrome covers execution.
+assert.ok(circlePath.includes("namespace-uri()='http://www.w3.org/2000/svg'"));
+const loose = w.document.createElement("article");
+loose.innerHTML = "<p>甲</p><p>乙</p>";
+w.document.body.appendChild(loose);
+const loosePath = scanner.inspectTarget(loose.querySelector("p")).data.xpath;
+assert.ok(!loosePath.includes("local-name()") && /^\/html\/body/.test(loosePath), loosePath);
+assert.equal(w.document.evaluate(loosePath, w.document, null, w.XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue, loose.querySelector("p"));
+for (const element of Array.from(w.document.querySelectorAll("body *"))) {
+  if (element.closest("[data-pagesense-overlay]") || element.closest("svg")) continue;
+  const data = scanner.inspectTarget(element);
+  assert.equal(data.ok, true, element.localName);
+  assert.equal(w.document.evaluate(data.data.xpath, w.document, null, w.XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
+    element, data.data.xpath);
+}
 dom.window.close();
-console.log("PASS CSS/XPath queries, scoped lists, minimal reads, stable identity, DOM mutations/rescan, stale pages, truncation and automatic-scan controls");
+console.log("PASS CSS/XPath queries, scoped lists, minimal reads, stable identity, DOM mutations/rescan, stale pages, truncation, short XPath and automatic-scan controls");

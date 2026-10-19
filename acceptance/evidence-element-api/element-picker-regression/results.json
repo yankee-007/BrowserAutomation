@@ -1,15 +1,15 @@
 {
-  "verifiedAt": "2026-10-19T13:27:51.118Z",
+  "verifiedAt": "2026-10-19T13:52:53.127Z",
   "browser": "Chrome/155.0.8059.84",
   "node": "v24.20.0",
   "sourceHashes": {
     "shared/constants.js": "433a66d3da4173225710735c752b5e644c734875e9697d2505177ad4e21b33c5",
-    "content/scanner.js": "e8b65de2a0175fe6d7b9db93e6990be9534248829e89f44ac0b6db4a2e3ecc76",
+    "content/scanner.js": "1e58c95de4fc844d5d2581f353598ef3b201646160008692a116abf952cae467",
     "content/content.js": "d6ffd738334958508347dc1365043c95e343e91e87bd6263323a46cc2f9436e2",
     "content/element-picker.js": "8c0dd2b91df7196fff040a67d3161f1ab005934335a6dca252a1e47fe9e50028",
-    "popup/popup.js": "4983f8adde740b2854b54b191fb3abb9639fd7d4ed5da9f18ad955c19d51829d",
+    "popup/popup.js": "d66af75003a77a7cf593bb70ebcd60b0c779336400a4a86f589c34fab1eda9f6",
     "popup/popup.html": "dc7ba8bb81ad55792b9c12879562fcaea7cea998120621220c1c7a013bede916",
-    "popup/popup.css": "b5c90d15fe088d33f3077092f6c3c4d3cacd31b7be419d5714aa113deaa88405",
+    "popup/popup.css": "b573a0a9ed78d66a3d20df564daf86e6bdb267d6705d887c8276e1d5902fccc7",
     "bridge/controller-bridge.js": "9914b88b85f49aa45bdb515e0cb8a00aec7627eab9e657094e80aa184a187b21"
   },
   "results": [

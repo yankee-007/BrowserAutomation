@@ -27,6 +27,8 @@ with PageSenseClient() as client:
 
 `css_position` 支持原生 CSS；`xpath_position` 支持返回元素节点的 XPath。别名为 `css` / `css_selector`、`xpath`，兼容输入拼写 `css_positon`。不支持 Playwright 专用伪选择器、XPath 标量/属性/文本节点或任意 JavaScript。`client.css_position(css)`、`client.xpath_position(xpath)` 是单元素便捷方法；`find_all` 等同于 `findall`。
 
+侧栏复制的 XPath 优先短路径：用最近唯一祖先 ID 作锚点、普通 HTML 标签名，并省略多余的 `[1]`；仅对内联 SVG/MathML 或 XML 文档退回 `local-name()` / `namespace-uri()` 写法。生成后会在页面中校验唯一命中，手写 XPath 不受该格式限制。
+
 ## 查询与作用域
 
 - `client.find(by, selector, strict=True)` 立即查询并要求唯一匹配：无匹配抛 `ELEMENT_NOT_FOUND`，多匹配抛 `AMBIGUOUS_SELECTOR`。显式 `strict=False` 时取 DOM 顺序首项。
