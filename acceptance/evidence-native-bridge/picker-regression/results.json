@@ -1,0 +1,78 @@
+{
+  "verifiedAt": "2026-10-19T11:24:17.777Z",
+  "browser": "Chrome/155.0.8059.84",
+  "node": "v24.20.0",
+  "sourceHashes": {
+    "shared/constants.js": "53a86dc6a0f0b6b139b60681e6820d5c3a6b91e46cd5eb6d8291a2c5164e2c9a",
+    "content/scanner.js": "c34bb58e60d5de9f6d1ae27e6be0d6745a00d6ba1af7a997b7c61390abeacfbf",
+    "content/content.js": "9762c9ced9ce81f1435a92e2a7eff9331476caa83005789f56785ef371810f87",
+    "content/element-picker.js": "8c0dd2b91df7196fff040a67d3161f1ab005934335a6dca252a1e47fe9e50028",
+    "popup/popup.js": "1b13c1faa2954c34ababd16084032a07b92ad6b10359e1902c086e8b36dd2b69",
+    "popup/popup.html": "ed73afd1b6faaf5d5fb5be8bd8238f02ed7c1517e3004aae8f32d2cc6e5aa108",
+    "popup/popup.css": "b5c90d15fe088d33f3077092f6c3c4d3cacd31b7be419d5714aa113deaa88405",
+    "bridge/controller-bridge.js": "edf1cb4b1a9631379c791ab0e69fe51aaa7f1efa78ef93ecf37f8b1678fa8466"
+  },
+  "results": [
+    {
+      "name": "Picker starts without a scan; hover frame matches the exact element"
+    },
+    {
+      "name": "Selection displays full details without triggering the page button; ordinary clicks resume afterward"
+    },
+    {
+      "name": "Nested link text is selected exactly; selection neither navigates nor toggles checkbox"
+    },
+    {
+      "name": "iframe and Shadow host selected as outer elements without entering their internals"
+    },
+    {
+      "name": "Escape/button cancellation and repeated sessions release event interception"
+    },
+    {
+      "name": "Explicit selection resolves the exact target even when the page cloned an old mapping attribute"
+    },
+    {
+      "name": "Non-interactive node outside scan scope/filter gets its own details; CSS/text copy payloads are correct"
+    },
+    {
+      "name": "Picker overlay/mapping causes no live-scan loop; picked snapshot survives unrelated live updates"
+    },
+    {
+      "name": "Picked details fit width 320",
+      "details": {
+        "width": 320,
+        "documentWidth": 320,
+        "mainWidth": 305,
+        "mainScrollWidth": 305
+      }
+    },
+    {
+      "name": "Picked details fit width 400",
+      "details": {
+        "width": 400,
+        "documentWidth": 400,
+        "mainWidth": 385,
+        "mainScrollWidth": 385
+      }
+    },
+    {
+      "name": "Picked details fit width 600",
+      "details": {
+        "width": 600,
+        "documentWidth": 600,
+        "mainWidth": 585,
+        "mainScrollWidth": 585
+      }
+    },
+    {
+      "name": "Clearing selection and changing tabs release the old page session"
+    },
+    {
+      "name": "Reload/restricted page/side-panel close cancel picking; page actions remain usable"
+    },
+    {
+      "name": "Reopened panel starts with no active or stale selection"
+    }
+  ],
+  "errors": []
+}

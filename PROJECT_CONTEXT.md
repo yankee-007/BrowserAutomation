@@ -3,16 +3,16 @@
 ## 目标与当前阶段
 
 PageSense 将用户已打开网页中的交互控件、文本、媒体及语义结构整理为结构化数据，
-提供关键字/结构查询、定位、高亮、元素详情与五类基础操作，并通过本地 Python Controller
+提供关键字/结构查询、定位、高亮、元素详情与五类基础操作，并通过本地桥接与 Python 客户端
 暴露结构化 API。当前磁盘实现为 V2.0.0，属于 Browser Runtime + Controller Transport；
 尚无 LLM / Planner / Agent 决策层。
 
-项目记忆与协作规则已初始化。当前界面使用浏览器原生侧栏，点击扩展图标打开；分为页面概览、元素检查、Python 对接三个工作区，支持几何分布图、定位候选、代码生成和选中/完整/筛选快照主动发送；支持手动扫描和显式开启实时扫描，切换标签页、刷新或导航后清空旧结果，实时模式在新页面就绪后自动恢复。后续工作以用户当前需求和任务记录为准。
+项目记忆与协作规则已初始化。当前界面使用浏览器原生侧栏，点击扩展图标打开；分为页面概览、元素检查、Python 对接三个工作区，支持几何分布图、定位候选、代码生成，默认重新扫描并发送当前页面全部元素，也可发送选中/筛选结果；默认通过 Native Messaging 自动启动已注册的本地 Host，Python 只连接，无需手动 server.py/Token 配对；支持手动扫描和显式开启实时扫描，切换标签页、刷新或导航后清空旧结果，实时模式在新页面就绪后自动恢复。后续工作以用户当前需求和任务记录为准。
 
 ## 技术形态与核心能力
 
 - 浏览器侧：Chrome / Edge、Manifest V3、原生 JavaScript / HTML / CSS；manifest 声明最低 Chromium 116。按需注入 Content Script，无前端打包步骤。
-- Python 侧：WebSocket Server、同步 `PageSenseClient` API 与人工 CLI；依赖清单仅声明 `websockets>=12.0`，实际兼容下限本轮未验证。
+- Python 侧：浏览器启动的 Native Host、默认同步客户端 `PageSenseClient`，保留显式 mode="server" 的旧 WebSocket Server 与人工 CLI；依赖为 `websockets>=15.0.1`，本轮验证 15.0.1 与 17.2。Native Host 首次需当前用户注册，安装器支持 Windows Chrome/Edge。
 - 测试侧：Node.js、jsdom、puppeteer-core；现有验收资产包含真实 Edge、协议、CLI 与独立验收。
 - 主要能力：手动/实时扫描，范围可选 content/interactive/all；四个分组、18 个细分类；
   搜索支持多词 AND、offset 分页、标签/class/属性/精确 ID/视口过滤，以及原生 CSS 与扫描映射求交；
@@ -32,7 +32,7 @@ PageSense 将用户已打开网页中的交互控件、文本、媒体及语义�
 | `pagesense/popup/` | 原生侧栏复用的扫描结果、搜索、人工操作与 Controller 配置界面；监听所属窗口的标签页变化 |
 | `pagesense/background/`、`pagesense/bridge/` | Worker 生命周期、WebSocket 连接与请求转发 |
 | [controller/README.md](controller/README.md) | Controller 安装、API、CLI 和协议说明 |
-| `controller/server.py`、`pagesense.py`、`protocol.py`、`cli.py` | Python 传输服务、客户端、协议与人工命令 |
+| `controller/native_host.py`、`native_client.py`、`install_bridge.py`、`server.py`、`pagesense.py` | Python 传输服务、客户端、协议与人工命令 |
 | `acceptance/`、`acceptance/indep/` | 既有测试与独立验收脚本 |
 | `acceptance/evidence-v2-independent/` | 已保存的独立验收证据，不清理或覆盖 |
 
@@ -40,10 +40,10 @@ PageSense 将用户已打开网页中的交互控件、文本、媒体及语义�
 
 ## 业务规则、持久化与长期约束
 
-- Controller 仅允许 `127.0.0.1` / `localhost`，默认端口 8765；Python 为 Server，扩展为 Client。生产路径的 Python 不直接通过 Selenium / Playwright / CDP 驱动浏览器；测试 harness 使用 CDP 属观察与验收设施。
+- 默认由浏览器 Native Messaging 启动 Host，在 127.0.0.1 随机端口接受 Python 客户端，配对凭据由当前用户运行目录自动发现；业务 Python 不启动服务。旧模式仍为扩展连接 Python Server，仅允许 `127.0.0.1` / `localhost`、默认端口 8765，需显式 mode="server"。生产路径的 Python 不直接通过 Selenium / Playwright / CDP 驱动浏览器；测试 harness 使用 CDP 属观察与验收设施。
 - Bridge 复用原有 Content Script / Action Executor，不另建执行逻辑；默认只操作当前活动标签页。elementId 与当前 DOM 映射有关，失效时应返回错误，不能猜测替代目标。新定位器和元素字典携带 pageId 保护；旧式纯数字 ID 仍有跨标签页防护缺口，见下表。
 - 当前不实现自动决策、Action Queue、search-and-click、批量投递或站点风控规避。副作用验证以自带 demo 为入口；真实提交、消息发送和账户操作需单独明确任务授权。
-- `chrome.storage.local` 保存 Controller host、port、用户输入 token 和 autoconnect 配置；扫描结果、映射、索引、最近请求日志主要在内存中。无数据库。不得把 token、浏览器 profile 或真实页面私密数据写入项目记忆。
+- `chrome.storage.local` 保存连接方式/暂停状态，以及旧模式 Controller host、port、用户输入 token 和 autoconnect 配置；Native Host 注册/启动器与自动生成的会话发现凭据在当前用户 AppData，凭据不进入项目；扫描结果、映射、索引、最近请求日志主要在内存中。无数据库。不得把 token、浏览器 profile 或真实页面私密数据写入项目记忆。
 - `.edge-profile/`、`acceptance/edge-v2-indep-profile/`、已安装依赖、Python 字节码与本机 Agent 权限设置仅忽略，不删除。测试代码、锁文件、报告与证据保持可跟踪。
 
 ## 已知问题与易回归区域
@@ -53,7 +53,7 @@ PageSense 将用户已打开网页中的交互控件、文本、媒体及语义�
 | 项目 | 已有证据与限制 |
 | --- | --- |
 | FINDING-001（P3，OPEN） | 旧式纯数字 elementId 无页面作用域；跨标签页复用旧 ID 可静默命中其他元素并执行。新 `client.locator(css)` 与 `client.element(element)` 已携带 pageId，真实 Chrome 验证换页/刷新后旧句柄返回 STALE_PAGE；不将历史缺陷整体标为已修复。更换标签页、导航、重扫与 ID 格式是易回归区域。 |
-| FINDING-003（P2，OPEN） | Controller 停机约 30 秒以上后 Worker 可能被回收；无法无人值守自恢复，需要一次浏览器交互唤醒。重连、心跳与 Worker 生命周期需真实浏览器验证。 |
+| FINDING-003（P2，OPEN） | 旧 WebSocket 模式 Controller 停机约 30 秒以上后 Worker 可能被回收；无法无人值守自恢复，需要一次浏览器交互唤醒。重连、心跳与 Worker 生命周期需真实浏览器验证。 |
 | FINDING-002（当前实现已修复） | SEARCH 的 `indexSize` 现在返回整个索引规模，`total` 为过滤后的命中数；元素查询任务通过真实 Python/WebSocket/扩展路径验证。历史报告保持原文。 |
 | 既有修复护栏 | 源码可见 UTF-8 token 字节比较和 64 MiB 入站 WebSocket 消息上限；独立报告称 BUG-001、BUG-003 已修复。本轮只核对实现，不重复宣称运行通过。 |
 | 覆盖与能力限制 | 不递归 iframe / Shadow DOM，不识别 Canvas 内部元素；虚拟列表限已挂载 DOM；合成事件不等同可信用户输入；Controller 不支持 file://。真实 Popup、剪贴板、下载与真实业务页面人工验收状态未知。 |
@@ -87,6 +87,7 @@ PageSense 将用户已打开网页中的交互控件、文本、媒体及语义�
   复制仅验证载荷，选取外层 iframe/Shadow host 与窄栏已验证；
   证据在 `acceptance/evidence-element-picker/`，不替代完整独立验收。
 - 元素工作台：三工作区、页面分布、定位器唯一验证、Python 示例实际执行、选中/全部/跨分页筛选发送、收件 ACK/满箱和页面句柄保护已通过真实 Chrome 155 与 Python 3.14/websockets 17.2 验证，42 项 Python 回归通过，查询/点选/实时回归见 `acceptance/evidence-ui-workbench/`。Edge 独立测试进程启动失败，本轮使用 Chrome；系统剪贴板只校验载荷，用户个人浏览器与审美接受未代验。用法见[元素工作台](docs/element-workbench.md)。
+- 自动桥接：Native Host 启动、默认 Python 客户端、预先收件、默认整页重新扫描发送、大于 1 MiB 的扫描和命令限额、客户端退出/重连、原始页面句柄保护、生成源码实际执行及 Host 清理已通过真实 Chrome 155 验证，证据在 `acceptance/evidence-native-bridge/`。Windows 安装器根据匹配项目路径的扩展元数据注册当前用户 Host，不读取浏览历史、Cookie 或已有 Token。用法见[自动桥接](docs/native-bridge.md)。
 - 未知/未验证：用户浏览器加载状态、其运行进程、完整依赖与全量产品验收、人工接受及发布部署。GitHub 远端已由用户确认；上传快照不代表产品验收或部署。Python 命令可用，不代表 Controller 本轮已运行。
 - 本轮检查范围与逐项语义映射见[初始化核验记录](docs/agent/bootstrap-audit.md)。后续工作只依赖本项目文件，不依赖原聊天、工具包或本机缓存。
 

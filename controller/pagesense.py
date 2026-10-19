@@ -1,6 +1,7 @@
 """PageSense Controller - high level client API.
 
-Thin, transport-agnostic wrapper over :class:`server.ControllerServer`. The
+Default client for the browser-owned native bridge; mode="server" retains the
+legacy ControllerServer transport. The
 API deliberately names nothing about any particular website: it is a generic
 browser runtime surface that a future agent layer can drive.
 """
@@ -23,8 +24,7 @@ class PageSenseClient:
 
     Example::
 
-        client = PageSenseClient(token="ABC123").start()
-        client.wait_for_extension(timeout=60)
+        client = PageSenseClient().start()
         state = client.scan()
         results = client.search("搜索职位")
         client.input(results["results"][0]["elementId"], "AI应用工程师")
@@ -36,10 +36,18 @@ class PageSenseClient:
         port: int = DEFAULT_PORT,
         token: str | None = None,
         request_timeout: float = DEFAULT_REQUEST_TIMEOUT,
+        *, mode: str = "native", runtime_dir=None, extension_id=None, session_id=None,
     ):
-        self.server = ControllerServer(
-            host=host, port=port, token=token, request_timeout=request_timeout
-        )
+        if mode == "native":
+            if token is not None or port != DEFAULT_PORT or host != DEFAULT_HOST:
+                raise ValueError("默认自动连接无需 host/port/token；旧脚本请显式设置 mode='server'。")
+            from native_client import NativeClientTransport
+            self.server = NativeClientTransport(request_timeout, directory=runtime_dir,
+                                                extension_id=extension_id, session_id=session_id)
+        elif mode == "server":
+            self.server = ControllerServer(host=host, port=port, token=token, request_timeout=request_timeout)
+        else:
+            raise ValueError("mode 必须为 native 或 server。")
         self.request_timeout = request_timeout
 
     @classmethod

@@ -359,6 +359,8 @@ class ControllerServer:
             await self._send(P.make_request(request_id, method, params))
         except Exception as exc:
             self._pending.pop(request_id, None)
+            if isinstance(exc, P.PageSenseError):
+                raise
             raise P.PageSenseError(P.ERR_TRANSPORT, str(exc)) from exc
 
         effective_timeout = self.request_timeout if timeout is None else float(timeout)
@@ -367,6 +369,8 @@ class ControllerServer:
         except asyncio.TimeoutError:
             self._pending.pop(request_id, None)
             raise P.RequestTimeout(method, effective_timeout) from None
+        finally:
+            self._pending.pop(request_id, None)
 
     def request_sync(self, method: str, params: dict | None = None,
                      timeout: float | None = None) -> Any:

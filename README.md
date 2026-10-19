@@ -4,14 +4,14 @@ PageSense Chrome / Edge Manifest V3 扩展与本地 Python Controller：扫描�
 
 侧栏支持手动/实时扫描交互控件、文本、媒体与语义结构，18 种细分类、分页搜索、
 标签/class/属性/CSS 查询和元素详情。新增三工作区、页面分布图、可复制的 Python 定位代码，
-可发送选中、全部或筛选结果到 Python，见[元素工作台](docs/element-workbench.md)。
+默认发送当前页面全部扫描元素，也可发送选中或筛选结果。插件自动启动本地桥接，Python 默认直接连接，见[自动桥接说明](docs/native-bridge.md)与[元素工作台](docs/element-workbench.md)。
 
 **当前质量状态**：既有[独立验收报告](PageSense-V2.0-INDEPENDENT-ACCEPTANCE-REPORT.md)结论为 FAIL；旧式纯数字 elementId 的跨标签页风险与长断线自恢复问题仍存在；新定位器和页面句柄会校验 pageId。本次侧栏相关检查通过，不替代全量产品验收。
 
 ## 使用与开发
 
 1. 按[扩展使用文档](pagesense/README.md)加载整个 `pagesense/` 目录；扩展本身不需要前端构建。
-2. 点击工具栏的 PageSense 图标打开浏览器侧栏。由旧版更新时，先在扩展管理页重新加载 PageSense。按[Controller 使用文档](controller/README.md)准备 Python 依赖，并在 `controller/` 运行 `python server.py`。将本次启动生成的 token 填入侧栏“Python 对接”的连接配置；不要把 token 写入共享文档。
+2. 点击工具栏的 PageSense 图标打开侧栏。更新后先在扩展管理页重新加载并重开侧栏。首次在 `controller/` 执行 `python -m pip install -r requirements.txt` 和 `python install_bridge.py`，回到插件重试自动连接。此后由插件启动桥接，业务 Python 使用 `with PageSenseClient() as browser:` 直接获取数据和操作，无需手动启动服务或 Token 配对。详见[安装与 Python 示例](docs/native-bridge.md)。
 3. 测试页面为 [demo.html](pagesense/test/demo.html)。需要 HTTP 服务时，可从项目根运行 `node acceptance/serve.js 8770`，然后在浏览器打开 `http://127.0.0.1:8770/test/demo.html`。Controller 默认使用 8765；两个服务不要占同一端口。
 4. 测试脚本在 `acceptance/` 与 `controller/`，环境要求和已知运行陷阱见[上下文的验证入口](PROJECT_CONTEXT.md#开发与验证入口)。侧栏可通过 `node acceptance/side-panel-browser.js acceptance/evidence-side-panel` 在独立 Edge 测试实例中验证，使用全新临时浏览器配置与自带 demo 页面。
 

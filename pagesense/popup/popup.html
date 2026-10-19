@@ -70,7 +70,7 @@
         <p id="locatorValidation" class="inline-status" role="status"></p>
         <div class="code-heading"><label for="pythonAction">Python 操作</label><select id="pythonAction"><option value="text">读取文本</option><option value="click">点击</option><option value="input">输入文本</option><option value="clear">清空</option><option value="keypress">按 Enter</option><option value="locate">定位</option></select><button type="button" class="element-action-btn" id="copyPythonBtn">复制 Python</button></div>
         <pre id="pythonCode" class="code-block" tabindex="0" aria-label="Python 示例代码"></pre>
-        <p class="section-help">在 controller 目录运行。先启动此脚本，再在“Python 对接”连接它。每次操作重新定位，必须唯一匹配；读取文本最多 20000 字符。</p>
+        <p class="section-help">在 controller 目录运行。先打开插件，Python 自动连接。每次操作重新定位，必须唯一匹配；读取文本最多 20000 字符。</p>
       </section>
       <div class="inspector-body" id="pickedElementDetails"></div>
     </section>
@@ -223,9 +223,15 @@
     </section>
     </section>
     <section id="view-python" class="workspace-view hidden" role="tabpanel" aria-labelledby="tab-python">
-      <div class="section-intro"><h2>让 Python 接管操作</h2><p>Python 启动本地服务，插件连接后接收命令。数据只在你点击发送时传递。</p></div>
-      <button type="button" id="copyStartupBtn" class="element-action-btn">复制 Python 启动与收件代码</button>
-      <details id="connectionGuide" class="connection-guide" open><summary>首次连接指南</summary><ol class="connection-steps"><li>在 controller 目录运行下方收件示例（首次安装：<code>pip install -r requirements.txt</code>）。</li><li>将终端显示的 Token 粘贴到下面，点击“连接 Python”。</li><li>选择发送范围。Python 收到元素后，可用定位器或页面句柄执行操作。</li></ol></details>
+      <div class="section-intro"><h2>让 Python 接管操作</h2><p>打开插件后自动准备本地连接。Python 直接获取元素、发送操作，无需另启 server.py。</p></div>
+      <button type="button" id="copyStartupBtn" class="element-action-btn">复制 Python 收件代码</button>
+      <details id="connectionGuide" class="connection-guide" open><summary>首次使用：安装一次本地桥接</summary>
+        <p class="section-help">在 controller 目录安装依赖并运行下面命令。以后由插件自动启动，无需填写端口和 Token。</p>
+        <pre id="installCommand" class="install-command"></pre>
+        <button type="button" id="copyInstallBtn" class="element-action-btn">复制安装命令</button>
+        <p class="section-help">安装完成后点击“重试自动连接”。Python 脚本只需使用 PageSenseClient()。</p>
+      </details>
+      <label class="transport-mode-label" for="transportMode">连接方式<select id="transportMode"><option value="native">自动连接（推荐）</option><option value="legacy">手动 WebSocket（兼容旧脚本）</option></select></label>
     <details class="controller-panel" id="controllerPanel" open>
       <summary class="controller-summary-row">
         <span class="controller-dot" id="controllerDot"></span>
@@ -237,7 +243,7 @@
           <span id="controllerStateText">○ 未连接</span>
           <span class="controller-endpoint" id="controllerEndpoint">127.0.0.1:8765</span>
         </div>
-        <div class="controller-config">
+        <div id="legacyConfig" class="hidden"><div class="controller-config">
           <label class="controller-field">
             <span>端口</span>
             <input type="number" id="controllerPort" min="1" max="65535" value="8765" />
@@ -248,8 +254,9 @@
               autocomplete="off" />
           </label>
         </div>
+        </div>
         <div class="controller-actions">
-          <button type="button" class="btn btn-secondary" id="controllerConnectBtn">连接 Python</button>
+          <button type="button" class="btn btn-secondary" id="controllerConnectBtn">重试自动连接</button>
           <button type="button" class="btn btn-secondary" id="controllerDisconnectBtn">断开</button>
         </div>
         <div class="controller-error hidden" id="controllerError"></div>
@@ -264,15 +271,15 @@
       <section class="export-panel" aria-label="发送页面数据">
         <h2>发送到 Python</h2>
         <label for="exportTarget">发送范围</label>
-        <select id="exportTarget"><option value="selected">当前选中元素</option><option value="all">全部扫描元素</option><option value="filtered">当前筛选的全部结果（跨分页）</option></select>
+        <select id="exportTarget"><option value="all" selected>当前页面全部扫描元素（默认）</option><option value="selected">当前选中元素</option><option value="filtered">当前筛选的全部结果（跨分页）</option></select>
         <p id="exportSummary" class="section-help">先点选元素或扫描页面。</p>
         <button type="button" id="sendPythonBtn" class="btn btn-primary">发送到 Python</button>
         <p id="exportStatus" class="inline-status" role="status"></p>
-        <p class="section-help">包含页面、定位信息、元素属性与本次扫描/筛选设置。Token 不包含在发送数据中。“已收到”表示进入 Python 内存收件箱，尚未执行操作。</p>
+        <p class="section-help">默认重新扫描当前页面，发送当前范围内的全部结果，不受搜索和分页影响。数据在本机收件箱暂存，Python 可随后获取；发送不执行操作。</p>
       </section>
       <div class="code-heading"><h2>Python 收件示例</h2><button type="button" id="copyReceiverBtn" class="element-action-btn">复制收件代码</button></div>
       <pre id="receiverCode" class="code-block" tabindex="0" aria-label="Python 收件示例"></pre>
-      <p class="section-help">此示例和元素检查中的脚本均会启动服务，同一端口一次运行一个。停止后重新启动会生成新 Token。扫描也可由 Python 主动调用 client.scan(scope="content")。</p>
+      <p class="section-help">先打开插件，再运行 Python 示例。无需手动启动服务或粘贴 Token。Python 也可主动调用 client.scan(scope="content")；同一浏览器会话一次连接一个业务脚本。</p>
     </section>
   </main>
 

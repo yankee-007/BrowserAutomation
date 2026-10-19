@@ -16,11 +16,25 @@
 
 importScripts(
   "../shared/constants.js",
-  "../bridge/controller-bridge.js"
+  "../bridge/controller-bridge.js",
+  "../bridge/native-bridge.js"
 );
 
 var PS = self.PAGESENSE;
 var BRIDGE_MESSAGES = PS.BRIDGE_MESSAGES;
+var transportMode = "native";
+function activeBridge() { return transportMode === "legacy" ? self.PageSenseBridge : self.PageSenseNativeBridge; }
+var initialization = null;
+function initTransport() {
+  if (initialization) return initialization;
+  initialization = chrome.storage.local.get([PS.NATIVE.MODE_KEY]).then(function (stored) {
+    transportMode = stored[PS.NATIVE.MODE_KEY] || "native";
+    if (transportMode === "legacy") return self.PageSenseBridge.init();
+    if (transportMode === "paused") return self.PageSenseNativeBridge.disconnect();
+    return self.PageSenseNativeBridge.connect();
+  });
+  return initialization;
+}
 
 /** Guard against registering the same listener twice in one worker life. */
 if (!self.__PAGESENSE_SW_READY__) {
@@ -37,7 +51,7 @@ if (!self.__PAGESENSE_SW_READY__) {
       return false;
     }
 
-    var bridge = self.PageSenseBridge;
+    var bridge = activeBridge();
 
     switch (message.type) {
       case BRIDGE_MESSAGES.SEND_EXPORT:
@@ -50,17 +64,36 @@ if (!self.__PAGESENSE_SW_READY__) {
         });
         return true;
 
+      case BRIDGE_MESSAGES.START_NATIVE:
+        if (sender.tab || sender.url !== chrome.runtime.getURL("popup/popup.html")) return false;
+        self.PageSenseBridge.disconnect().then(function () {
+          transportMode = "native";
+          return chrome.storage.local.set({ [PS.NATIVE.MODE_KEY]: "native" });
+        }).then(function () { return self.PageSenseNativeBridge.connect(); }).then(function (status) {
+          sendResponse({ ok: true, status: status });
+        });
+        return true;
+
       case BRIDGE_MESSAGES.GET_STATUS:
-        sendResponse(bridge.getStatus());
-        return false;
+        initTransport().then(function () {
+          var selectedBridge = activeBridge();
+          var status = transportMode === "native" ? self.PageSenseNativeBridge.ensure() : selectedBridge.getStatus();
+          status.mode = transportMode === "legacy" ? "legacy" : "native";
+          sendResponse(status);
+        }).catch(function () { sendResponse({ state: "ERROR", mode: "native", connected: false,
+          lastError: { message: "无法读取本地连接配置，请重新打开侧栏。" } }); });
+        return true;
 
       case BRIDGE_MESSAGES.CONNECT:
-        bridge.connect({
+        self.PageSenseNativeBridge.disconnect().then(function () {
+          transportMode = "legacy";
+          return chrome.storage.local.set({ [PS.NATIVE.MODE_KEY]: "legacy" });
+        }).then(function () { return self.PageSenseBridge.connect({
           host: message.host,
           port: message.port,
           token: message.token,
           autoconnect: true
-        }).then(function (status) {
+        }); }).then(function (status) {
           sendResponse({ ok: true, status: status });
         }).catch(function (err) {
           sendResponse({
@@ -75,13 +108,17 @@ if (!self.__PAGESENSE_SW_READY__) {
         return true; // async response
 
       case BRIDGE_MESSAGES.DISCONNECT:
+        if (transportMode !== "legacy") {
+          transportMode = "paused";
+          chrome.storage.local.set({ [PS.NATIVE.MODE_KEY]: "paused" });
+        }
         bridge.disconnect().then(function (status) {
           sendResponse({ ok: true, status: status });
         });
         return true; // async response
 
       case BRIDGE_MESSAGES.SET_CONFIG:
-        bridge.saveConfig({
+        self.PageSenseBridge.saveConfig({
           host: message.host,
           port: message.port,
           token: message.token
@@ -106,13 +143,13 @@ if (!self.__PAGESENSE_SW_READY__) {
 
   // A restored worker has no socket: reconnect when the user has opted in.
   chrome.runtime.onStartup.addListener(function () {
-    self.PageSenseBridge.init();
+    initTransport();
   });
 
   chrome.runtime.onInstalled.addListener(function () {
-    self.PageSenseBridge.init();
+    initTransport();
   });
 
   // Reconnect as soon as the worker itself is (re)started.
-  self.PageSenseBridge.init();
+  initTransport();
 }

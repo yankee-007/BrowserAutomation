@@ -88,7 +88,7 @@ GIT_POLICY 可显式设为 `disabled`；启用 Git 时仍遵循既有项目检�
 | 任务、验证与交接 | [docs/agent/workflow.md](workflow.md) |
 | Git 工作、交付与隔离 | [docs/agent/git.md](git.md) |
 | 任务导航 | [docs/tasks/README.md](../tasks/README.md)，当前无登记任务 |
-| 决策导航 | [docs/decisions/README.md](../decisions/README.md)，当前无 ADR |
+| 决策导航 | [docs/decisions/README.md](../decisions/README.md)，当前决策以索引为准 |
 | 本轮范围与语义核验 | [docs/agent/bootstrap-audit.md](bootstrap-audit.md)，仅供初始化追溯，非日常必读 |
 
 后续按实际路径读取。凭据、机器专属临时路径与活跃进程信息不写入共享策略。

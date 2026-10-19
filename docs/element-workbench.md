@@ -2,6 +2,10 @@
 
 PageSense 使用已经打开的浏览器页面。插件负责读取 DOM 和执行基础操作，Python 负责你编写的流程。无需 Selenium / Playwright 驱动或前端构建。
 
+## 默认自动连接
+
+首次按[自动桥接说明](native-bridge.md)安装当前用户本地桥接，再重新加载扩展。浏览器会自动启动桥接，Python 使用 `PageSenseClient()` 作为客户端，不再单独运行 server.py 或复制 Token。
+
 ## 从页面选取到代码
 
 1. 更新代码后，在浏览器扩展管理页重新加载 `pagesense/`，关闭再打开侧栏。
@@ -9,15 +13,12 @@ PageSense 使用已经打开的浏览器页面。插件负责读取 DOM 和执�
 3. “元素检查”显示目标文本、定位器、坐标、属性、父子层级及 HTML。属性和代码内容按纯文本转义展示。
 4. 推荐定位器优先考虑 `data-testid`、`data-test`、`data-qa`、唯一 ID 和名称属性。候选项显示选择时的匹配数；DOM 路径容易受结构变化影响。
 5. 可编辑 CSS 并点击“验证并高亮”。仅唯一匹配才更新检查器并高亮；零命中、多命中和语法错误分别提示，不执行点击。
-6. 选择 Python 操作并复制代码。在 `controller/` 运行该脚本，按脚本打印的 Token 连接插件。支持读取文本、点击、输入、清空、Enter 和定位。复制源码与脚本启动不会自动附带此前页面 Token。
+6. 选择 Python 操作并复制代码。先打开插件并确认桥接就绪，再在 `controller/` 运行该客户端脚本。支持读取文本、点击、输入、清空、Enter 和定位。默认代码不含手动服务启动或 Token 配对步骤。
 
 ```python
 from pagesense import PageSenseClient
 
 with PageSenseClient() as client:
-    print("Token:", client.token, flush=True)
-    if not client.wait_for_extension(timeout=60):
-        raise TimeoutError("请在插件中连接 Python")
     target = client.locator('[data-testid="search-order"]')
     target.click()
     client.locator('input[name="order"]').input("PS-1001")
@@ -35,10 +36,10 @@ with PageSenseClient() as client:
 
 ## 主动发送到 Python
 
-“Python 对接”提供启动与收件代码、连接配置和发送范围。连接成功后指南及配置自动收起，仍可手动展开修改。
+“Python 对接”提供首次安装命令、自动连接状态、客户端收件代码和发送范围。连接成功后指南及配置自动收起，仍可手动展开修改。
 
 - **当前选中元素**：发送原目标及其详情、候选定位器。
-- **全部扫描元素**：发送完整最近扫描，不受当前搜索或分页影响。
+- **当前页面全部扫描元素（默认）**：点击时重新扫描，发送当前范围全部结果，不受搜索或分页影响；无需先手动扫描。
 - **当前筛选的全部结果**：发送关键字、分组、属性和 CSS 条件共同命中的全部元素，包含其他分页。
 
 载荷包含 `kind`、`pageId`、页面、时间、扫描/筛选设置和 `elements`；选中模式附带 `details`。元素包括 `elementId`、`pageId`、CSS、文本、属性和坐标。发送设置不包含连接 Token。页面内容只在本地连接传输，收件箱只在内存保存。
@@ -47,9 +48,6 @@ with PageSenseClient() as client:
 from pagesense import PageSenseClient
 
 with PageSenseClient() as client:
-    print("Token:", client.token, flush=True)
-    if not client.wait_for_extension(timeout=60):
-        raise TimeoutError("请连接插件")
     snapshot = client.wait_for_export(timeout=120)
     print(snapshot["page"]["url"], len(snapshot["elements"]))
     # 根据你自己的流程选择需要的元素；收件本身不执行操作。
@@ -58,9 +56,9 @@ with PageSenseClient() as client:
     text = client.element(element).text()
 ```
 
-每个 `PageSenseClient` 启动一个服务。同端口一次运行一个脚本，不要同时运行 `server.py` 和上面的脚本。Python 也可主动 `client.scan(scope="content")` 或 `client.search(...)` 取得数据。
+`PageSenseClient` 默认连接浏览器已经启动的桥接，同一浏览器会话一次连接一个业务脚本。Python 也可主动 `client.scan(scope="content")` 或 `client.search(...)` 取得数据。
 
-“Python 已收到”表示后端确认载荷已进入收件箱，未承诺已执行、已持久化或已被业务代码消费。收件箱最多 8 份、总计 64 MiB；满时明确拒绝，调用 `wait_for_export()` 消费后可再次发送。等待默认 60 秒，超时抛 `TimeoutError`；服务退出会丢失未消费内容。断线或 8 秒未确认时显示错误；后端可能已收到但回执丢失，插件不会自动重发。
+Python 未运行时也可发送，显示“本地收件箱已收到”，客户端随后连接可获取。“Python 已收到”表示后端确认载荷已进入收件箱，未承诺已执行、已持久化或已被业务代码消费。收件箱最多 8 份、总计 64 MiB；满时明确拒绝，调用 `wait_for_export()` 消费后可再次发送。等待默认 60 秒，超时抛 `TimeoutError`；浏览器关闭、Host 退出或暂停自动连接会丢失该 Host 未消费内容；仅关闭业务客户端会保留收件箱。断线或 8 秒未确认时显示错误；后端可能已收到但回执丢失，插件不会自动重发。
 
 ## 定位和句柄的区别
 
@@ -75,3 +73,5 @@ with PageSenseClient() as client:
 交互参考 [Chrome DevTools 检查模式](https://developer.chrome.com/docs/devtools/inspect-mode)；定位 API 参考 [Playwright 的唯一匹配规则](https://playwright.dev/python/docs/locators#strictness)与[开源 Locator 实现](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/client/locator.ts)。本项目按原生 DOM 和既有 Action Executor 实现所需子集，未引入 Playwright 运行时或其自动等待功能。
 
 真实 Chrome 155、临时配置和合成网页的证据在 [`acceptance/evidence-ui-workbench/`](../acceptance/evidence-ui-workbench/)。包含点选、CSS 验证、Python 动作、三种发送、收件压力、旧句柄防误操作、复制源码实际运行及 320/400/600px 布局；另有查询、点选和实时扫描回归。默认 Edge 在本机启动独立测试进程失败，改用 Chrome 完成验证；这不替代用户个人 Edge 环境和全量独立验收。
+
+自动桥接与新默认发送的最新验证见 `acceptance/evidence-native-bridge/`；旧服务器模式需显式 `PageSenseClient(mode="server")`，详见[自动桥接](native-bridge.md)。

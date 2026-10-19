@@ -364,6 +364,7 @@
     els.currentPageTitle.textContent = tab.title || tab.url || "(未知页面)";
     els.currentPageUrl.textContent = tab.url || "";
     els.currentPageUrl.title = tab.url || "";
+    updateExportSummary();
   }
 
   /** A persistent panel must never retain actionable results from another page. */
@@ -1480,6 +1481,7 @@
   STATE_LABELS[PAGESENSE.BRIDGE_STATES.ERROR] = "● 连接异常";
 
   var bridgeConfigLoaded = false;
+  var lastBridgeMode = "native";
   function renderBridgeStatus(status) {
     if (!status) {
       els.controllerStateText.textContent = "Service Worker 未响应";
@@ -1491,13 +1493,21 @@
     var state = status.state || PAGESENSE.BRIDGE_STATES.DISCONNECTED;
     els.controllerStateText.textContent = STATE_LABELS[state] || state;
     els.controllerStateInline.textContent = STATE_LABELS[state] || state;
-    els.controllerEndpoint.textContent = status.host + ":" + status.port;
-    if (!bridgeConfigLoaded) {
+    lastBridgeMode = status.mode || "legacy";
+    if (!document.getElementById("transportMode").dataset.dirty) document.getElementById("transportMode").value = lastBridgeMode;
+    syncTransportMode();
+    els.controllerEndpoint.textContent = lastBridgeMode === "native" ? "浏览器自动启动" : status.host + ":" + status.port;
+    if (!bridgeConfigLoaded && status.port) {
       els.controllerPort.value = String(status.port);
       bridgeConfigLoaded = true;
       renderPython(); renderReceiver();
     }
-    els.pythonStatus.textContent = state === PAGESENSE.BRIDGE_STATES.CONNECTED ? "Python 已连接" : "Python " + (STATE_LABELS[state] || state).replace(/[○◌●] /g, "");
+    var nativeLabel = status.connected ? (status.pythonConnected ? "Python 已连接" : "桥接就绪 · 等待 Python") : (state === "CONNECTING" ? "桥接启动中…" : "本地桥接未就绪");
+    els.pythonStatus.textContent = lastBridgeMode === "native" ? nativeLabel : state === PAGESENSE.BRIDGE_STATES.CONNECTED ? "Python 已连接" : "Python " + (STATE_LABELS[state] || state).replace(/[○◌●] /g, "");
+    if (lastBridgeMode === "native") {
+      els.controllerStateText.textContent = nativeLabel;
+      els.controllerStateInline.textContent = status.connected ? "已就绪" : "未连接";
+    }
     els.pythonStatus.classList.toggle("is-connected", state === PAGESENSE.BRIDGE_STATES.CONNECTED);
 
     var dotClass = "controller-dot";
@@ -1513,7 +1523,7 @@
     if (status.lastError && state !== PAGESENSE.BRIDGE_STATES.CONNECTED) {
       els.controllerError.classList.remove("hidden");
       els.controllerError.textContent =
-        (status.lastError.code ? status.lastError.code + ": " : "") +
+        (lastBridgeMode !== "native" && status.lastError.code ? status.lastError.code + ": " : "") +
         (status.lastError.message || "");
     } else {
       els.controllerError.classList.add("hidden");
@@ -1574,15 +1584,15 @@
   });
 
   els.controllerConnectBtn.addEventListener("click", async function () {
+    delete document.getElementById("transportMode").dataset.dirty;
     var port = Number(els.controllerPort.value);
     var token = els.controllerToken.value;
     els.controllerConnectBtn.disabled = true;
     try {
-      var response = await sendBridgeMessage({
-        type: PAGESENSE.BRIDGE_MESSAGES.CONNECT,
-        host: PAGESENSE.BRIDGE.DEFAULT_HOST,
-        port: port,
-        token: token
+      var nativeMode = document.getElementById("transportMode").value === "native";
+      var response = await sendBridgeMessage(nativeMode ? { type: PAGESENSE.BRIDGE_MESSAGES.START_NATIVE } : {
+        type: PAGESENSE.BRIDGE_MESSAGES.CONNECT, host: PAGESENSE.BRIDGE.DEFAULT_HOST,
+        port: port, token: token
       });
       if (response.status) {
         renderBridgeStatus(response.status);
@@ -1590,7 +1600,7 @@
       if (!response.ok && response.error) {
         showToast("连接失败：" + response.error.message, "error");
       } else {
-        showToast("正在连接 " + PAGESENSE.BRIDGE.DEFAULT_HOST + ":" + port, "success");
+        showToast(nativeMode ? "正在自动启动本地桥接…" : "正在连接 " + PAGESENSE.BRIDGE.DEFAULT_HOST + ":" + port, "success");
       }
       startBridgePolling();
     } finally {
@@ -1607,7 +1617,7 @@
       if (response.status) {
         renderBridgeStatus(response.status);
       }
-      showToast("已断开 Controller", "success");
+      showToast("连接已暂停，可点击按钮重新连接。", "success");
     } finally {
       els.controllerDisconnectBtn.disabled = false;
     }
@@ -1681,10 +1691,14 @@
   function pyString(value) { return JSON.stringify(String(value)).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029"); }
   function pythonPort() { var port = Number(els.controllerPort.value); return Number.isInteger(port) && port > 0 && port <= 65535 ? port : 8765; }
   function pythonPreamble() {
-    return 'from pagesense import PageSenseClient\n\nwith PageSenseClient(port=' + pythonPort() + ') as client:\n' +
-      '    print("Token:", client.token, flush=True)\n' +
-      '    if not client.wait_for_extension(timeout=60):\n        raise TimeoutError("请在插件中连接 Python")\n';
+    if (document.getElementById("transportMode").value === "legacy") {
+      return 'from pagesense import PageSenseClient\n\nwith PageSenseClient(mode="server", port=' + pythonPort() + ') as client:\n' +
+        '    print("Token:", client.token, flush=True)\n' +
+        '    if not client.wait_for_extension(timeout=60):\n        raise TimeoutError("请在插件中连接 Python")\n';
+    }
+    return 'from pagesense import PageSenseClient\n\nwith PageSenseClient() as client:\n';
   }
+
   function renderPython() {
     if (!state.picked) { els.pythonCode.textContent = ""; return; }
     var operation = { text: "text = target.text()\n    print(text)", click: "target.click()",
@@ -1817,6 +1831,11 @@
   }
   function updateExportSummary() {
     if (!els.exportSummary) return;
+    if (els.exportTarget.value === "all") {
+      els.exportSummary.textContent = "点击发送时重新扫描当前页面，包含全部结果和其他分页，不受当前筛选影响。";
+      els.sendPythonBtn.disabled = Boolean(exportInFlight) || !state.tab || PAGESENSE.inspectUrl(state.tab.url).restricted;
+      return;
+    }
     try {
       var data = exportSnapshot();
       els.exportSummary.textContent = data.elements.length + ' 个元素 / ' + data.page.url + '。发送的是本次快照。';
@@ -1830,12 +1849,26 @@
     var revision = state.pageRevision;
     els.sendPythonBtn.disabled = true; els.sendPickedBtn.disabled = true;
     try {
+      if (els.exportTarget.value === "all") {
+        els.exportStatus.textContent = "正在扫描当前页面的全部元素…";
+        var tab = await getActiveTab();
+        if (revision !== state.pageRevision || !state.tab || tab.id !== state.tab.id || tab.url !== state.tab.url)
+          throw new Error("页面已切换，请在当前页面重新发送。");
+        if (PAGESENSE.inspectUrl(tab.url).restricted) throw new Error("此页面不支持扫描，请切换到普通网页。");
+        await injectContentScripts(tab.id);
+        var scan = await requestScan(tab.id);
+        if (revision !== state.pageRevision) return;
+        acceptScan(scan, false);
+        if (els.exportTarget.value !== "all") throw new Error("发送范围已改变，请重新发送。");
+      }
       var data = exportSnapshot();
-      els.exportStatus.textContent = "正在发送，等待 Python 确认…";
+      els.exportStatus.textContent = "正在发送，等待本地收件确认…";
       var response = await sendBridgeMessage({ type: PAGESENSE.BRIDGE_MESSAGES.SEND_EXPORT, data: data });
       if (revision !== state.pageRevision) return;
       if (!response.ok) throw new Error((response.error || {}).message || "Python 未响应");
-      els.exportStatus.textContent = "Python 已收到 " + data.elements.length + " 个元素（尚未执行操作）。";
+      els.exportStatus.textContent = response.receipt && response.receipt.pythonConnected === false ?
+        "本地收件箱已收到 " + data.elements.length + " 个元素，Python 连接后即可获取（尚未执行操作）。" :
+        "Python 已收到 " + data.elements.length + " 个元素（尚未执行操作）。";
       showToast(els.exportStatus.textContent, "success");
     } catch (error) {
       if (revision === state.pageRevision) {
@@ -1851,6 +1884,24 @@
   });
   document.getElementById("copyStartupBtn").addEventListener("click", function () { els.copyReceiverBtn.click(); });
   renderReceiver(); updateExportSummary();
+
+  function syncTransportMode() {
+    var legacy = document.getElementById("transportMode").value === "legacy";
+    document.getElementById("legacyConfig").classList.toggle("hidden", !legacy);
+    els.controllerConnectBtn.textContent = legacy ? "连接 Python" : "重试自动连接";
+    renderPython(); renderReceiver();
+  }
+  document.getElementById("transportMode").addEventListener("change", function () {
+    document.getElementById("transportMode").dataset.dirty = "true";
+    syncTransportMode();
+    // Keep the chosen draft until the user explicitly connects this mode.
+  });
+  var installCommand = 'python -m pip install -r requirements.txt\npython install_bridge.py --extension-id ' + chrome.runtime.id;
+  document.getElementById("installCommand").textContent = installCommand;
+  document.getElementById("copyInstallBtn").addEventListener("click", async function () {
+    var copied = await copyText(installCommand); showToast(copied ? "安装命令已复制" : "复制失败", copied ? "success" : "error");
+  });
+  syncTransportMode();
 
   // Show the connection state even before the panel is expanded.
   startBridgePolling();

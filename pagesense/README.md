@@ -26,7 +26,9 @@ PageSense 是一个基于 **Chrome / Edge + Manifest V3 + 原生 JavaScript** �
 侧栏分为“页面概览 / 元素检查 / Python 对接”。概览显示页面几何分布、搜索和分页列表；
 点选网页或从列表“检查 / Python”进入统一检查器，查看唯一定位候选、属性、层级、坐标和 HTML，
 并复制可运行的 Python 代码。“Python 对接”可发送选中元素、完整扫描或跨分页的筛选结果，
-后端使用 `wait_for_export()` 收件，用 `client.element(element)` 或 `client.locator(css)` 操作。
+后端使用 `wait_for_export()` 收件，用 `client.element(element)` 或 `client.locator(css)` 操作。默认发送当前页面全部扫描元素，会先重新扫描、不受查询或分页影响。
+
+插件默认通过 Native Messaging 自动启动本地桥接。首次按[自动桥接](../docs/native-bridge.md)注册后，Python 直接使用 PageSenseClient()，无需单独启动 server.py 或手动配对 Token。旧模式在连接方式中保留。
 
 完整使用流程、发送范围与定位限制见[元素工作台说明](../docs/element-workbench.md)。
 

@@ -3,18 +3,13 @@
 PageSense V2.0 的 **Python 侧 Controller**：一个本地 WebSocket 服务，把浏览器里的
 PageSense 扩展暴露成一组可编程的 Python 接口。
 
-它只做两件事：**传输** 与 **结构化 API**。
+默认由插件通过 Native Messaging 启动本地桥接，业务 Python 是客户端。它只提供**传输**与**结构化 API**。
 浏览器 DOM 的读取与操作全部仍由 PageSense 扩展完成 —— Controller 不使用
 Selenium / Playwright / CDP，也不直接接触浏览器。
 
-```
-Python Controller  (WebSocket Server, 127.0.0.1:8765)
-        ↕  ws
-PageSense Extension (WebSocket Client, Service Worker)
-        ↕  chrome.tabs.sendMessage
-Content Script: Scanner / Element Search / Highlighter / Action Executor
-        ↕
-      Browser DOM
+```text
+Python 业务客户端 ↔ 本地 Host（浏览器启动）↔ Native Messaging ↔ 扩展 → DOM
+兼容旧模式：Python Server ↔ WebSocket ↔ 扩展 → DOM
 ```
 
 ---
@@ -30,102 +25,63 @@ pip install -r requirements.txt
 
 ---
 
-## 启动
+## 默认：插件启动桥接，Python 直接连接
 
-```bash
-python server.py
-```
+首次在本目录运行 `python install_bridge.py`，重新加载插件并点击“重试自动连接”。
+安装器会匹配本项目已安装扩展的 ID；也可从插件复制带扩展 ID 的安装命令。
+仅注册当前用户的 Chrome / Edge Native Messaging Host，不需要管理员。
 
-输出：
-
-```
-PageSense Controller
-Listening: 127.0.0.1:8765
-Token: 3F9A21C4B7E05D18
-
-Waiting for extension...
-
-输入 help 查看命令。
-
->
-```
-
-> **token 每次启动随机生成**，不会写进任何源码。把这一行的 token 复制到
-> 侧栏“Python 对接”的连接配置里，点击「连接 Python」。
-
-可选参数：
-
-```bash
-python server.py --port 8765          # 端口（默认 8765）
-python server.py --token MYTOKEN      # 固定 token（便于反复调试）
-python server.py --timeout 10         # 单请求超时秒数（默认 10）
-python server.py --no-cli             # 只启动服务，不进入交互 CLI
-```
-
-`python cli.py` 与 `python server.py` 等价。
-
----
-
-## 连接扩展
-
-1. 浏览器加载 `pagesense/` 扩展（见上级 README）
-2. 打开 PageSense 侧栏 → **Python 对接** → 展开 **连接本地 Python**
-3. 填入 `server.py` 打印的 token，确认端口是 `8765`
-4. 点击 **连接 Python**
-
-连接成功后：
-
-```
-Controller
-● 已连接
-127.0.0.1:8765
-```
-
-Controller 端同时打印：
-
-```
-PageSense connected
-version=2.0.0
-```
-
-连接状态只有四种：`DISCONNECTED` / `CONNECTING` / `CONNECTED` / `ERROR`。
-
----
-
-## 先选元素，再写 Python
-
-侧栏点选元素后可复制完整 Python 脚本，不需要先扫描。`client.locator(css)` 每次操作
-重新解析原生 CSS，要求唯一匹配，并将页面身份传入 Action Executor。它不包含自动等待或重试。
+之后打开插件，直接运行自己的 Python 脚本：
 
 ```python
-target = client.locator('[data-testid="search-order"]')
-target.click()
-client.locator('input[name="order"]').input("PS-1001")
-text = client.locator("#status").text()
+from pagesense import PageSenseClient
+
+with PageSenseClient() as client:
+    page = client.scan(scope="content")
+    print(len(page["elements"]))
+    # 用真实网页的唯一 CSS：
+    client.locator('[data-testid="search-order"]').click()
 ```
 
-侧栏还可主动发送选中元素、整个扫描或筛选后的全部结果：
+`PageSenseClient()` 只连接浏览器自动启动的 Host，不监听端口，不需 server.py、手动 Token 或
+`wait_for_extension()`。关闭业务脚本保留浏览器桥接，断线不重放命令；可重新 start() 连接。
+同一浏览器会话限一个业务客户端，多个浏览器需通过 session_id / extension_id 明确选择。
+
+## 发送当前页面全部扫描元素
+
+插件“发送到 Python”默认会重新扫描当前页面，并发送当前扫描范围内全部元素，包含其他分页、
+不受搜索过滤影响。未手动扫描也可以直接发送，Python 未运行时先保存在本地 Host 的内存收件箱。
 
 ```python
-snapshot = client.wait_for_export(timeout=120)
-element = snapshot["elements"][0]  # 业务代码自行选择目标
-client.element(element).locate()
-text = client.element(element).text()
+from pagesense import PageSenseClient
+
+with PageSenseClient() as client:
+    snapshot = client.wait_for_export(timeout=120)
+    print(snapshot["page"]["url"], len(snapshot["elements"]))
+    element = snapshot["elements"][0]  # 业务代码自行选择目标
+    client.element(element).locate()
+    text = client.element(element).text()
 ```
 
-这些示例使用已经启动且连接的 `client`。每个 `PageSenseClient` 自带本地服务，
-同端口不要与 `server.py` 同时启动。完整启动代码和 UI 流程见[元素工作台](../docs/element-workbench.md)。
+ACK 只表示入箱，不代表已执行；最多 8 份、总计 64 MiB，满时拒绝不覆盖。
+收件默认等 60 秒，超时抛 TimeoutError；关闭浏览器/Host 会丢失未消费数据。
+扫描结果可超过 1 MiB；发往插件的单条命令受 Native Messaging 1 MiB 上限约束，超限执行前拒绝。
 
-`client.element(element)` 和接受字典的 `click/inspect/input/clear/keypress/locate/highlight`
-携带 `pageId`，换页返回 `STALE_PAGE`。兼容旧式数字 ID 的接口仍不防跨页面误用；
-请传整个元素字典或使用 `locator()`。`read_text(element)` / `element.text()` 返回最多
-20000 字符，不操作系统剪贴板；`inspect()` 可查看截断标记。
+## 定位与读取
 
-主动发送的协议为 `EXPORT {id, data}` / `EXPORT_ACK {id, success, error?}`，仅在认证连接上使用；
-ACK 表示进入内存收件箱，尚未执行。最多 8 份及总计 64 MiB，满时拒绝而不覆盖；
-`wait_for_export()` 默认等待 60 秒，超时抛 `TimeoutError`。停止服务后收件箱丢失。
-新 `RESOLVE_ELEMENT {selector}` 返回详情、候选定位器与页面句柄；零/多命中分别为
-`ELEMENT_NOT_FOUND` / `AMBIGUOUS_SELECTOR`，无效 CSS 为 `INVALID_SELECTOR`。
+`client.locator(css)` 每次操作解析原生 CSS，恰好一个节点才能执行，无需先扫描；不含自动等待。
+支持 click/input/clear/keypress/locate/highlight/inspect/text。`client.element(element)` 固定快照
+中的 elementId + pageId；换页返回 STALE_PAGE，不猜测替代目标。旧式纯数字 ID 仍保留跨页风险。
+`read_text(element)` / `element.text()` 返回最多 20000 字符，不操作系统剪贴板；inspect() 可查截断标记。
+
+## 兼容：手动 WebSocket 服务与 CLI
+
+旧方式保留：运行 `python server.py`（或 `python cli.py`），在插件选择“手动 WebSocket（兼容旧脚本）”，
+填入端口和该服务打印的 Token。原参数 --host / --port / --token / --timeout / --no-cli 不变。
+若业务代码需要自行启动旧服务，使用 `PageSenseClient(mode="server", port=8765)`；from_server() 仍可包装已有服务。
+默认模式使用自定义 host/port/token 会要求显式选择 server 模式，不会静默忽略配置。
+
+完整安装、生命周期、多会话、协议与验证见[自动桥接说明](../docs/native-bridge.md)和[元素工作台](../docs/element-workbench.md)。
 
 ## CLI 命令
 

@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "controller"))
 from pagesense import PageSenseClient
 
-with PageSenseClient(port=0) as client:
+with PageSenseClient(mode="server", port=0) as client:
     print(json.dumps({"port": client.server.port, "token": client.token}), flush=True)
     for line in sys.stdin:
         command = json.loads(line)

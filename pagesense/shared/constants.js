@@ -436,6 +436,8 @@
     EXPORT_ACK: "EXPORT_ACK"
   };
 
+  PS.NATIVE = { HOST: "com.pagesense.bridge", MODE_KEY: "pagesenseTransportMode" };
+
   PS.BRIDGE = {
     /** Protocol version string exchanged during HELLO. */
     PROTOCOL: "pagesense/1",
@@ -485,7 +487,8 @@
     CONNECT: "PAGESENSE_BRIDGE_CONNECT",
     DISCONNECT: "PAGESENSE_BRIDGE_DISCONNECT",
     SET_CONFIG: "PAGESENSE_BRIDGE_SET_CONFIG",
-    SEND_EXPORT: "PAGESENSE_BRIDGE_SEND_EXPORT"
+    SEND_EXPORT: "PAGESENSE_BRIDGE_SEND_EXPORT",
+    START_NATIVE: "PAGESENSE_BRIDGE_START_NATIVE"
   };
 
   /** chrome.storage.local keys holding the bridge configuration. */

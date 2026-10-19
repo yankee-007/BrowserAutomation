@@ -216,3 +216,6 @@ kbd { font: 10px "Segoe UI", sans-serif; color: var(--ps-text-muted); border: 1p
 body[data-view=python] .capture-tools { display: none; }
 .connection-guide { margin: 12px 0; }
 .connection-guide summary { color: var(--ps-text-muted); }
+
+.transport-mode-label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; margin: 12px 0; }
+.install-command { font-size: 11px; }

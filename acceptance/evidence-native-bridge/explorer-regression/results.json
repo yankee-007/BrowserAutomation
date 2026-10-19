@@ -1,0 +1,94 @@
+{
+  "verifiedAt": "2026-10-19T11:21:50.902Z",
+  "browser": "Chrome/155.0.8059.84",
+  "node": "v24.20.0",
+  "sourceHashes": {
+    "shared/constants.js": "53a86dc6a0f0b6b139b60681e6820d5c3a6b91e46cd5eb6d8291a2c5164e2c9a",
+    "content/scanner.js": "c34bb58e60d5de9f6d1ae27e6be0d6745a00d6ba1af7a997b7c61390abeacfbf",
+    "content/element-search.js": "24e1ce6fb81f79ce0e7785fdfed0be5da3b6638e65741d6746b18914cb84ced2",
+    "content/content.js": "9762c9ced9ce81f1435a92e2a7eff9331476caa83005789f56785ef371810f87",
+    "popup/popup.js": "1783c664beb2d380655788f07bcdc0ee3df022ae2f9d275f04f22629aa7545fe",
+    "popup/popup.html": "ed73afd1b6faaf5d5fb5be8bd8238f02ed7c1517e3004aae8f32d2cc6e5aa108",
+    "popup/popup.css": "b5c90d15fe088d33f3077092f6c3c4d3cacd31b7be419d5714aa113deaa88405",
+    "bridge/controller-bridge.js": "edf1cb4b1a9631379c791ab0e69fe51aaa7f1efa78ef93ecf37f8b1678fa8466"
+  },
+  "results": [
+    {
+      "name": "Default content scan includes text/media/structure/controls; card rendering paginated",
+      "details": {
+        "total": 281,
+        "categories": {
+          "region": 2,
+          "heading": 2,
+          "paragraph": 260,
+          "button": 1,
+          "label": 1,
+          "input": 1,
+          "select": 2,
+          "toggle": 1,
+          "editable": 1,
+          "image": 1,
+          "list": 2,
+          "table": 5,
+          "text": 2
+        }
+      }
+    },
+    {
+      "name": "All 257 search matches reachable across pages without duplicates or an overall cap"
+    },
+    {
+      "name": "Search finds text beyond the 300-character card preview"
+    },
+    {
+      "name": "Tag/class/attributes/CSS intersect; details, escaped unique selector, copy payloads and highlight work"
+    },
+    {
+      "name": "Invalid CSS/JSON are explicit errors; clear and group/subtype filtering work"
+    },
+    {
+      "name": "CSS result membership refreshes with live content changes and stable IDs"
+    },
+    {
+      "name": "Interactive and all-visible-DOM scopes rescan correctly"
+    },
+    {
+      "name": "Real Python client ↔ WebSocket ↔ extension supports scopes, page 3, CSS/attrs, accurate indexSize and inspect"
+    },
+    {
+      "name": "Detailed card and query controls fit width 320",
+      "details": {
+        "width": 320,
+        "documentWidth": 320,
+        "mainWidth": 305,
+        "mainScrollWidth": 305
+      }
+    },
+    {
+      "name": "Detailed card and query controls fit width 400",
+      "details": {
+        "width": 400,
+        "documentWidth": 400,
+        "mainWidth": 385,
+        "mainScrollWidth": 385
+      }
+    },
+    {
+      "name": "Detailed card and query controls fit width 600",
+      "details": {
+        "width": 600,
+        "documentWidth": 600,
+        "mainWidth": 585,
+        "mainScrollWidth": 585
+      }
+    },
+    {
+      "name": "5000 DOM text records scanned without count cap; final page reachable",
+      "details": {
+        "total": 5283,
+        "scanMs": 388
+      }
+    }
+  ],
+  "errors": []
+}

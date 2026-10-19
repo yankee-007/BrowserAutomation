@@ -65,6 +65,10 @@ async function exportFromPanel(kind) {
   panel.on("pageerror", error => errors.push(error.message));
   await wait(() => document.getElementById("currentPageUrl").textContent.includes("/workbench"));
   await panel.setViewport({ width: 400, height: 900 });
+  await panel.click("#tab-python");
+  await panel.select("#transportMode", "legacy");
+  await panel.select("#exportTarget", "selected");
+  await panel.click("#tab-explore");
   await panel.screenshot({ path: path.join(EVIDENCE, "empty-400.png") });
   assert.equal(await panel.$eval("#sendPythonBtn", el => el.disabled), true);
   await panel.click("#pickElementBtn");
@@ -97,7 +101,7 @@ async function exportFromPanel(kind) {
   pass("Locator validation highlights one element and reports missing, ambiguous and invalid CSS without clicking");
 
   await panel.click("#sendPickedBtn");
-  await wait(() => document.getElementById("exportStatus").textContent.includes("请先连接"));
+  await wait(() => document.getElementById("exportStatus").textContent.startsWith("发送失败"));
   controller = spawn(PYTHON, ["-u", path.join(__dirname, "ui-workbench-controller.py")], {
     windowsHide: true, stdio: ["pipe", "pipe", "pipe"], env: { ...process.env, PYTHONIOENCODING: "utf-8" } });
   controller.stderr.on("data", chunk => process.stderr.write(chunk));

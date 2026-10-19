@@ -8,7 +8,8 @@
     "activeTab",
     "scripting",
     "storage",
-    "sidePanel"
+    "sidePanel",
+    "nativeMessaging"
   ],
   "host_permissions": [
     "http://*/*",

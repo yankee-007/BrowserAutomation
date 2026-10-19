@@ -1,0 +1,49 @@
+{
+  "verifiedAt": "2026-10-19T11:30:42.635Z",
+  "browser": "Chrome/155.0.8059.84",
+  "results": [
+    {
+      "name": "Automatic mode and complete-page export are default; missing host has a concrete install command"
+    },
+    {
+      "name": "Browser starts the actual registered native host; legacy Python server is absent"
+    },
+    {
+      "name": "Python connects without server/token setup, receives prequeued full-page data and executes DOM operations"
+    },
+    {
+      "name": "Default send refreshes the current page and includes all records despite search/category/pagination"
+    },
+    {
+      "name": "Commands exceeding the native 1 MiB outbound limit fail before execution"
+    },
+    {
+      "name": "Complete scan payload exceeding 1 MiB crosses the actual native messaging path without truncation",
+      "data": {
+        "elements": 2333
+      }
+    },
+    {
+      "name": "Copied Python is client-only and connection/send controls fit 320/400/600px"
+    },
+    {
+      "name": "Client exit/reconnect preserves host, old handles fail on another page, and exact generated Python executes directly"
+    },
+    {
+      "name": "Closing the browser terminates its host and removes its own discovery credential"
+    }
+  ],
+  "errors": [],
+  "sourceHashes": {
+    "pagesense/bridge/native-bridge.js": "987f97180c66cebf4640f0da33ce0e572c4243f60e38bcbe05ed0a965b7718d2",
+    "pagesense/background/service-worker.js": "24e5edd32207dee53fbdab473b90c479793e80f3bdceb7a07264e481356afb81",
+    "pagesense/popup/popup.js": "1b13c1faa2954c34ababd16084032a07b92ad6b10359e1902c086e8b36dd2b69",
+    "pagesense/popup/popup.html": "ed73afd1b6faaf5d5fb5be8bd8238f02ed7c1517e3004aae8f32d2cc6e5aa108",
+    "pagesense/popup/popup.css": "b5c90d15fe088d33f3077092f6c3c4d3cacd31b7be419d5714aa113deaa88405",
+    "pagesense/manifest.json": "fba08d60031cba45f34f4209960dbdade8d8550d99255cfa15b08c389e810afe",
+    "controller/native_host.py": "43b3dc1208c1a8c656bac7bb077b15ec82cc73b45adbec42e90a57db9f112f61",
+    "controller/native_client.py": "8ab26116406cd56be74f56ca8d9e7900a2337b80d4a18f54ae2bde04c5d151f4",
+    "controller/install_bridge.py": "c4f8b5616bae35a8e0f2b3d52e67f12f5929108736bceaf535dd3d5d3f5db01a",
+    "controller/pagesense.py": "df85ca26743f769566b0c6c8ae66bba6ab2ff1fb8578064fc89ba2914f1e000e"
+  }
+}

@@ -19,6 +19,8 @@ task-worktree 下任务记录通常先存在各自分支，集成分支 `main` �
 
 ## 已完成任务
 
+- [TASK-20261019-c82ab49d1e06：插件自动桥接与默认整页发送](TASK-20261019-c82ab49d1e06-native-bridge.md)：Native Messaging 启动 Host、Python 默认客户端、默认完整重扫发送、Windows 注册器和兼容模式完成；真实浏览器与 Python 证据在 `acceptance/evidence-native-bridge/`。
+
 - [TASK-20261019-7bf19c8e3a42：元素工作台与 Python 定位流程](TASK-20261019-7bf19c8e3a42-ui-workbench.md)：三工作区、分布图、统一检查器、Python 代码生成、三种数据发送和页面句柄保护完成；Chrome 实测证据在 `acceptance/evidence-ui-workbench/`。
 
 - [TASK-20261018-2779796d58e0：页面点选元素](TASK-20261018-2779796d58e0-element-picker.md)：按钮、悬停预览、点选详情、取消与生命周期验证完成；证据在 `acceptance/evidence-element-picker/`。
